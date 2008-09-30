@@ -1,8 +1,13 @@
 <?php
 /**
+ * Provides a Formfield for saving a string of tags into either
+ * a many_many relationship or a text property.
+ * By default, tags are separated by whitespace.
+ *
  * Features:
  * - Bundled with jQuery-based autocomplete library which is applied to a textfield
  * - Autosuggest functionality (currently JSON only)
+ * 
  * @author Ingo Schommer, SilverStripe Ltd. (<firstname>@silverstripe.com)
  * @package formfields
  * @subpackage tagfield
@@ -33,9 +38,13 @@ class TagField extends TextField {
 	protected $tagSort;
 	
 	/**
-	 * @var $separator 
+	 * @var $separator Determines on which character to split tags in a string.
 	 */
 	protected $separator = ' ';
+	
+	protected static $separator_to_regex = array(
+		' ' => '\s',
+	);
 	
 	/**
 	 * @var array $customTags Override the tagging behaviour with a custom set
@@ -76,7 +85,7 @@ class TagField extends TextField {
 		} else if($tagTopicClassObj->hasField($this->Name())) {
 			$tags = $this->getTextbasedTags($searchString);
 		} else {
-			user_error('TagField::suggest(): Cant find valid relation or text property with name "' . $this->Name . '"', E_USER_ERROR);
+			user_error('TagField::suggest(): Cant find valid relation or text property with name "' . $this->Name() . '"', E_USER_ERROR);
 		}
 		
 		return Convert::raw2json($tags);
@@ -85,7 +94,7 @@ class TagField extends TextField {
 	function saveInto($record) {		
 		if($this->value) {
 			// $record should match the $tagTopicClass
-			if($record->many_many($this->Name()) {
+			if($record->many_many($this->Name())) {
 				$this->saveIntoObjectTags($record);
 			} elseif($record->hasField($this->Name())) {
 				$this->saveIntoTextbasedTags($record);
@@ -97,7 +106,6 @@ class TagField extends TextField {
 	
 	protected function saveIntoObjectTags($record) {
 		$tagsArr = $this->splitTagsToArray($this->value);
-		
 		$relationName = $this->Name();
 		$existingTagsComponentSet = $record->$relationName();
 		$tagClass = $this->getTagClass();
@@ -113,12 +121,12 @@ class TagField extends TextField {
 			$tagObj = DataObject::get_one($tagClass, $SQL_filter);
 			if(!$tagObj) {
 				$tagObj = new $tagClass();
-				$tagObj->{$this->tagObjectField} = $this->value;
-				$tabObj->write();
+				$tagObj->{$this->tagObjectField} = $tagString;
+				$tagObj->write();
 			}
 			$tagsToAdd[] = $tagObj;
 		}
-		
+
 		// remove all before readding
 		$existingTagsComponentSet->removeAll();
 		$existingTagsComponentSet->addMany($tagsToAdd);
@@ -126,11 +134,19 @@ class TagField extends TextField {
 	
 	protected function saveIntoTextbasedTags($record) {
 		$tagFieldName = $this->Name();
-		$record->$tagFieldName = $this->value;
+		
+		// necessary step to filter whitespace etc.
+		$RAW_tagsArr = $this->splitTagsToArray($this->value);
+		$record->$tagFieldName = $this->combineTagsFromArray($RAW_tagsArr);
 	}
 	
 	protected function splitTagsToArray($tagsString) {
-		return array_unique(split("*" . escape($this->separator) . "*", trim($tagsString)));
+		$separator = (isset(self::$separator_to_regex[$this->separator])) ? self::$separator_to_regex[$this->separator] : $this->separator;
+		return array_unique(preg_split('/\s*' . $separator . '\s*/', trim($tagsString)));
+	}
+	
+	protected function combineTagsFromArray($tagsArr) {
+		return implode($this->separator, $tagsArr);
 	}
 	
 	/**

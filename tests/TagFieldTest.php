@@ -4,19 +4,50 @@
  * @package testing
  * 
  * @todo Test filtering and sorting
+ * @todo Test custom tags
+ * @todo Test custom separators
  */
 class TagFieldTest extends FunctionalTest {
 	
+	static $fixture_file = 'tagfield/tests/TagFieldTest.yml';
+	
 	function testExistingObjectSaving() {
-		
+		// should contain "tag1" and "tag2"
+		$existingEntry = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		$field->setValue('tag1   tag3 ');
+		$field->saveInto($existingEntry);
+		$existingEntry->write();
+		$this->assertEquals(
+			array_values($existingEntry->Tags()->map('ID', 'Title')),
+			array('tag1','tag3')
+		);
 	}
 	
 	function testNewObjectSaving() {
-		
+		$newEntry = new TagFieldTest_BlogEntry();
+		$newEntry->write();
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		$field->setValue('tag1 tag2'); // test separator handling as well
+		$field->saveInto($newEntry);
+
+		$this->assertEquals(
+			array_values($newEntry->Tags()->map('ID', 'Title')),
+			array('tag1','tag2')
+		);
 	}
 	
 	function testTextbasedSaving() {
-		
+		// should contain "tag1" and "tag2"
+		$existingEntry = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
+		$field = new TagField('TextbasedTags', null, null, 'TagFieldTest_BlogEntry');
+		$field->setValue('tag1   tag3 '); // test separator handling as well
+		$field->saveInto($existingEntry);
+		$existingEntry->write();
+		$this->assertEquals(
+			$existingEntry->TextbasedTags,
+			'tag1 tag3'
+		);
 	}
 	
 	function testObjectSuggest() {
