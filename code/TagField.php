@@ -60,18 +60,19 @@ class TagField extends TextField {
 	
 	public function Field() {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
+		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery_improvements.js");
 		Requirements::javascript("tagfield/javascript/jquery.tags.js");
 		Requirements::css("tagfield/css/TagField.css");
 		
 		if($this->customTags) {
 			Requirements::customScript("jQuery(document).ready(function() {
-				$('#" . $this->id() . "').tagSuggest({
+				jQuery('#" . $this->id() . "').tagSuggest({
 					tags: " . Convert::raw2json($this->customTags) . "
 				});
 			});");
 		} else {
 			Requirements::customScript("jQuery(document).ready(function() {
-				$('#" . $this->id() . "').tagSuggest({
+				jQuery('#" . $this->id() . "').tagSuggest({
 				    url: '" . $this->Link() . "/suggest',
 					separator: '" . $this->separator . "'
 				});
