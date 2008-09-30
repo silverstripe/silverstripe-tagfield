@@ -64,7 +64,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest', 
 			null,
-			array('Tags' => 'tag')
+			array('tag' => 'tag')
 		);
 		$this->assertEquals($field->suggest($request), '["tag1","tag2"]');
 		
@@ -73,7 +73,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
 			null,
-			array('Tags' => 'tag1')
+			array('tag' => 'tag1')
 		);
 		
 		$this->assertEquals($field->suggest($request), '["tag1"]');
@@ -83,7 +83,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
 			null,
-			array('Tags' => 'TAG1')
+			array('tag' => 'TAG1')
 		);
 		$this->assertEquals($field->suggest($request), '["tag1"]');
 		
@@ -92,7 +92,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
 			null,
-			array('Tags' => 'unknown')
+			array('tag' => 'unknown')
 		);
 		$this->assertEquals($field->suggest($request), '[]');
 	}
@@ -105,7 +105,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
-			array('TextbasedTags' => 'tag')
+			array('tag' => 'tag')
 		);
 		$this->assertEquals($field->suggest($request), '["textbasedtag1","textbasedtag2"]');
 		
@@ -114,7 +114,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
-			array('TextbasedTags' => 'tag1')
+			array('tag' => 'tag1')
 		);
 		$this->assertEquals($field->suggest($request), '["textbasedtag1"]');
 		
@@ -123,7 +123,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
-			array('TextbasedTags' => 'TAG1')
+			array('tag' => 'TAG1')
 		);
 		$this->assertEquals($field->suggest($request), '["textbasedtag1"]');
 		
@@ -132,7 +132,7 @@ class TagFieldTest extends FunctionalTest {
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
-			array('TextbasedTags' => 'unknown')
+			array('tag' => 'unknown')
 		);
 		$this->assertEquals($field->suggest($request), '[]');
 	}

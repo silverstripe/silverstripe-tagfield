@@ -48,7 +48,7 @@ class TagField extends TextField {
 	
 	/**
 	 * @var array $customTags Override the tagging behaviour with a custom set
-	 * used by {@link suggest()}.
+	 * which is used by the javascript library directly instead of querying {@link suggest()}.
 	 */
 	protected $customTags;
 	
@@ -62,11 +62,21 @@ class TagField extends TextField {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
 		Requirements::javascript("tagfield/javascript/jquery.tags.js");
 		Requirements::css("tagfield/css/TagField.css");
-		Requirements::customScript("jQuery(document).ready(function() {
-			$('#" . $this->id() . "').tagSuggest({
-			    url: '" . $this->Link() . "/suggest'
-			});
-		});");
+		
+		if($this->customTags) {
+			Requirements::customScript("jQuery(document).ready(function() {
+				$('#" . $this->id() . "').tagSuggest({
+					tags: " . Convert::raw2json($this->customTags) . "
+				});
+			});");
+		} else {
+			Requirements::customScript("jQuery(document).ready(function() {
+				$('#" . $this->id() . "').tagSuggest({
+				    url: '" . $this->Link() . "/suggest',
+					separator: '" . $this->separator . "'
+				});
+			});");
+		}
 		
 		return parent::Field();
 	}
@@ -79,7 +89,7 @@ class TagField extends TextField {
 	public function suggest($request) {
 		$tagTopicClassObj = singleton($this->tagTopicClass);
 		
-		$searchString = $request->requestVar($this->Name());
+		$searchString = $request->requestVar('tag');
 		
 		if($this->customTags) {
 			$tags = $this->customTags;
@@ -152,7 +162,7 @@ class TagField extends TextField {
 	}
 	
 	protected function combineTagsFromArray($tagsArr) {
-		return implode($this->separator, $tagsArr);
+		return ($tagsArr) ? implode($this->separator, $tagsArr) : array();
 	}
 	
 	/**
@@ -235,6 +245,14 @@ class TagField extends TextField {
 	
 	public function getSeparator() {
 		return $this->separator;
+	}
+	
+	public function setCustomTags($tags) {
+		$this->customTags = $tags;
+	}
+	
+	public function getCustomTags() {
+		return $this->customTags;
 	}
 	
 }
