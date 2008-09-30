@@ -49,41 +49,92 @@ class TagFieldTest extends FunctionalTest {
 			'tag1 tag3'
 		);
 	}
-	
-	function testObjectSuggest() {
+	/*
+	function testSuggestRequest() {
 		// partial
 		$response = $this->post('TagFieldTestController/ObjectTestForm/fields/Tags/suggest', array('tag','tag'));
 		$this->assertEquals($response->getBody(), '["tag1","tag2"]');
+	}
+	*/
+	function testObjectSuggest() {
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		
+		// partial
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest', 
+			null,
+			array('Tags' => 'tag')
+		);
+		$this->assertEquals($field->suggest($request), '["tag1","tag2"]');
 		
 		// full
-		$response = $this->post('TagFieldTestController/ObjectTestForm/fields/Tags/suggest', array('tag','tag1'));
-		$this->assertEquals($response->getBody(), '["tag1"]');
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
+			null,
+			array('Tags' => 'tag1')
+		);
+		
+		$this->assertEquals($field->suggest($request), '["tag1"]');
 		
 		// case insensitive
-		$response = $this->post('TagFieldTestController/ObjectTestForm/fields/Tags/suggest', array('tag','TAG1'));
-		$this->assertEquals($response->getBody(), '["tag1"]');
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
+			null,
+			array('Tags' => 'TAG1')
+		);
+		$this->assertEquals($field->suggest($request), '["tag1"]');
 		
 		// no match
-		$response = $this->post('TagFieldTestController/ObjectTestForm/fields/Tags/suggest', array('tag','unknown'));
-		$this->assertEquals($response->getBody(), '[]');
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
+			null,
+			array('Tags' => 'unknown')
+		);
+		$this->assertEquals($field->suggest($request), '[]');
 	}
 	
 	function testTextbasedSuggest() {
+		$field = new TagField('TextbasedTags', null, null, 'TagFieldTest_BlogEntry');
+		
 		// partial
-		$response = $this->post('TagFieldTestController/TextbasedTestForm/fields/Tags/suggest', array('tag','tag'));
-		$this->assertEquals($response->getBody(), '["tag1","tag2"]');
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			null,
+			array('TextbasedTags' => 'tag')
+		);
+		$this->assertEquals($field->suggest($request), '["textbasedtag1","textbasedtag2"]');
 		
 		// full
-		$response = $this->post('TagFieldTestController/TextbasedTestForm/fields/Tags/suggest', array('tag','tag1'));
-		$this->assertEquals($response->getBody(), '["tag1"]');
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			null,
+			array('TextbasedTags' => 'tag1')
+		);
+		$this->assertEquals($field->suggest($request), '["textbasedtag1"]');
 		
 		// case insensitive
-		$response = $this->post('TagFieldTestController/TextbasedTestForm/fields/Tags/suggest', array('tag','TAG1'));
-		$this->assertEquals($response->getBody(), '["tag1"]');
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			null,
+			array('TextbasedTags' => 'TAG1')
+		);
+		$this->assertEquals($field->suggest($request), '["textbasedtag1"]');
 		
 		// no match
-		$response = $this->post('TagFieldTestController/TextbasedTestForm/fields/Tags/suggest', array('tag','unknown'));
-		$this->assertEquals($response->getBody(), '[]');
+		$request = new HTTPRequest(
+			'get',
+			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			null,
+			array('TextbasedTags' => 'unknown')
+		);
+		$this->assertEquals($field->suggest($request), '[]');
 	}
 	
 }

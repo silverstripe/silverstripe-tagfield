@@ -6,10 +6,10 @@ TagFieldTest_Tag:
 TagFieldTest_BlogEntry:
    blogentry1:
       Title: blogentry1
-      Tags: => TagFieldTest_Tag.tag1,TagFieldTest_Tag.tag2
+      Tags: =>TagFieldTest_Tag.tag1,=>TagFieldTest_Tag.tag2
    blogentry2:
        Title: blogentry2
-       Tags: => TagFieldTest_Tag.tag1
+       Tags: =>TagFieldTest_Tag.tag1
    blogentry3:
       Title: blogentry3
    blogentry4:

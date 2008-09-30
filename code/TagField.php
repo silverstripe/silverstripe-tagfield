@@ -61,7 +61,8 @@ class TagField extends TextField {
 	public function Field() {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
 		Requirements::javascript("tagfield/javascript/jquery.tags.js");
-		Requirements::customScript("$.ready(function() {
+		Requirements::css("tagfield/css/TagField.css");
+		Requirements::customScript("jQuery(document).ready(function() {
 			$('#" . $this->id() . "').tagSuggest({
 			    url: '" . $this->Link() . "/suggest'
 			});
@@ -71,13 +72,15 @@ class TagField extends TextField {
 	}
 	
 	/**
+	 * Helper for autocompletion in javascript library.
+	 * 
 	 * @return string JSON array
 	 */
 	public function suggest($request) {
 		$tagTopicClassObj = singleton($this->tagTopicClass);
 		
 		$searchString = $request->requestVar($this->Name());
-
+		
 		if($this->customTags) {
 			$tags = $this->customTags;
 		} else if($tagTopicClassObj->many_many($this->Name())) {
@@ -105,6 +108,9 @@ class TagField extends TextField {
 	}
 	
 	protected function saveIntoObjectTags($record) {
+		// HACK We can't save relationship tables without having an ID
+		if(!$record->isInDB()) $record->write();
+		
 		$tagsArr = $this->splitTagsToArray($this->value);
 		$relationName = $this->Name();
 		$existingTagsComponentSet = $record->$relationName();
@@ -187,17 +193,24 @@ class TagField extends TextField {
 			Convert::raw2sql($searchString)
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
-		
+
 		$allTopicObjs = DataObject::get($this->tagTopicClass, $SQL_filter, $this->tagSort);
-		$multipleTagsArr = ($allTopicObjs) ? array_values($allTopicObjs->map('ID', $this->Name)) : array();
-		$tagArr = array();
+		$multipleTagsArr = ($allTopicObjs) ? array_values($allTopicObjs->map('ID', $this->Name())) : array();
+		$filteredTagArr = array();
 		foreach($multipleTagsArr as $multipleTags) {
-			$tagArr += $this->splitTagsToArray($multipleTags);
+			$singleTagsArr = $this->splitTagsToArray($multipleTags);
+			foreach($singleTagsArr as $singleTag) {
+				// only add those tags of the whole string which
+				// match the search terms
+				if(stripos($singleTag, $searchString) !== false) {
+					$filteredTagArr[] = $singleTag;
+				}
+			}
 		}
 		// remove duplicates (retains case sensitive duplicates)
-		$tagArr = array_unique($tagArr);
+		$filteredTagArr = array_unique($filteredTagArr);
 		
-		return $tagArr;
+		return $filteredTagArr;
 	}
 	
 	public function setTagFilter($sql) {
