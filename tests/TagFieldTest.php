@@ -137,6 +137,20 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($field->suggest($request), '[]');
 	}
 	
+	function testValueDisplayFromRelation() {
+		$form = new Form(
+			$this,
+			'Form',
+			new FieldSet(
+				$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry')
+			),
+			new FieldSet()
+		);
+		$existingEntry = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
+		$form->loadDataFrom($existingEntry);
+		$this->assertEquals($field->Value(), 'tag1 tag2', 'Correctly displays saved relationships');
+	}
+	
 }
 
 class TagFieldTest_Tag extends DataObject implements TestOnly {
