@@ -63,7 +63,7 @@ class TagField extends TextField {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery_improvements.js");
 		Requirements::javascript("tagfield/javascript/jquery.tags.js");
 		Requirements::css("tagfield/css/TagField.css");
-		
+
 		if($this->customTags) {
 			Requirements::customScript("jQuery(document).ready(function() {
 				jQuery('#" . $this->id() . "').tagSuggest({
@@ -73,7 +73,7 @@ class TagField extends TextField {
 		} else {
 			Requirements::customScript("jQuery(document).ready(function() {
 				jQuery('#" . $this->id() . "').tagSuggest({
-				    url: '" . $this->Link() . "/suggest',
+				    url: '" . parse_url($this->Link(),PHP_URL_PATH) . "/suggest',
 					separator: '" . $this->separator . "'
 				});
 			});");
@@ -115,6 +115,16 @@ class TagField extends TextField {
 			} else {
 				user_error('TagField::saveInto(): Cant find valid field or relation to save into', E_USER_ERROR);
 			}
+		}
+	}
+	
+	function setValue($value, $obj = null) {
+		if(isset($obj) && is_object($obj) && $obj instanceof DataObject) {
+			if(!$obj->many_many($this->Name())) user_error("TagField::setValue(): Cant find relationship named '$this->Name()' on object", E_USER_ERROR);
+			$tags = $obj->{$this->Name()}();
+			$this->value = implode($this->separator, array_values($tags->map('ID',$this->tagObjectField)));
+		} else {
+			parent::setValue($value, $obj);
 		}
 	}
 	
