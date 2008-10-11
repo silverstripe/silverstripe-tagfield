@@ -8,6 +8,27 @@
  * - Bundled with jQuery-based autocomplete library which is applied to a textfield
  * - Autosuggest functionality (currently JSON only)
  * 
+ * Example Datamodel and Instanciation:
+ * <code>
+ * class Article extends DataObject {
+ * 	static $many_many = array('Tags'=>'Tag');
+ * }
+ * class Tag extends DataObject {
+ * 	static $db = array('Title'=>'Varchar');
+ * 	static $belongs_many_many = array('Articles'=>'Article');
+ * }
+ * </code>
+ * <code>
+ * $form = new Form($this,'Form',
+ * 	new FieldSet(
+ * 		new TagField('Tags', 'My Tags', null, 'Article')
+ *	)
+ * 	new FieldSet()
+ * );
+ * $form->loadDataFrom($myArticle);
+ * $form->saveInto($myArticle);
+ * </code>
+ * 
  * @author Ingo Schommer, SilverStripe Ltd. (<firstname>@silverstripe.com)
  * @package formfields
  * @subpackage tagfield
@@ -52,7 +73,7 @@ class TagField extends TextField {
 	 */
 	protected $customTags;
 	
-	function __construct($name, $title = null, $value = null, $tagTopicClass) {
+	function __construct($name, $title = null, $value = null, $tagTopicClass = null) {
 		$this->tagTopicClass = $tagTopicClass;
 		
 		parent::__construct($name, $title, $value);
@@ -126,6 +147,21 @@ class TagField extends TextField {
 		} else {
 			parent::setValue($value, $obj);
 		}
+	}
+	
+	/**
+	 * @param string $class Classname of the DataObject which contains
+	 * the relation or field for tags.
+	 */
+	public function setTagTopicClass($class) {
+		$this->tagTopicClass = $class;
+	}
+	
+	/**
+	 * @return string Classname
+	 */
+	public function getTagTopicClass() {
+		return $this->tagTopicClass;
 	}
 	
 	protected function saveIntoObjectTags($record) {
