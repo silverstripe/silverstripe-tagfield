@@ -109,7 +109,7 @@ class TagField extends TextField {
 	 * @return string JSON array
 	 */
 	public function suggest($request) {
-		$tagTopicClassObj = singleton($this->tagTopicClass);
+		$tagTopicClassObj = singleton($this->getTagTopicClass());
 		
 		$searchString = $request->requestVar('tag');
 		
@@ -140,8 +140,8 @@ class TagField extends TextField {
 	}
 	
 	function setValue($value, $obj = null) {
-		if(isset($obj) && is_object($obj) && $obj instanceof DataObject) {
-			if(!$obj->many_many($this->Name())) user_error("TagField::setValue(): Cant find relationship named '$this->Name()' on object", E_USER_ERROR);
+		if(isset($obj) && is_object($obj) && $obj instanceof DataObject && $obj->many_many($this->Name())) {
+			//if(!$obj->many_many($this->Name())) user_error("TagField::setValue(): Cant find relationship named '$this->Name()' on object", E_USER_ERROR);
 			$tags = $obj->{$this->Name()}();
 			$this->value = implode($this->separator, array_values($tags->map('ID',$this->tagObjectField)));
 		} else {
@@ -161,7 +161,14 @@ class TagField extends TextField {
 	 * @return string Classname
 	 */
 	public function getTagTopicClass() {
-		return $this->tagTopicClass;
+		$record = $this->form->getRecord();
+		if($this->tagTopicClass) {
+			return $this->tagTopicClass;
+		} elseif($record) {
+			return $record->ClassName;
+		} else {
+			return false;
+		}
 	}
 	
 	protected function saveIntoObjectTags($record) {
@@ -216,7 +223,7 @@ class TagField extends TextField {
 	 * Use only when storing tags in objects
 	 */
 	protected function getTagClass() {
-		$tagManyMany = singleton($this->tagTopicClass)->many_many($this->Name());
+		$tagManyMany = singleton($this->getTagTopicClass())->many_many($this->Name());
 		if(!$tagManyMany) {
 			user_error('TagField::getTagClass(): Cant find relation with name "' . $this->Name() . '"', E_USER_ERROR);
 		}
@@ -242,7 +249,7 @@ class TagField extends TextField {
 	}
 	
 	protected function getTextbasedTags($searchString) {
-		$baseClass = ClassInfo::baseDataClass($this->tagTopicClass);
+		$baseClass = ClassInfo::baseDataClass($this->getTagTopicClass());
 		
 		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
 			$baseClass,
@@ -251,8 +258,9 @@ class TagField extends TextField {
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 
-		$allTopicObjs = DataObject::get($this->tagTopicClass, $SQL_filter, $this->tagSort);
+		$allTopicObjs = DataObject::get($this->getTagTopicClass(), $SQL_filter, $this->tagSort);
 		$multipleTagsArr = ($allTopicObjs) ? array_values($allTopicObjs->map('ID', $this->Name())) : array();
+
 		$filteredTagArr = array();
 		foreach($multipleTagsArr as $multipleTags) {
 			$singleTagsArr = $this->splitTagsToArray($multipleTags);
