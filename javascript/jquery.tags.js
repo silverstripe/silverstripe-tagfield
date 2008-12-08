@@ -131,7 +131,7 @@
                     for (i = 0; i < matches.length; i++) {
                         html += '<' + settings.tagWrap + ' class="_tag_suggestion">' + matches[i] + '</' + settings.tagWrap + '>';
                     }
-
+                    
                     tagMatches.html(html);
                     suggestionsShow = !!(matches.length);
                 } else {
@@ -264,4 +264,26 @@
             setSelection();
         });
     };
+
+    // SilverStripe loader
+	SSTagFieldLoader = function() {
+		$('input.tagField').each(function() {
+		    var tags;
+		    if(tags = $(this).attr('taglist')) {
+        		$(this).tagSuggest({
+        		    tags:  tags,
+        			separator: $(this).attr('rel')
+        		});
+		    } else {
+        		$(this).tagSuggest({
+        		    url:  $(this).attr("href") + '/suggest',
+        			separator: $(this).attr('rel')
+        		});
+    		}
+		});
+	}
+
+    if(typeof $(document).livequery != 'undefined') $(document).livequery(SSTagFieldLoader);
+    else $(document).ready(SSTagFieldLoader);
+
 })(jQuery);

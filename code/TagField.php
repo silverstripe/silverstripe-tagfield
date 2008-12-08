@@ -73,8 +73,9 @@ class TagField extends TextField {
 	 */
 	protected $customTags;
 	
-	function __construct($name, $title = null, $value = null, $tagTopicClass = null) {
+	function __construct($name, $title = null, $value = null, $tagTopicClass = null, $tagObjectField = "Title") {
 		$this->tagTopicClass = $tagTopicClass;
+		$this->tagObjectField = $tagObjectField;
 		
 		parent::__construct($name, $title, $value);
 	}
@@ -85,22 +86,25 @@ class TagField extends TextField {
 		Requirements::javascript("tagfield/javascript/jquery.tags.js");
 		Requirements::css("tagfield/css/TagField.css");
 
-		if($this->customTags) {
-			Requirements::customScript("jQuery(document).ready(function() {
-				jQuery('#" . $this->id() . "').tagSuggest({
-					tags: " . Convert::raw2json($this->customTags) . "
-				});
-			});");
-		} else {
-			Requirements::customScript("jQuery(document).ready(function() {
-				jQuery('#" . $this->id() . "').tagSuggest({
-				    url: '" . parse_url($this->Link(),PHP_URL_PATH) . "/suggest',
-					separator: '" . $this->separator . "'
-				});
-			});");
-		}
+		// Standard textfield stuff
+		$attributes = array(
+			'type' => 'text',
+			'class' => 'text tagField',
+			'id' => $this->id(),
+			'name' => $this->Name(),
+			'value' => $this->Value(),
+			'tabindex' => $this->getTabIndex(),
+			'maxlength' => ($this->maxLength) ? $this->maxLength : null,
+			'size' => ($this->maxLength) ? min( $this->maxLength, 30 ) : null,
+		);
+		if($this->disabled) $attributes['disabled'] = 'disabled';
 		
-		return parent::Field();
+		// Data passed as custom attributes
+		if($this->customTags) $attributes['tags'] = $this->customTags;
+		else $attributes['href'] = parse_url($this->Link(),PHP_URL_PATH);
+		$attributes['rel'] = $this->separator;
+
+		return $this->createTag('input', $attributes);
 	}
 	
 	/**
@@ -242,7 +246,7 @@ class TagField extends TextField {
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 		
-		$tagObjs = DataObject::get($tagClass, $SQL_filter, $this->tagSort);
+		$tagObjs = DataObject::get($tagClass, $SQL_filter, $this->tagSort, "", 50);
 		$tagArr = ($tagObjs) ? array_values($tagObjs->map('ID', $this->tagObjectField)) : array();
 		
 		return $tagArr;
