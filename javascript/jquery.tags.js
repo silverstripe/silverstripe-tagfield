@@ -1,5 +1,6 @@
 /*
-  @author: remy sharp / http://remysharp.com
+  @author: remy sharp / http://remysharp.com  Modified by Sam Minnée, SilverStripe
+  
   @url: http://remysharp.com/2007/12/28/jquery-tag-suggestion/
   @usage: setGlobalTags(['javascript', 'jquery', 'java', 'json']); // applied tags to be used for all implementations
           $('input.tags').tagSuggest(options);
@@ -50,7 +51,7 @@
             'sort' : true,
             'tags' : null,
             'url' : null,
-            'delay' : 0,
+            'delay' : 300,
             'separator' : ' '
         };
 
@@ -83,6 +84,7 @@
             }
 
             function showSuggestions(el, key) {
+                console.log('showSuggestions');
                 workingTags = el.value.split(settings.separator);
                 matches = [];
                 var i, html = '', chosenTags = {}, tagSelected = false;
@@ -100,40 +102,43 @@
                     chosenTags[currentTags[i].toLowerCase()] = true;
                 }
 
-                if (currentTag.tag) {
+                if (currentTag.tag && currentTag.tag.length >= 3) {
+                    // Method to handle tag suggestion response
+                    processResponse = function(matches) {
+                        matches = $.grep(matches, function (v, i) {
+                            return !chosenTags[v.toLowerCase()];
+                        });
+
+                        if (settings.sort) {
+                            matches = matches.sort();
+                        }                    
+
+                        for (i = 0; i < matches.length; i++) {
+                            html += '<' + settings.tagWrap + ' class="_tag_suggestion">' + matches[i] + '</' + settings.tagWrap + '>';
+                        }
+                    
+                        tagMatches.html(html);
+                        suggestionsShow = !!(matches.length);
+                    }
+
+
                     // collect potential tags
                     if (settings.url) {
                         $.ajax({
                             'url' : settings.url,
                             'dataType' : 'json',
                             'data' : { 'tag' : currentTag.tag },
-                            'async' : false, // wait until this is ajax hit is complete before continue
-                            'success' : function (m) {
-                                matches = m;
-                            }
+                            'success' : processResponse
                         });
                     } else {
                         for (i = 0; i < userTags.length; i++) {
                             if (userTags[i].indexOf(currentTag.tag) === 0) {
                                 matches.push(userTags[i]);
                             }
-                        }                        
+                        }
+                        processResponse(matches); 
                     }
-                    
-                    matches = $.grep(matches, function (v, i) {
-                        return !chosenTags[v.toLowerCase()];
-                    });
 
-                    if (settings.sort) {
-                        matches = matches.sort();
-                    }                    
-
-                    for (i = 0; i < matches.length; i++) {
-                        html += '<' + settings.tagWrap + ' class="_tag_suggestion">' + matches[i] + '</' + settings.tagWrap + '>';
-                    }
-                    
-                    tagMatches.html(html);
-                    suggestionsShow = !!(matches.length);
                 } else {
                     hideSuggestions();
                 }
@@ -267,23 +272,26 @@
 
     // SilverStripe loader
 	SSTagFieldLoader = function() {
-		$('input.tagField').each(function() {
-		    var tags;
-		    if(tags = $(this).attr('taglist')) {
-        		$(this).tagSuggest({
-        		    tags:  tags,
-        			separator: $(this).attr('rel')
-        		});
-		    } else {
-        		$(this).tagSuggest({
-        		    url:  $(this).attr("href") + '/suggest',
-        			separator: $(this).attr('rel')
-        		});
-    		}
-		});
+	    var tags;
+	    if(tags = $(this).attr('taglist')) {
+    		$(this).tagSuggest({
+    		    tags:  tags,
+    			separator: $(this).attr('rel')
+    		});
+	    } else {
+    		$(this).tagSuggest({
+    		    url:  $(this).attr("href") + '/suggest',
+    			separator: $(this).attr('rel')
+    		});
+		}
 	}
 
-    if(typeof $(document).livequery != 'undefined') $(document).livequery(SSTagFieldLoader);
-    else $(document).ready(SSTagFieldLoader);
+    if(typeof $(document).livequery != 'undefined') {
+        $('input.tagField').livequery(SSTagFieldLoader);
+
+    } else $(document).ready(function() {
+        $('input.tagField').each(SSTagFieldLoader);
+
+    });
 
 })(jQuery);
