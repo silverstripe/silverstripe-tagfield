@@ -73,6 +73,12 @@ class TagField extends TextField {
 	 */
 	protected $customTags;
 	
+	/**
+	 * @var int $maxSuggestionsNum Maximum number of suggestions for each lookup.
+	 * Keep this number low for performance reasons and to avoid UI clutter.
+	 */
+	public $maxSuggestionsNum = 50;
+	
 	function __construct($name, $title = null, $value = null, $tagTopicClass = null, $tagObjectField = "Title") {
 		$this->tagTopicClass = $tagTopicClass;
 		$this->tagObjectField = $tagObjectField;
@@ -246,7 +252,7 @@ class TagField extends TextField {
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 		
-		$tagObjs = DataObject::get($tagClass, $SQL_filter, $this->tagSort, "", 50);
+		$tagObjs = DataObject::get($tagClass, $SQL_filter, $this->tagSort, "", $this->maxSuggestionsNum);
 		$tagArr = ($tagObjs) ? array_values($tagObjs->map('ID', $this->tagObjectField)) : array();
 		
 		return $tagArr;
