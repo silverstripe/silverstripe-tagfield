@@ -165,7 +165,7 @@ class TagField extends TextField {
 	 * @return string Classname
 	 */
 	public function getTagTopicClass() {
-		$record = $this->form->getRecord();
+		$record = ($this->form) ? $this->form->getRecord() : null;
 		if($this->tagTopicClass) {
 			return $this->tagTopicClass;
 		} elseif($record) {
