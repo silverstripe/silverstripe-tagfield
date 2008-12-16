@@ -84,7 +84,6 @@
             }
 
             function showSuggestions(el, key) {
-                console.log('showSuggestions');
                 workingTags = el.value.split(settings.separator);
                 matches = [];
                 var i, html = '', chosenTags = {}, tagSelected = false;
