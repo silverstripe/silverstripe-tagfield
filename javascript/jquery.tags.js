@@ -52,8 +52,8 @@
             'tags' : null,
             'url' : null,
             'delay' : 300,
-            'separator' : ' '
         };
+		defaults['separator'] = $(this).attr('rel');
 
         var i, tag, userTags = [], settings = $.extend({}, defaults, options);
 
