@@ -18,6 +18,11 @@
   @license: Creative Commons License - ShareAlike http://creativecommons.org/licenses/by-sa/3.0/
   @version: 1.4
   @changes: fixed filtering to ajax hits
+
+
+Custom events
+ * 'tags:tagSelected': This will be triggered on the input element after a tag has been selected from the
+                       list that appears
 */
 
 (function ($) {
@@ -158,6 +163,7 @@
 
                 currentTags = v.split(settings.separator);
                 hideSuggestions();
+				tagsElm.trigger('tags:tagSelected');
             }
 
             function chooseTag(tag) {
