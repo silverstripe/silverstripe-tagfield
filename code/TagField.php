@@ -259,37 +259,14 @@ class TagField extends TextField {
 		return $tagArr;
 	}
 	
-	/*protected function getTextbasedTags($searchString) {
-		$baseClass = ClassInfo::baseDataClass($this->getTagTopicClass());
-		
-		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
-			$baseClass,
-			$this->tagFieldName,
-			Convert::raw2sql($searchString)
-		);
-		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
-
-		$allTopicObjs = DataObject::get($this->getTagTopicClass(), $SQL_filter, $this->tagSort);
-		$multipleTagsArr = ($allTopicObjs) ? array_values($allTopicObjs->map('ID', $this->tagFieldName)) : array();
-
-		$filteredTagArr = array();
-		foreach($multipleTagsArr as $multipleTags) {
-			$singleTagsArr = $this->splitTagsToArray($multipleTags);
-			foreach($singleTagsArr as $singleTag) {
-				// only add those tags of the whole string which
-				// match the search terms
-				if(stripos($singleTag, $searchString) !== false) {
-					$filteredTagArr[] = $singleTag;
-				}
-			}
-		}
-		// remove duplicates (retains case sensitive duplicates)
-		$filteredTagArr = array_unique($filteredTagArr);
-		
-		return $filteredTagArr;
-	}*/
-	
-	protected function getTextbasedTags($searchString) { 
+	/**
+	 * Return an array map of unique tags from
+	 * the field name of the topic class.
+	 * 
+	 * @param $searchString The text to search for tags
+	 * @return array
+	 */
+	protected function getTextbasedTags($searchString) {
 		$baseClass = ClassInfo::baseDataClass($this->getTagTopicClass());
 
 		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
@@ -299,9 +276,13 @@ class TagField extends TextField {
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 		
-		$sql = "Select `".$this->tagFieldName."` From `".$this->getTagTopicClass(). "` Where ".$SQL_filter;
+		$sql = "SELECT `" . $this->tagFieldName . "` FROM `".$this->getTagTopicClass() . "` WHERE ".$SQL_filter;
 		$map = DB::query($sql)->column();
-		return $map;
+		
+		// remove duplicates (retains case sensitive duplicates)
+		$filteredMap = array_unique($map);
+		
+		return $filteredMap;
 	}
 	
 	public function setTagFilter($sql) {
