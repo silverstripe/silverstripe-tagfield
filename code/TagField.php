@@ -276,13 +276,10 @@ class TagField extends TextField {
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 		
-		$sql = "SELECT `" . $this->tagFieldName . "` FROM `" . $this->getTagTopicClass() . "` WHERE " . $SQL_filter;
+		$sql = "SELECT DISTINCT `" . $this->tagFieldName . "` FROM `" . $this->getTagTopicClass() . "` WHERE " . $SQL_filter;
 		$map = DB::query($sql)->column();
 		
-		// remove duplicates (retains case sensitive duplicates)
-		$filteredMap = array_unique($map);
-		
-		return $filteredMap;
+		return $map;
 	}
 	
 	public function setTagFilter($sql) {
