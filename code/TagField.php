@@ -276,7 +276,7 @@ class TagField extends TextField {
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 		
-		$sql = "SELECT `" . $this->tagFieldName . "` FROM `".$this->getTagTopicClass() . "` WHERE ".$SQL_filter;
+		$sql = "SELECT `" . $this->tagFieldName . "` FROM `" . $this->getTagTopicClass() . "` WHERE " . $SQL_filter;
 		$map = DB::query($sql)->column();
 		
 		// remove duplicates (retains case sensitive duplicates)
