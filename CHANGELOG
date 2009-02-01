@@ -1,0 +1,237 @@
+0.1 - 2009-02-01
+ 
+	Sun, 01 Feb 2009 06:41:20 GMT ischommer [71143]
+		* modules/tagfield/trunk/javascript/jquery.tags.js (modified)
+
+		BUGFIX Fixed jquery.tags saving of "matches" variable - was  ...
+
+
+	Sun, 01 Feb 2009 06:39:57 GMT ischommer [71142]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		BUGFIX Disabled browser autocomplete on <input> elements in TagField
+		-  ...
+
+
+	Sun, 01 Feb 2009 05:43:05 GMT ischommer [71141]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		ENHANCEMENT Improved tag suggestion performance by using raw SQL
+		rather  ...
+
+
+	Sun, 01 Feb 2009 05:38:28 GMT ischommer [71140]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		BUGFIX Reverted nlou's numerous attempts at breaking this field
+		(r70473,  ...
+
+
+	Tue, 27 Jan 2009 03:18:45 GMT sharvey [70795]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		BUGFIX Fixed failing filtering of duplicates  ...
+
+
+	Tue, 27 Jan 2009 03:01:13 GMT sharvey [70788]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		MINOR Code style formatting fixes for consistency
+
+
+	Tue, 27 Jan 2009 02:58:56 GMT sharvey [70787]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		BUGFIX Only retain unique tags (ignoring case sensitivity) when  ...
+
+
+	Fri, 23 Jan 2009 05:34:08 GMT nlou [70696]
+		* modules/sapphire/branches/2.3/core/model/DataObjectSet.php (modified)
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+
+
+
+	Wed, 21 Jan 2009 02:36:00 GMT nlou [70526]
+		* modules/tagfield/trunk/javascript/jquery.tags.js (modified)
+
+		Feature: add the tags:tagSelected trigger which will call the
+		customised  ...
+
+
+	Tue, 20 Jan 2009 23:26:30 GMT nlou [70482]
+		* modules/tagfield/trunk/CHANGELOG (modified)
+		* modules/tagfield/trunk/code (modified)
+		* modules/tagfield/trunk/code/TagField.php (modified)
+		* modules/tagfield/trunk/css (modified)
+		* modules/tagfield/trunk/images (modified)
+		* modules/tagfield/trunk/javascript (modified)
+		* modules/tagfield/trunk/LICENSE (modified)
+		* modules/tagfield/trunk/README (modified)
+		* modules/tagfield/trunk/templates (modified)
+		* modules/tagfield/trunk/tests (modified)
+		* modules/tagfield/trunk/_config.php (modified)
+
+		Undoing change committed in r70473
+
+
+	Tue, 20 Jan 2009 22:51:15 GMT nlou [70473]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		MINOR: newly configuration for the site
+
+
+	Thu, 15 Jan 2009 22:45:59 GMT nlou [70245]
+		* modules/tagfield/trunk/javascript/jquery.tags.js (modified)
+
+		Feature, Add the ability in front end that a tag field could
+		dynamically  ...
+
+
+	Tue, 16 Dec 2008 23:00:42 GMT aoneil [69288]
+		* modules/tagfield/trunk/javascript/jquery.tags.js (modified)
+
+		MINOR: Removed log message
+
+
+	Tue, 09 Dec 2008 20:53:42 GMT ischommer [67981]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		ENHANCEMENT Added TagField->maxSuggestionsNum
+
+
+	Tue, 09 Dec 2008 20:52:11 GMT ischommer [67980]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		BUGFIX Only getting TagField->getTagTopicClass() if $form  ...
+
+
+	Mon, 08 Dec 2008 23:54:11 GMT sminnee [67871]
+		* modules/tagfield/trunk/javascript/jquery.tags.js (modified)
+
+		Get tagfield working reliably in CMS
+
+
+	Mon, 08 Dec 2008 04:47:02 GMT sminnee [67778]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+		* modules/tagfield/trunk/javascript/jquery.tags.js (modified)
+
+		BUGFIX: Get TagField working in the ModelAdmin.
+		FEATURE: Make  ...
+
+
+	Wed, 05 Nov 2008 21:26:06 GMT ischommer [65302]
+		* modules/tagfield/trunk/lang (added)
+		* modules/tagfield/trunk/lang/en_US.php (added)
+		* modules/tagfield/trunk/lang/_manifest_exclude (added)
+
+		MINOR Added language tables for TagField
+
+
+	Wed, 05 Nov 2008 21:25:44 GMT ischommer [65301]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		BUGFIX Infering TagField->getTagTopicClass() from the form record  ...
+
+
+	Sat, 11 Oct 2008 18:46:56 GMT ischommer [64095]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		ENHANCEMENT Added getters/setters for $tagTopicClass in TagField
+		MINOR  ...
+
+
+	Thu, 09 Oct 2008 00:33:27 GMT ischommer [63924]
+		* modules/tagfield/trunk/tests/TagFieldTest.php (modified)
+
+		ENHANCEMENT Added unittest  ...
+
+
+	Thu, 09 Oct 2008 00:32:37 GMT ischommer [63923]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		BUGFIX Fixed TagField->setValue() for ComponentSets (still pending on
+		a  ...
+
+
+	Tue, 30 Sep 2008 18:16:51 GMT ischommer [63419]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+
+		fixed jquery noconflict
+
+
+	Tue, 30 Sep 2008 18:12:17 GMT ischommer [63418]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+		* modules/tagfield/trunk/css/TagField.css (modified)
+		* modules/tagfield/trunk/javascript/jquery.tags.js (modified)
+		* modules/tagfield/trunk/LICENSE (modified)
+		* modules/tagfield/trunk/README (modified)
+		* modules/tagfield/trunk/tests/TagFieldTest.php (modified)
+
+		ENHANCEMENT Improved customTag support
+
+
+	Tue, 30 Sep 2008 17:37:41 GMT ischommer [63417]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+		* modules/tagfield/trunk/css/TagField.css (added)
+		* modules/tagfield/trunk/tests/TagFieldTest.php (modified)
+		* modules/tagfield/trunk/tests/TagFieldTest.yml (modified)
+
+		BUGFIX Passing all tests now
+		MINOR Added css stubs
+
+
+	Tue, 30 Sep 2008 16:49:56 GMT ischommer [63416]
+		* modules/tagfield/trunk/code/TagField.php (modified)
+		* modules/tagfield/trunk/README (modified)
+		* modules/tagfield/trunk/tests/TagFieldTest.php (modified)
+
+		ENHANCEMENT Added saving unit tests
+		BUGFIX Fixed separator  ...
+
+
+	Tue, 30 Sep 2008 16:04:49 GMT ischommer [63415]
+		* modules/tagfield/trunk/tagfield (deleted)
+
+		removed obsolete tagfield folder in wrong nesting
+
+
+	Tue, 30 Sep 2008 16:04:04 GMT ischommer [63414]
+		* modules/tagfield/trunk/CHANGELOG (moved)
+		* modules/tagfield/trunk/code (moved)
+		* modules/tagfield/trunk/css (moved)
+		* modules/tagfield/trunk/images (moved)
+		* modules/tagfield/trunk/javascript (moved)
+		* modules/tagfield/trunk/LICENSE (moved)
+		* modules/tagfield/trunk/README (moved)
+		* modules/tagfield/trunk/templates (moved)
+		* modules/tagfield/trunk/tests (moved)
+		* modules/tagfield/trunk/_config.php (moved)
+
+		moved tagfield into proper folder structure
+
+
+	Tue, 30 Sep 2008 16:00:21 GMT ischommer [63413]
+		* modules/tagfield (added)
+		* modules/tagfield/branches (added)
+		* modules/tagfield/tags (added)
+		* modules/tagfield/trunk (added)
+		* modules/tagfield/trunk/tagfield (added)
+		* modules/tagfield/trunk/tagfield/CHANGELOG (added)
+		* modules/tagfield/trunk/tagfield/code (added)
+		* modules/tagfield/trunk/tagfield/code/TagField.php (added)
+		* modules/tagfield/trunk/tagfield/css (added)
+		* modules/tagfield/trunk/tagfield/images (added)
+		* modules/tagfield/trunk/tagfield/javascript (added)
+		* modules/tagfield/trunk/tagfield/javascript/jquery.tags.js (added)
+		* modules/tagfield/trunk/tagfield/LICENSE (added)
+		* modules/tagfield/trunk/tagfield/README (added)
+		* modules/tagfield/trunk/tagfield/templates (added)
+		* modules/tagfield/trunk/tagfield/tests (added)
+		* modules/tagfield/trunk/tagfield/tests/TagFieldTest.php (added)
+		* modules/tagfield/trunk/tagfield/tests/TagFieldTest.yml (added)
+		* modules/tagfield/trunk/tagfield/_config.php (added)
+
+		added "tagfield" module
+
+
