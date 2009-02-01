@@ -108,8 +108,9 @@ Custom events
 
                 if (currentTag.tag && currentTag.tag.length >= 3) {
                     // Method to handle tag suggestion response
-                    processResponse = function(matches) {
-                        matches = $.grep(matches, function (v, i) {
+                    processResponse = function(_matches) {
+
+                        matches = $.grep(_matches, function (v, i) {
                             return !chosenTags[v.toLowerCase()];
                         });
 
@@ -188,7 +189,7 @@ Custom events
                 fromTab = false;
                 var type = ev.type;
                 var resetSelection = false;
-                
+
                 switch (ev.keyCode) {
                     case 37: // ignore cases (arrow keys)
                     case 38:
@@ -265,7 +266,7 @@ Custom events
 
             // replace with jQuery version
             tagMatches = $(tagMatches).click(function (ev) {
-                if (ev.target.nodeName == settings.tagWrap.toUpperCase() && $(ev.target).is('._tag_suggestion')) {
+                if (ev.target.nodeName.toUpperCase() == settings.tagWrap.toUpperCase() && $(ev.target).is('._tag_suggestion')) {
                     chooseTag(ev.target.innerHTML);
                 }                
             }).addClass(settings.matchClass);
