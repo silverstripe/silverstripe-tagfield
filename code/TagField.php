@@ -102,6 +102,7 @@ class TagField extends TextField {
 			'name' => $this->Name(),
 			'value' => $this->Value(),
 			'tabindex' => $this->getTabIndex(),
+			'autocomplete' => 'off',
 			'maxlength' => ($this->maxLength) ? $this->maxLength : null,
 			'size' => ($this->maxLength) ? min( $this->maxLength, 30 ) : null,
 		);
