@@ -21,7 +21,7 @@
  * <code>
  * $form = new Form($this,'Form',
  * 	new FieldSet(
- * 		new TagField('Tags', 'My Tags', null, 'Article')
+ * 		new TagField('Tags', 'My Tags', null, 'Article', 'Title')
  *	)
  * 	new FieldSet()
  * );
@@ -36,16 +36,17 @@
 class TagField extends TextField {
 	
 	/**
-	 * @var string $tagTextbasedClass The DataObject class with a text property
+	 * @var string $tagTopicClass The DataObject class with a text property
 	 * or many_many relation matching the name of the Field.
 	 */
 	protected $tagTopicClass;
 	
 	/**
-	 * @var string $tagFieldName Only applies to object-based tagging.
+	 * @var string $tagObjectField Only applies to object-based tagging.
 	 * The fieldname for textbased tagging is inferred from the formfield name.
+	 * The value should be a property name on the DataObject defined in {@link $tagTopicClass}
 	 */
-	protected $tagFieldName = 'Title';
+	protected $tagObjectField = 'Title';
 	
 	/**
 	 * @var string $tagFilter
@@ -65,7 +66,7 @@ class TagField extends TextField {
 	
 	protected static $separator_to_regex = array(
 		' ' => '\s',
-		',' => '\,',
+		',' => '\,', 
 	);
 	
 	/**
@@ -80,9 +81,9 @@ class TagField extends TextField {
 	 */
 	public $maxSuggestionsNum = 50;
 	
-	function __construct($name, $title = null, $value = null, $tagTopicClass = null, $tagFieldName = "Title") {
+	function __construct($name, $title = null, $value = null, $tagTopicClass = null, $tagObjectField = "Title") {
 		$this->tagTopicClass = $tagTopicClass;
-		$this->tagFieldName = ($tagFieldName) ? $tagFieldName : $name; 
+		$this->tagObjectField = $tagObjectField;
 		
 		parent::__construct($name, $title, $value);
 	}
@@ -107,8 +108,11 @@ class TagField extends TextField {
 		if($this->disabled) $attributes['disabled'] = 'disabled';
 		
 		// Data passed as custom attributes
-		if($this->customTags) $attributes['tags'] = $this->customTags;
-		else $attributes['href'] = parse_url($this->Link(),PHP_URL_PATH);
+		if($this->customTags) {
+			$attributes['tags'] = $this->customTags;
+		} else {
+			$attributes['href'] = parse_url($this->Link(),PHP_URL_PATH);
+		}
 		$attributes['rel'] = $this->separator;
 
 		return $this->createTag('input', $attributes);
@@ -126,12 +130,12 @@ class TagField extends TextField {
 		
 		if($this->customTags) {
 			$tags = $this->customTags;
-		} else if($tagTopicClassObj->many_many($this->tagFieldName)) {
+		} else if($tagTopicClassObj->many_many($this->Name())) {
 			$tags = $this->getObjectTags($searchString);
-		} else if($tagTopicClassObj->hasField($this->tagFieldName)) {
+		} else if($tagTopicClassObj->hasField($this->Name())) {
 			$tags = $this->getTextbasedTags($searchString);
 		} else {
-			user_error('TagField::suggest(): Cant find valid relation or text property with name "' . $this->tagFieldName . '"', E_USER_ERROR);
+			user_error('TagField::suggest(): Cant find valid relation or text property with name "' . $this->Name() . '"', E_USER_ERROR);
 		}
 		
 		return Convert::raw2json($tags);
@@ -140,9 +144,9 @@ class TagField extends TextField {
 	function saveInto($record) {		
 		if($this->value) {
 			// $record should match the $tagTopicClass
-			if($record->many_many($this->tagFieldName)) {
+			if($record->many_many($this->Name())) {
 				$this->saveIntoObjectTags($record);
-			} elseif($record->hasField($this->tagFieldName)) {
+			} elseif($record->hasField($this->Name())) {
 				$this->saveIntoTextbasedTags($record);
 			} else {
 				user_error('TagField::saveInto(): Cant find valid field or relation to save into', E_USER_ERROR);
@@ -151,10 +155,10 @@ class TagField extends TextField {
 	}
 	
 	function setValue($value, $obj = null) {
-		if(isset($obj) && is_object($obj) && $obj instanceof DataObject && $obj->many_many($this->tagFieldName)) {
+		if(isset($obj) && is_object($obj) && $obj instanceof DataObject && $obj->many_many($this->Name())) {
 			//if(!$obj->many_many($this->Name())) user_error("TagField::setValue(): Cant find relationship named '$this->Name()' on object", E_USER_ERROR);
-			$tags = $obj->{$this->tagFieldName}();
-			$this->value = implode($this->separator, array_values($tags->map('ID',$this->tagFieldName)));
+			$tags = $obj->{$this->Name()}();
+			$this->value = implode($this->separator, array_values($tags->map('ID',$this->tagObjectField)));
 		} else {
 			parent::setValue($value, $obj);
 		}
@@ -187,7 +191,7 @@ class TagField extends TextField {
 		if(!$record->isInDB()) $record->write();
 		
 		$tagsArr = $this->splitTagsToArray($this->value);
-		$relationName = $this->tagFieldName;
+		$relationName = $this->Name();
 		$existingTagsComponentSet = $record->$relationName();
 		$tagClass = $this->getTagClass();
 		$tagBaseClass = ClassInfo::baseDataClass($tagClass);
@@ -196,13 +200,13 @@ class TagField extends TextField {
 		if($tagsArr) foreach($tagsArr as $tagString) {
 			$SQL_filter = sprintf('`%s`.`%s` = "%s"',
 				$tagBaseClass,
-				$this->tagFieldName,
+				$this->tagObjectField,
 				Convert::raw2sql($tagString)
 			);
 			$tagObj = DataObject::get_one($tagClass, $SQL_filter);
 			if(!$tagObj) {
 				$tagObj = new $tagClass();
-				$tagObj->{$this->tagFieldName} = $tagString;
+				$tagObj->{$this->tagObjectField} = $tagString;
 				$tagObj->write();
 			}
 			$tagsToAdd[] = $tagObj;
@@ -214,7 +218,7 @@ class TagField extends TextField {
 	}
 	
 	protected function saveIntoTextbasedTags($record) {
-		$tagFieldName = $this->tagFieldName;
+		$tagFieldName = $this->Name();
 		
 		// necessary step to filter whitespace etc.
 		$RAW_tagsArr = $this->splitTagsToArray($this->value);
@@ -234,9 +238,9 @@ class TagField extends TextField {
 	 * Use only when storing tags in objects
 	 */
 	protected function getTagClass() {
-		$tagManyMany = singleton($this->getTagTopicClass())->many_many($this->tagFieldName);
+		$tagManyMany = singleton($this->getTagTopicClass())->many_many($this->Name());
 		if(!$tagManyMany) {
-			user_error('TagField::getTagClass(): Cant find relation with name "' . $this->tagFieldName . '"', E_USER_ERROR);
+			user_error('TagField::getTagClass(): Cant find relation with name "' . $this->Name() . '"', E_USER_ERROR);
 		}
 
 		return $tagManyMany[1];
@@ -248,13 +252,13 @@ class TagField extends TextField {
 		
 		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
 			$tagBaseClass,
-			$this->tagFieldName,
+			$this->tagObjectField,
 			Convert::raw2sql($searchString)
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 		
 		$tagObjs = DataObject::get($tagClass, $SQL_filter, $this->tagSort, "", $this->maxSuggestionsNum);
-		$tagArr = ($tagObjs) ? array_values($tagObjs->map('ID', $this->tagFieldName)) : array();
+		$tagArr = ($tagObjs) ? array_values($tagObjs->map('ID', $this->tagObjectField)) : array();
 		
 		return $tagArr;
 	}
@@ -268,18 +272,32 @@ class TagField extends TextField {
 	 */
 	protected function getTextbasedTags($searchString) {
 		$baseClass = ClassInfo::baseDataClass($this->getTagTopicClass());
-
+		
 		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
 			$baseClass,
-			$this->tagFieldName,
+			$this->Name(),
 			Convert::raw2sql($searchString)
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
+
+		$allTopicObjs = DataObject::get($this->getTagTopicClass(), $SQL_filter, $this->tagSort);
+		$multipleTagsArr = ($allTopicObjs) ? array_values($allTopicObjs->map('ID', $this->Name())) : array();
+
+		$filteredTagArr = array();
+		foreach($multipleTagsArr as $multipleTags) {
+			$singleTagsArr = $this->splitTagsToArray($multipleTags);
+			foreach($singleTagsArr as $singleTag) {
+				// only add those tags of the whole string which
+				// match the search terms
+				if(stripos($singleTag, $searchString) !== false) {
+					$filteredTagArr[] = $singleTag;
+				}
+			}
+		}
+		// remove duplicates (retains case sensitive duplicates)
+		$filteredTagArr = array_unique($filteredTagArr);
 		
-		$sql = "SELECT DISTINCT `" . $this->tagFieldName . "` FROM `" . $this->getTagTopicClass() . "` WHERE " . $SQL_filter;
-		$map = DB::query($sql)->column();
-		
-		return $map;
+		return $filteredTagArr;
 	}
 	
 	public function setTagFilter($sql) {
