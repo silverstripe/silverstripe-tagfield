@@ -280,11 +280,12 @@ class TagField extends TextField {
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 
-		$allTopicObjs = DataObject::get($this->getTagTopicClass(), $SQL_filter, $this->tagSort);
-		$multipleTagsArr = ($allTopicObjs) ? array_values($allTopicObjs->map('ID', $this->Name())) : array();
+		$allTopicSQL = singleton($this->getTagTopicClass())->buildSQL($SQL_filter, $this->tagSort);
+		$allTopicSQL->select = array($this->Name());
+		$multipleTagsArr = $allTopicSQL->execute()->column();
 
 		$filteredTagArr = array();
-		foreach($multipleTagsArr as $multipleTags) {
+		if($multipleTagsArr) foreach($multipleTagsArr as $multipleTags) {
 			$singleTagsArr = $this->splitTagsToArray($multipleTags);
 			foreach($singleTagsArr as $singleTag) {
 				// only add those tags of the whole string which
