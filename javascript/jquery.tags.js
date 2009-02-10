@@ -164,7 +164,6 @@ Custom events
 
                 currentTags = v.split(settings.separator);
                 hideSuggestions();
-				tagsElm.trigger('tags:tagSelected');
             }
 
             function chooseTag(tag) {
@@ -182,6 +181,7 @@ Custom events
 
                 tagsElm.val(workingTags.join(settings.separator));
                 tagsElm.blur().focus();
+				tagsElm.trigger('tags:tagSelected');
                 setSelection();
             }
 
