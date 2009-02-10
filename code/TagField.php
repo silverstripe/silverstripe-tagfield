@@ -199,7 +199,7 @@ class TagField extends TextField {
 		
 		$tagsToAdd = array();
 		if($tagsArr) foreach($tagsArr as $tagString) {
-			$SQL_filter = sprintf('"%s"."%s" = \'%s\'',
+			$SQL_filter = sprintf('`%s`.`%s` = %s',
 				$tagBaseClass,
 				$this->tagObjectField,
 				Convert::raw2sql($tagString)
@@ -251,7 +251,7 @@ class TagField extends TextField {
 		$tagClass = $this->getTagClass();
 		$tagBaseClass = ClassInfo::baseDataClass($tagClass);
 		
-		$SQL_filter = sprintf('"%s"."%s" LIKE \'%%%s%%\'',
+		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
 			$tagBaseClass,
 			$this->tagObjectField,
 			Convert::raw2sql($searchString)
@@ -274,7 +274,7 @@ class TagField extends TextField {
 	protected function getTextbasedTags($searchString) {
 		$baseClass = ClassInfo::baseDataClass($this->getTagTopicClass());
 		
-		$SQL_filter = sprintf('"%s"."%s" LIKE \'%%%s%%\'',
+		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
 			$baseClass,
 			$this->Name(),
 			Convert::raw2sql($searchString)
