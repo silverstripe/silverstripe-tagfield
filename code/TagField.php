@@ -199,7 +199,7 @@ class TagField extends TextField {
 		
 		$tagsToAdd = array();
 		if($tagsArr) foreach($tagsArr as $tagString) {
-			$SQL_filter = sprintf('`%s`.`%s` = %s',
+			$SQL_filter = sprintf('`%s`.`%s` = \'%s\'',
 				$tagBaseClass,
 				$this->tagObjectField,
 				Convert::raw2sql($tagString)
