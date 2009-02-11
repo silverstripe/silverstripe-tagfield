@@ -1,5 +1,6 @@
 /*
-  @author: remy sharp / http://remysharp.com  Modified by Sam Minnée, SilverStripe
+  @author: remy sharp / http://remysharp.com  Modified by Sam Minnée, SilverStripe.
+											  Apply the async request patch By Normann Lou, Silverstripe.
   
   @url: http://remysharp.com/2007/12/28/jquery-tag-suggestion/
   @usage: setGlobalTags(['javascript', 'jquery', 'java', 'json']); // applied tags to be used for all implementations
@@ -16,7 +17,7 @@
     delay - optional sets the delay between keyup and the request - can help throttle ajax requests, defaults to zero delay
     separator - optional separator string, defaults to ' ' (Brian J. Cardiff)
   @license: Creative Commons License - ShareAlike http://creativecommons.org/licenses/by-sa/3.0/
-  @version: 1.4
+  @version: 1.4 - Using async request
   @changes: fixed filtering to ajax hits
 
 
@@ -76,6 +77,7 @@ Custom events
             var workingTags = [];
             var currentTag = {"position": 0, tag: ""};
             var tagMatches = document.createElement(settings.tagContainer);
+			var currentRequest = null;
             
             function showSuggestionsDelayed(el, key) {
                 if (settings.delay) {
@@ -109,7 +111,8 @@ Custom events
                 if (currentTag.tag && currentTag.tag.length >= 3) {
                     // Method to handle tag suggestion response
                     processResponse = function(_matches) {
-
+						currentRequest = null; // unset the currentRequest, since it is completed.
+						
                         matches = $.grep(_matches, function (v, i) {
                             return !chosenTags[v.toLowerCase()];
                         });
@@ -129,12 +132,15 @@ Custom events
 
                     // collect potential tags
                     if (settings.url) {
-                        $.ajax({
+						// cancel previous request if exists.
+						if (currentRequest != null) {
+							currentRequest.abort();
+						}
+                        currentRequest = $.ajax({
                             'url' : settings.url,
                             'dataType' : 'json',
                             'data' : { 'tag' : currentTag.tag },
                             'success' : processResponse,
-							'async' : false, // wait until this is ajax hit is complete before continue
                         });
                     } else {
                         for (i = 0; i < userTags.length; i++) {
