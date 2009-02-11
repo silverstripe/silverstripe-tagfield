@@ -56,7 +56,7 @@ Custom events
             'sort' : true,
             'tags' : null,
             'url' : null,
-            'delay' : 300,
+        //    'delay' : 300,
         };
 		defaults['separator'] = $(this).attr('rel');
 
@@ -133,7 +133,8 @@ Custom events
                             'url' : settings.url,
                             'dataType' : 'json',
                             'data' : { 'tag' : currentTag.tag },
-                            'success' : processResponse
+                            'success' : processResponse,
+							'async' : false, // wait until this is ajax hit is complete before continue
                         });
                     } else {
                         for (i = 0; i < userTags.length; i++) {
