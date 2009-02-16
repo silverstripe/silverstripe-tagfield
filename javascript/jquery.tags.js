@@ -3,6 +3,8 @@
 											  Apply the async request patch By Normann Lou, Silverstripe.
   
   @url: http://remysharp.com/2007/12/28/jquery-tag-suggestion/
+  @async request patch rul: http://plugins.jquery.com/files/issues/Tag-AsyncRequest.patch
+
   @usage: setGlobalTags(['javascript', 'jquery', 'java', 'json']); // applied tags to be used for all implementations
           $('input.tags').tagSuggest(options);
           
@@ -77,7 +79,7 @@ Custom events
             var workingTags = [];
             var currentTag = {"position": 0, tag: ""};
             var tagMatches = document.createElement(settings.tagContainer);
-			var currentRequest = null;
+            var currentRequest = null;
             
             function showSuggestionsDelayed(el, key) {
                 if (settings.delay) {
@@ -111,7 +113,7 @@ Custom events
                 if (currentTag.tag && currentTag.tag.length >= 3) {
                     // Method to handle tag suggestion response
                     processResponse = function(_matches) {
-						currentRequest = null; // unset the currentRequest, since it is completed.
+                        currentRequest = null; // unset the currentRequest, since it is completed.
 						
                         matches = $.grep(_matches, function (v, i) {
                             return !chosenTags[v.toLowerCase()];
@@ -132,10 +134,10 @@ Custom events
 
                     // collect potential tags
                     if (settings.url) {
-						// cancel previous request if exists.
-						if (currentRequest != null) {
-							currentRequest.abort();
-						}
+	                    // cancel previous request if exists.
+	                    if (currentRequest != null) {
+		                    currentRequest.abort();
+		                }
                         currentRequest = $.ajax({
                             'url' : settings.url,
                             'dataType' : 'json',
