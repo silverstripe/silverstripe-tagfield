@@ -142,7 +142,7 @@ Custom events
                             'url' : settings.url,
                             'dataType' : 'json',
                             'data' : { 'tag' : currentTag.tag },
-                            'success' : processResponse,
+                            'success' : processResponse
                         });
                     } else {
                         for (i = 0; i < userTags.length; i++) {
