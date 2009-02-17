@@ -58,7 +58,7 @@ Custom events
             'tagWrap' : 'span', 
             'sort' : true,
             'tags' : null,
-            'url' : null,
+            'url' : null
         //    'delay' : 300,
         };
 		defaults['separator'] = $(this).attr('rel');
