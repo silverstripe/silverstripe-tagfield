@@ -91,7 +91,8 @@ class TagField extends TextField {
 	public function Field() {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery_improvements.js");
-		Requirements::javascript("tagfield/javascript/jquery.tags.js");
+		Requirements::javascript("tagfield/javascript/TagField.js");
+		Requirements::javascript("tagfield/thirdparty/jquery-tags/jquery.tags.js");
 		Requirements::css("tagfield/css/TagField.css");
 
 		// Standard textfield stuff
@@ -112,7 +113,7 @@ class TagField extends TextField {
 		if($this->customTags) {
 			$attributes['tags'] = $this->customTags;
 		} else {
-			$attributes['href'] = parse_url($this->Link(),PHP_URL_PATH);
+			$attributes['href'] = parse_url($this->Link(),PHP_URL_PATH) . '/suggest';
 		}
 		$attributes['rel'] = $this->separator;
 
@@ -228,7 +229,7 @@ class TagField extends TextField {
 	
 	protected function splitTagsToArray($tagsString) {
 		$separator = (isset(self::$separator_to_regex[$this->separator])) ? self::$separator_to_regex[$this->separator] : $this->separator;
-		return array_unique(preg_split('/\s*' . $separator . '\s*/', trim($tagsString)));
+		return array_unique(preg_split('/\s*' . $separator . '\s*/', trim($tagsString), -1, PREG_SPLIT_NO_EMPTY));
 	}
 	
 	protected function combineTagsFromArray($tagsArr) {
@@ -272,17 +273,17 @@ class TagField extends TextField {
 	 * @return array
 	 */
 	protected function getTextbasedTags($searchString) {
-		$baseClass = ClassInfo::baseDataClass($this->getTagTopicClass());
-		
 		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
-			$baseClass,
+			$this->getTagTopicClass(),
 			$this->Name(),
 			Convert::raw2sql($searchString)
 		);
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 
 		$allTopicSQL = singleton($this->getTagTopicClass())->buildSQL($SQL_filter, $this->tagSort);
-		$allTopicSQL->select = array($this->Name());
+		$allTopicSQL->select = array(
+			sprintf('`%s`.`%s`', $this->getTagTopicClass(), $this->Name())
+		);
 		$multipleTagsArr = $allTopicSQL->execute()->column();
 
 		$filteredTagArr = array();
