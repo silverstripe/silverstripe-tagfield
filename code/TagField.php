@@ -81,6 +81,13 @@ class TagField extends TextField {
 	 */
 	public $maxSuggestionsNum = 50;
 	
+	/**
+	 * @var boolean Delete tags which are no longer in use.
+	 * This only applies for tags defined by a $many_many relation,
+	 * text-based tags will be removed implicitly through modifying the actual text value.
+	 */
+	public $deleteUnusedTags = true;
+	
 	function __construct($name, $title = null, $value = null, $tagTopicClass = null, $tagObjectField = "Title") {
 		$this->tagTopicClass = $tagTopicClass;
 		$this->tagObjectField = $tagObjectField;
@@ -194,11 +201,13 @@ class TagField extends TextField {
 		
 		$tagsArr = $this->splitTagsToArray($this->value);
 		$relationName = $this->Name();
-		$existingTagsComponentSet = $record->$relationName();
+		$tagsComponentSet = $record->$relationName();
+		$existingTags = $tagsComponentSet->getIdList();
 		$tagClass = $this->getTagClass();
 		$tagBaseClass = ClassInfo::baseDataClass($tagClass);
 		
-		$tagsToAdd = array();
+		// list of new tag IDs
+		$newTags = array();
 		if($tagsArr) foreach($tagsArr as $tagString) {
 			$SQL_filter = sprintf('`%s`.`%s` = \'%s\'',
 				$tagBaseClass,
@@ -211,12 +220,28 @@ class TagField extends TextField {
 				$tagObj->{$this->tagObjectField} = $tagString;
 				$tagObj->write();
 			}
-			$tagsToAdd[] = $tagObj;
+			$newTags[] = $tagObj->ID;
 		}
-
-		// remove all before readding
-		$existingTagsComponentSet->removeAll();
-		$existingTagsComponentSet->addMany($tagsToAdd);
+		
+		// set new tags
+		$tagsComponentSet->setByIdList($newTags);
+		
+		if($this->deleteUnusedTags) {
+			// check for tags which are no longer used
+			$removedTags = array_diff($existingTags, $newTags);
+			list($parentClass, $tagClass, $parentIDField, $tagIDField, $relationTable) = $record->many_many($relationName);
+			$counts = array();
+			foreach($removedTags as $removedTagID) {
+				$removedTagQuery = new SQLQuery(
+					array("COUNT(`ID`)"),
+					array($relationTable),
+					array(sprintf("`%s` = %d", $tagIDField, (int)$removedTagID))
+				);
+				$removedTagCount = $removedTagQuery->execute()->value();
+				
+				if($removedTagCount == 0) DataObject::delete_by_id($tagClass, $removedTagID);
+			}
+		}
 	}
 	
 	protected function saveIntoTextbasedTags($record) {

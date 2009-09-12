@@ -150,6 +150,49 @@ class TagFieldTest extends FunctionalTest {
 		$form->loadDataFrom($existingEntry);
 		$this->assertEquals($field->Value(), 'tag1 tag2', 'Correctly displays saved relationships');
 	}
+
+	function testRemoveUnusedTagsEnabled() {
+		// should contain "tag1" and "tag2"
+		$entry1 = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
+		
+		// should contain "tag1"
+		$entry2 = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry2');
+		
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		$field->setValue('tag3');
+		$field->saveInto($entry1);
+		$entry1->write();
+		
+		$this->assertType(
+			'TagFieldTest_Tag', 
+			DataObject::get_one('TagFieldTest_Tag', '`TagFieldTest_Tag`.`Title` = \'tag1\''),
+			'Removing a tag relation which is still present in other objects shouldnt remove the tag record'
+		);
+		$this->assertFalse(
+			DataObject::get_one('TagFieldTest_Tag', '`TagFieldTest_Tag`.`Title` = \'tag2\''),
+			'If the only remaining relation of a tag record is removed, the tag should be removed completely'
+		);
+	}
+	
+	function testRemoveUnusedTagsDisabled() {
+		// should contain "tag1" and "tag2"
+		$entry1 = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
+		
+		// should contain "tag1"
+		$entry2 = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry2');
+		
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		$field->deleteUnusedTags = false;
+		$field->setValue('tag3');
+		$field->saveInto($entry1);
+		$entry1->write();
+		
+		$this->assertType(
+			'TagFieldTest_Tag', 
+			DataObject::get_one('TagFieldTest_Tag', '`TagFieldTest_Tag`.`Title` = \'tag2\''),
+			'If the only remaining relation of a tag record is removed and $deleteUnusedTags is disabled, the tag record should be retained'
+		);
+	}
 	
 }
 
