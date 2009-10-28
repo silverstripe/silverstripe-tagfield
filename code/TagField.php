@@ -198,6 +198,8 @@ class TagField extends TextField {
 	protected function saveIntoObjectTags($record) {
 		// HACK We can't save relationship tables without having an ID
 		if(!$record->isInDB()) $record->write();
+
+		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
 		
 		$tagsArr = $this->splitTagsToArray($this->value);
 		$relationName = $this->Name();
@@ -209,7 +211,7 @@ class TagField extends TextField {
 		// list of new tag IDs
 		$newTags = array();
 		if($tagsArr) foreach($tagsArr as $tagString) {
-			$SQL_filter = sprintf('`%s`.`%s` = \'%s\'',
+			$SQL_filter = sprintf("{$q}%s{$q}.{$q}%s{$q} = '%s'",
 				$tagBaseClass,
 				$this->tagObjectField,
 				Convert::raw2sql($tagString)
@@ -233,9 +235,9 @@ class TagField extends TextField {
 			$counts = array();
 			foreach($removedTags as $removedTagID) {
 				$removedTagQuery = new SQLQuery(
-					array("COUNT(`ID`)"),
+					array("COUNT({$q}ID{$q})"),
 					array($relationTable),
-					array(sprintf("`%s` = %d", $tagIDField, (int)$removedTagID))
+					array(sprintf("{$q}%s{$q} = %d", $tagIDField, (int)$removedTagID))
 				);
 				$removedTagCount = $removedTagQuery->execute()->value();
 				
@@ -277,7 +279,9 @@ class TagField extends TextField {
 		$tagClass = $this->getTagClass();
 		$tagBaseClass = ClassInfo::baseDataClass($tagClass);
 		
-		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
+		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
+		
+		$SQL_filter = sprintf("{$q}%s{$q}.{$q}%s{$q} LIKE '%%%s%%'",
 			$tagBaseClass,
 			$this->tagObjectField,
 			Convert::raw2sql($searchString)
@@ -298,7 +302,10 @@ class TagField extends TextField {
 	 * @return array
 	 */
 	protected function getTextbasedTags($searchString) {
-		$SQL_filter = sprintf("`%s`.`%s` LIKE '%%%s%%'",
+
+		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
+		
+		$SQL_filter = sprintf("{$q}%s{$q}.{$q}%s{$q} LIKE '%%%s%%'",
 			$this->getTagTopicClass(),
 			$this->Name(),
 			Convert::raw2sql($searchString)
@@ -307,7 +314,7 @@ class TagField extends TextField {
 
 		$allTopicSQL = singleton($this->getTagTopicClass())->buildSQL($SQL_filter, $this->tagSort);
 		$allTopicSQL->select = array(
-			sprintf('`%s`.`%s`', $this->getTagTopicClass(), $this->Name())
+			sprintf("{$q}%s{$q}.{$q}%s{$q}", $this->getTagTopicClass(), $this->Name())
 		);
 		$multipleTagsArr = $allTopicSQL->execute()->column();
 

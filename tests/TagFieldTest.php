@@ -56,11 +56,15 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($response->getBody(), '["tag1","tag2"]');
 	}
 	*/
+	
 	function testObjectSuggest() {
 		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+
+		// backwards compatibility change
+		$httpReqClass = class_exists('SS_HTTPRequest') ? 'SS_HTTPRequest' : 'HTTPRequest';
 		
 		// partial
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest', 
 			null,
@@ -69,7 +73,7 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($field->suggest($request), '["tag1","tag2"]');
 		
 		// full
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
 			null,
@@ -79,7 +83,7 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($field->suggest($request), '["tag1"]');
 		
 		// case insensitive
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
 			null,
@@ -88,7 +92,7 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($field->suggest($request), '["tag1"]');
 		
 		// no match
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
 			null,
@@ -99,9 +103,12 @@ class TagFieldTest extends FunctionalTest {
 	
 	function testTextbasedSuggest() {
 		$field = new TagField('TextbasedTags', null, null, 'TagFieldTest_BlogEntry');
+
+		// backwards compatibility change
+		$httpReqClass = class_exists('SS_HTTPRequest') ? 'SS_HTTPRequest' : 'HTTPRequest';
 		
 		// partial
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
@@ -110,7 +117,7 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($field->suggest($request), '["textbasedtag1","textbasedtag2"]');
 		
 		// full
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
@@ -119,7 +126,7 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($field->suggest($request), '["textbasedtag1"]');
 		
 		// case insensitive
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
@@ -128,7 +135,7 @@ class TagFieldTest extends FunctionalTest {
 		$this->assertEquals($field->suggest($request), '["textbasedtag1"]');
 		
 		// no match
-		$request = new HTTPRequest(
+		$request = new $httpReqClass(
 			'get',
 			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
 			null,
@@ -163,13 +170,14 @@ class TagFieldTest extends FunctionalTest {
 		$field->saveInto($entry1);
 		$entry1->write();
 		
+		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
 		$this->assertType(
 			'TagFieldTest_Tag', 
-			DataObject::get_one('TagFieldTest_Tag', '`TagFieldTest_Tag`.`Title` = \'tag1\''),
+			DataObject::get_one('TagFieldTest_Tag', "{$q}TagFieldTest_Tag{$q}.{$q}Title{$q} = 'tag1'"),
 			'Removing a tag relation which is still present in other objects shouldnt remove the tag record'
 		);
 		$this->assertFalse(
-			DataObject::get_one('TagFieldTest_Tag', '`TagFieldTest_Tag`.`Title` = \'tag2\''),
+			DataObject::get_one('TagFieldTest_Tag', "{$q}TagFieldTest_Tag{$q}.{$q}Title{$q} = 'tag2'"),
 			'If the only remaining relation of a tag record is removed, the tag should be removed completely'
 		);
 	}
@@ -187,9 +195,10 @@ class TagFieldTest extends FunctionalTest {
 		$field->saveInto($entry1);
 		$entry1->write();
 		
+		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
 		$this->assertType(
 			'TagFieldTest_Tag', 
-			DataObject::get_one('TagFieldTest_Tag', '`TagFieldTest_Tag`.`Title` = \'tag2\''),
+			DataObject::get_one('TagFieldTest_Tag', "{$q}TagFieldTest_Tag{$q}.{$q}Title{$q} = 'tag2'"),
 			'If the only remaining relation of a tag record is removed and $deleteUnusedTags is disabled, the tag record should be retained'
 		);
 	}
