@@ -10,6 +10,11 @@
 class TagFieldTest extends FunctionalTest {
 	
 	static $fixture_file = 'tagfield/tests/TagFieldTest.yml';
+
+	protected $extraDataObjects = array(
+		'TagFieldTest_Tag',
+		'TagFieldTest_BlogEntry',
+	);
 	
 	function testExistingObjectSaving() {
 		// should contain "tag1" and "tag2"
