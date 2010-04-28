@@ -236,7 +236,7 @@ class TagField extends TextField {
 			foreach($removedTags as $removedTagID) {
 				$removedTagQuery = new SQLQuery(
 					array("COUNT({$q}ID{$q})"),
-					array("\"$relationTable\""),
+					array($q.$relationTable.$q),
 					array(sprintf("{$q}%s{$q} = %d", $tagIDField, (int)$removedTagID))
 				);
 				$removedTagCount = $removedTagQuery->execute()->value();
