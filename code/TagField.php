@@ -281,7 +281,8 @@ class TagField extends TextField {
 		
 		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
 		
-		$SQL_filter = sprintf("{$q}%s{$q}.{$q}%s{$q} LIKE '%%%s%%'",
+		//NOTE: using the LOWER function will mean that indexes will not work on this column.
+		$SQL_filter = 'LOWER(' . sprintf("{$q}%s{$q}.{$q}%s{$q}) LIKE LOWER('%%%s%%')",
 			$tagBaseClass,
 			$this->tagObjectField,
 			Convert::raw2sql($searchString)
@@ -305,7 +306,8 @@ class TagField extends TextField {
 
 		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
 		
-		$SQL_filter = sprintf("{$q}%s{$q}.{$q}%s{$q} LIKE '%%%s%%'",
+		//NOTE: using the LOWER function will mean that indexes will not work on this column.
+		$SQL_filter = 'LOWER(' . sprintf("{$q}%s{$q}.{$q}%s{$q}) LIKE LOWER('%%%s%%')",
 			$this->getTagTopicClass(),
 			$this->Name(),
 			Convert::raw2sql($searchString)
