@@ -88,6 +88,11 @@ class TagField extends TextField {
 	 */
 	public $deleteUnusedTags = true;
 	
+	/*
+	 * If no sort clause is provided, then we'll sort it by the ID by default
+	 */
+	public static $default_sort = "\"ID\" ASC";
+	
 	function __construct($name, $title = null, $value = null, $tagTopicClass = null, $tagObjectField = "Title") {
 		$this->tagTopicClass = $tagTopicClass;
 		$this->tagObjectField = $tagObjectField;
