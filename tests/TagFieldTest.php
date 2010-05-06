@@ -23,9 +23,15 @@ class TagFieldTest extends FunctionalTest {
 		$field->setValue('tag1   tag3 ');
 		$field->saveInto($existingEntry);
 		$existingEntry->write();
+		
+		$compare1=array_values($existingEntry->Tags()->map('ID', 'Title'));
+		$compare2=array('tag1','tag3');
+		sort($compare1);
+		sort($compare2);
+		
 		$this->assertEquals(
-			array_values($existingEntry->Tags()->map('ID', 'Title')),
-			array('tag1','tag3')
+			$compare1,
+			$compare2
 		);
 	}
 	
@@ -36,9 +42,13 @@ class TagFieldTest extends FunctionalTest {
 		$field->setValue('tag1 tag2'); // test separator handling as well
 		$field->saveInto($newEntry);
 
+		$compare1=array_values($newEntry->Tags()->map('ID', 'Title'));
+		$compare2=array('tag1','tag2');
+		sort($compare1);
+		sort($compare2);
 		$this->assertEquals(
-			array_values($newEntry->Tags()->map('ID', 'Title')),
-			array('tag1','tag2')
+			$compare1,
+			$compare2
 		);
 	}
 	
