@@ -222,6 +222,8 @@ class TagFieldTest extends FunctionalTest {
 
 class TagFieldTest_Tag extends DataObject implements TestOnly {
 	
+	static $default_sort="\"ID\" ASC";
+	
 	static $db = array(
 		'Title' => 'Varchar(200)'
 	);
@@ -233,6 +235,8 @@ class TagFieldTest_Tag extends DataObject implements TestOnly {
 }
 
 class TagFieldTest_BlogEntry extends DataObject implements TestOnly {
+	
+	static $default_sort="\"ID\" ASC";
 	
 	static $db = array(
 		'Title' => 'Text',
