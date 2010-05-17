@@ -3,11 +3,9 @@
  * @author Ingo Schommer, SilverStripe Ltd. (<firstname>@silverstripe.com)
  * @package testing
  * 
- * @todo Test filtering and sorting
  * @todo Test custom tags
- * @todo Test custom separators
  */
-class TagFieldTest extends FunctionalTest {
+class TagFieldTest extends SapphireTest {
 	
 	static $fixture_file = 'tagfield/tests/unit/TagFieldTest.yml';
 
@@ -41,7 +39,7 @@ class TagFieldTest extends FunctionalTest {
 		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
 		$field->setValue('tag1 tag2'); // test separator handling as well
 		$field->saveInto($newEntry);
-
+	
 		$compare1=array_values($newEntry->Tags()->map('ID', 'Title'));
 		$compare2=array('tag1','tag2');
 		sort($compare1);
@@ -74,7 +72,7 @@ class TagFieldTest extends FunctionalTest {
 	
 	function testObjectSuggest() {
 		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
-
+	
 		// backwards compatibility change
 		$httpReqClass = class_exists('SS_HTTPRequest') ? 'SS_HTTPRequest' : 'HTTPRequest';
 		
@@ -118,7 +116,7 @@ class TagFieldTest extends FunctionalTest {
 	
 	function testTextbasedSuggest() {
 		$field = new TagField('TextbasedTags', null, null, 'TagFieldTest_BlogEntry');
-
+	
 		// backwards compatibility change
 		$httpReqClass = class_exists('SS_HTTPRequest') ? 'SS_HTTPRequest' : 'HTTPRequest';
 		
@@ -172,7 +170,7 @@ class TagFieldTest extends FunctionalTest {
 		$form->loadDataFrom($existingEntry);
 		$this->assertEquals($field->Value(), 'tag1 tag2', 'Correctly displays saved relationships');
 	}
-
+	
 	function testRemoveUnusedTagsEnabled() {
 		// should contain "tag1" and "tag2"
 		$entry1 = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
@@ -218,6 +216,42 @@ class TagFieldTest extends FunctionalTest {
 		);
 	}
 	
+	function testCustomSeparators() {
+		// should contain "tag1" and "tag2"
+		$existingEntry = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		$field->setSeparator(',');
+		$field->setValue('tag1,tag3');
+		$field->saveInto($existingEntry);
+		$existingEntry->write();
+		
+		$compare1=array_values($existingEntry->Tags()->map('ID', 'Title'));
+		$compare2=array('tag1','tag3');
+		sort($compare1);
+		sort($compare2);
+		
+		$this->assertEquals(
+			$compare1,
+			$compare2
+		);
+	}
+	
+	function testSuggestWithTagSort() {
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		$field->setTagSort('"TagFieldTest_Tag"."Title" DESC');
+		
+		// backwards compatibility change
+		$httpReqClass = class_exists('SS_HTTPRequest') ? 'SS_HTTPRequest' : 'HTTPRequest';
+		
+		// partial
+		$request = new $httpReqClass(
+			'get',
+			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest', 
+			null,
+			array('tag' => 'tag')
+		);
+		$this->assertEquals($field->suggest($request), '["tag2","tag1"]');
+	}
 }
 
 class TagFieldTest_Tag extends DataObject implements TestOnly {

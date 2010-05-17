@@ -70,8 +70,7 @@ class TagField extends TextField {
 	);
 	
 	/**
-	 * @var array $customTags Override the tagging behaviour with a custom set
-	 * which is used by the javascript library directly instead of querying {@link suggest()}.
+	 * @var array $customTags 
 	 */
 	protected $customTags;
 	
@@ -350,26 +349,54 @@ class TagField extends TextField {
 		return $this->tagFilter;
 	}
 	
+	/**
+	 * Sort tags (only applicable for many-many relations).
+	 * Only works for {@link suggest()}, not for the retrieval
+	 * of tag object relations through a {@link ComponentSet}.
+	 * 
+	 * @param String $sql SQL ORDER BY statement
+	 */
 	public function setTagSort($sql) {
 		$this->tagSort = $sql;
 	}
 	
+	/**
+	 * @return String SQL ORDER BY statement
+	 */
 	public function getTagSort() {
 		return $this->tagSort;
 	}
 	
+	/**
+	 * Separator between tags (Default: " ").
+	 * Will populate through to the JavaScript library as well.
+	 * 
+	 * @param String $separator
+	 */
 	public function setSeparator($separator) {
 		$this->separator = $separator;
 	}
 	
+	/**
+	 * @return String
+	 */
 	public function getSeparator() {
 		return $this->separator;
 	}
 	
+	/**
+	 * Override the tagging behaviour with a custom set
+	 * which is used by the javascript library directly instead of querying {@link suggest()}.
+	 * 
+	 * @param array $tags
+	 */
 	public function setCustomTags($tags) {
 		$this->customTags = $tags;
 	}
 	
+	/**
+	 * @return array
+	 */
 	public function getCustomTags() {
 		return $this->customTags;
 	}
