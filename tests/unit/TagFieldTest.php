@@ -9,7 +9,7 @@
  */
 class TagFieldTest extends FunctionalTest {
 	
-	static $fixture_file = 'tagfield/tests/TagFieldTest.yml';
+	static $fixture_file = 'tagfield/tests/unit/TagFieldTest.yml';
 
 	protected $extraDataObjects = array(
 		'TagFieldTest_Tag',
