@@ -1,0 +1,12 @@
+.field.tag span.tagMatches {
+   display: block;
+	margin-top: 5px;
+}
+
+.field.tag  span.tagMatches span {
+    padding: 2px;
+    margin-right: 4px;
+    background-color: #4EA3D7;
+    color: #fff;
+    cursor: pointer;
+}

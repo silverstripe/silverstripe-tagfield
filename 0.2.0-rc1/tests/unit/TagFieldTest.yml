@@ -1,0 +1,20 @@
+TagFieldTest_Tag:
+   tag1:
+      Title: tag1
+   tag2:
+      Title: tag2
+TagFieldTest_BlogEntry:
+   blogentry1:
+      Title: blogentry1
+      Tags: =>TagFieldTest_Tag.tag1,=>TagFieldTest_Tag.tag2
+   blogentry2:
+       Title: blogentry2
+       Tags: =>TagFieldTest_Tag.tag1
+   blogentry3:
+      Title: blogentry3
+   blogentry4:
+      Title: blogentry4
+      TextbasedTags: textbasedtag1 textbasedtag2
+   blogentry5:
+      Title: blogentry5
+      TextbasedTags: textbasedtag1
