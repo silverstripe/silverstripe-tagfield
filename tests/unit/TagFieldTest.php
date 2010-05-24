@@ -256,7 +256,7 @@ class TagFieldTest extends SapphireTest {
 
 class TagFieldTest_Tag extends DataObject implements TestOnly {
 	
-	static $default_sort="\"ID\" ASC";
+	static $default_sort = '"TagFieldTest_Tag"."ID" ASC';
 	
 	static $db = array(
 		'Title' => 'Varchar(200)'
@@ -270,7 +270,7 @@ class TagFieldTest_Tag extends DataObject implements TestOnly {
 
 class TagFieldTest_BlogEntry extends DataObject implements TestOnly {
 	
-	static $default_sort="\"ID\" ASC";
+	static $default_sort = '"TagFieldTest_BlogEntry"."ID" ASC';
 	
 	static $db = array(
 		'Title' => 'Text',
