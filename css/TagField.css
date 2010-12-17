@@ -1,12 +1,15 @@
 .field.tag span.tagMatches {
    display: block;
-	margin-top: 5px;
+	margin: 5px 0 3px 0;
 }
 
 .field.tag  span.tagMatches span {
-    padding: 2px;
+    padding: 3px 5px;
     margin-right: 4px;
-    background-color: #4EA3D7;
+    background-color: #2D8BC5;
     color: #fff;
     cursor: pointer;
+    font-size: 12px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
 }
