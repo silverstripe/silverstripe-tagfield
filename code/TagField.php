@@ -102,8 +102,8 @@ class TagField extends TextField {
 	public function Field() {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
 		Requirements::javascript(SAPPHIRE_DIR . "/javascript/jquery_improvements.js");
-		Requirements::javascript("tagfield/javascript/TagField.js");
 		Requirements::javascript("tagfield/thirdparty/jquery-tags/jquery.tags.js");
+		Requirements::javascript("tagfield/javascript/TagField.js");
 		Requirements::css("tagfield/css/TagField.css");
 
 		// Standard textfield stuff
