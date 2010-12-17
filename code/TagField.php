@@ -102,6 +102,12 @@ class TagField extends TextField {
 	public function Field() {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
 		Requirements::javascript(SAPPHIRE_DIR . "/javascript/jquery_improvements.js");
+
+		// If the request was made via AJAX, we need livequery to init the field.
+		if (Director::is_ajax()) {
+			Requirements::javascript(THIRDPARTY_DIR . '/jquery-livequery/jquery.livequery.js');
+		}
+
 		Requirements::javascript("tagfield/thirdparty/jquery-tags/jquery.tags.js");
 		Requirements::javascript("tagfield/javascript/TagField.js");
 		Requirements::css("tagfield/css/TagField.css");
