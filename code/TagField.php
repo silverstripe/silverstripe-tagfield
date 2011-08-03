@@ -87,6 +87,13 @@ class TagField extends TextField {
 	 */
 	public $deleteUnusedTags = true;
 	
+	/**
+	 * @var boolean Create new tags if not already defined in the $tagTopicClass table.
+	 * This only applies for tags defined by a $many_many relation,
+	 * text-based tags will be removed implicitly through modifying the actual text value.
+	 */
+	public $createNewTags = true;
+	
 	/*
 	 * If no sort clause is provided, then we'll sort it by the ID by default
 	 */
@@ -227,12 +234,12 @@ class TagField extends TextField {
 				Convert::raw2sql($tagString)
 			);
 			$tagObj = DataObject::get_one($tagClass, $SQL_filter);
-			if(!$tagObj) {
+			if(!$tagObj && $this->createNewTags) {
 				$tagObj = new $tagClass();
 				$tagObj->{$this->tagObjectField} = $tagString;
 				$tagObj->write();
 			}
-			$newTags[] = $tagObj->ID;
+			if ($tagObj) $newTags[] = $tagObj->ID;
 		}
 		
 		// set new tags
