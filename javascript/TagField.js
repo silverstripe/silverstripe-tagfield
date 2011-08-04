@@ -14,11 +14,10 @@
 		}
 	}
 	
-	if (typeof $(document).livequery != 'undefined') {
-		$('input.tagField').livequery(SSTagFieldLoader);
-	}	else {
-		$(document).ready(function(){
-			$('input.tagField').each(SSTagFieldLoader);
-		});
-	}
+	
+	$(document).ready(function(){
+		if (typeof $(document).livequery != 'undefined') 
+			$('input.tagField').livequery(SSTagFieldLoader);
+		else	$('input.tagField').each(SSTagFieldLoader);
+	});
 })(jQuery);
