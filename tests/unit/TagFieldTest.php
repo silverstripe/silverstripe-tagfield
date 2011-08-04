@@ -216,6 +216,25 @@ class TagFieldTest extends SapphireTest {
 		);
 	}
 	
+	function testCreateNewTagsDisabled() {
+		$newEntry = new TagFieldTest_BlogEntry();
+		$newEntry->write();
+		$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry');
+		$field->createNewTags = false;
+		$field->setValue('tag1 newtag2'); //'tag1' is from the fixture already, 'newtag2' is not in the db so shouldn't be added as a tag		
+		$field->saveInto($newEntry);		
+		
+		$savedEntry = DataObject::get_by_id('TagFieldTest_BlogEntry', $newEntry->ID);
+		$compare1=array_values($newEntry->Tags()->map('ID', 'Title'));
+		$compare2=array('tag1');
+		sort($compare1);
+		sort($compare2);
+		$this->assertEquals(
+			$compare1,
+			$compare2
+		);
+	}
+	
 	function testCustomSeparators() {
 		// should contain "tag1" and "tag2"
 		$existingEntry = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
