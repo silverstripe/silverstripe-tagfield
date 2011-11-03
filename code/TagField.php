@@ -153,6 +153,7 @@ class TagField extends TextField {
 		$tagTopicClassObj = singleton($this->getTagTopicClass());
 		
 		$searchString = $request->requestVar('tag');
+		$searchString = trim($searchString); # incase its comma seperated, and they do comma-space (, ) 
 		
 		if($this->customTags) {
 			$tags = $this->customTags;
