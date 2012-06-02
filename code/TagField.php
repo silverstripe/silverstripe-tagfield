@@ -168,15 +168,13 @@ class TagField extends TextField {
 	}
 	
 	function saveInto($record) {		
-		if($this->value) {
-			// $record should match the $tagTopicClass
-			if($record->many_many($this->Name())) {
-				$this->saveIntoObjectTags($record);
-			} elseif($record->hasField($this->Name())) {
-				$this->saveIntoTextbasedTags($record);
-			} else {
-				user_error('TagField::saveInto(): Cant find valid field or relation to save into', E_USER_ERROR);
-			}
+		// $record should match the $tagTopicClass
+		if($record->many_many($this->Name())) {
+			$this->saveIntoObjectTags($record);
+		} elseif($record->hasField($this->Name())) {
+			$this->saveIntoTextbasedTags($record);
+		} else {
+			user_error('TagField::saveInto(): Cant find valid field or relation to save into', E_USER_ERROR);
 		}
 	}
 	
