@@ -106,7 +106,9 @@ class TagField extends TextField {
 		parent::__construct($name, $title, $value);
 	}
 	
-	public function Field() {
+	public function Field($properties = array()) {
+		//TODO: do something with $properties? (now it's just there to prevent strict notices)
+		
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
 		Requirements::javascript(SAPPHIRE_DIR . "/javascript/jquery_improvements.js");
 
