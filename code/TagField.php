@@ -116,6 +116,7 @@ class TagField extends TextField {
 //		if (Director::is_ajax()) {
 //			Requirements::javascript(THIRDPARTY_DIR . '/jquery-livequery/jquery.livequery.js');
 //		}
+//		
 		//Doesn't seem to work in SS3, which just uses a json object for ajax, so we'll include it by default
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery-livequery/jquery.livequery.js');
 
