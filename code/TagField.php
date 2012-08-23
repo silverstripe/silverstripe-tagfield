@@ -280,7 +280,6 @@ class TagField extends TextField {
 	
 	protected function splitTagsToArray($tagsString) {
 		//$separator = (isset(self::$separator_to_regex[$this->separator])) ? self::$separator_to_regex[$this->separator] : $this->separator;
-		//var_dump( array_unique(explode($this->separator, trim($tagsString))) );
 		return array_unique(explode($this->separator, trim($tagsString)));
 	}
 	
