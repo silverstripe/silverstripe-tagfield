@@ -167,7 +167,8 @@ class TagField extends TextField {
 		return Convert::raw2json($tags);
 	}
 	
-	function saveInto($record) {		
+	function saveInto(DataObjectInterface $record) {
+				
 		// $record should match the $tagTopicClass
 		if($record->many_many($this->Name())) {
 			$this->saveIntoObjectTags($record);
