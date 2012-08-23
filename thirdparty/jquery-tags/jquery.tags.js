@@ -106,8 +106,8 @@ Custom events
                         currentTag = { position: i, tag: workingTags[i].toLowerCase() };
                         tagSelected = true;
                     }
-                    // lookup for filtering out chosen tags
-                    chosenTags[currentTags[i].toLowerCase()] = true;
+                    // lookup for filtering out chosen tags (working tags that should be...)
+                    chosenTags[workingTags[i].toLowerCase()] = true;
                 }
 
                 if (currentTag.tag && currentTag.tag.length >= 3) {
