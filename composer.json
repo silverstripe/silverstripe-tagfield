@@ -1,0 +1,10 @@
+{
+	"name": "silverstripe/tagfield",
+	"description": "Static publishing queue for westpac",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe"],
+	"require": {
+		"silverstripe/framework": "3.*",
+		"silverstripe/cms": "3.*"
+	}
+}
