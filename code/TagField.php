@@ -106,7 +106,7 @@ class TagField extends TextField {
 		parent::__construct($name, $title, $value);
 	}
 	
-	public function Field() {
+	public function Field($properties = array()) {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
 		Requirements::javascript(SAPPHIRE_DIR . "/javascript/jquery_improvements.js");
 
@@ -124,7 +124,7 @@ class TagField extends TextField {
 			'type' => 'text',
 			'class' => 'text tagField',
 			'id' => $this->id(),
-			'name' => $this->Name(),
+			'name' => $this->getName(),
 			'value' => $this->Value(),
 			'tabindex' => $this->getTabIndex(),
 			'autocomplete' => 'off',
@@ -156,22 +156,22 @@ class TagField extends TextField {
 		
 		if($this->customTags) {
 			$tags = $this->customTags;
-		} else if($tagTopicClassObj->many_many($this->Name())) {
+		} else if($tagTopicClassObj->many_many($this->getName())) {
 			$tags = $this->getObjectTags($searchString);
-		} else if($tagTopicClassObj->hasField($this->Name())) {
+		} else if($tagTopicClassObj->hasField($this->getName())) {
 			$tags = $this->getTextbasedTags($searchString);
 		} else {
-			user_error('TagField::suggest(): Cant find valid relation or text property with name "' . $this->Name() . '"', E_USER_ERROR);
+			user_error('TagField::suggest(): Cant find valid relation or text property with name "' . $this->getName() . '"', E_USER_ERROR);
 		}
 		
 		return Convert::raw2json($tags);
 	}
 	
-	function saveInto($record) {		
+	function saveInto(DataObjectInterface $record) {		
 		// $record should match the $tagTopicClass
-		if($record->many_many($this->Name())) {
+		if($record->many_many($this->getName())) {
 			$this->saveIntoObjectTags($record);
-		} elseif($record->hasField($this->Name())) {
+		} elseif($record->hasField($this->getName())) {
 			$this->saveIntoTextbasedTags($record);
 		} else {
 			user_error('TagField::saveInto(): Cant find valid field or relation to save into', E_USER_ERROR);
@@ -179,10 +179,10 @@ class TagField extends TextField {
 	}
 	
 	function setValue($value, $obj = null) {
-		if(isset($obj) && is_object($obj) && $obj instanceof DataObject && $obj->many_many($this->Name())) {
-			//if(!$obj->many_many($this->Name())) user_error("TagField::setValue(): Cant find relationship named '$this->Name()' on object", E_USER_ERROR);
-			$tags = $obj->{$this->Name()}();
-			$this->value = implode($this->separator, array_values($tags->map('ID',$this->tagObjectField)));
+		if(isset($obj) && is_object($obj) && $obj instanceof DataObject && $obj->many_many($this->getName())) {
+			//if(!$obj->many_many($this->getName())) user_error("TagField::setValue(): Cant find relationship named '$this->getName()' on object", E_USER_ERROR);
+			$tags = $obj->{$this->getName()}();
+			$this->value = implode($this->separator, array_values($tags->map('ID',$this->tagObjectField)->toArray()));
 		} else {
 			parent::setValue($value, $obj);
 		}
@@ -214,10 +214,8 @@ class TagField extends TextField {
 		// HACK We can't save relationship tables without having an ID
 		if(!$record->isInDB()) $record->write();
 
-		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
-		
 		$tagsArr = $this->splitTagsToArray($this->value);
-		$relationName = $this->Name();
+		$relationName = $this->getName();
 		$tagsComponentSet = $record->$relationName();
 		$existingTags = $tagsComponentSet->getIdList();
 		$tagClass = $this->getTagClass();
@@ -226,7 +224,7 @@ class TagField extends TextField {
 		// list of new tag IDs
 		$newTags = array();
 		if($tagsArr) foreach($tagsArr as $tagString) {
-			$SQL_filter = sprintf("{$q}%s{$q}.{$q}%s{$q} = '%s'",
+			$SQL_filter = sprintf("\"%s\".\"%s\" = '%s'",
 				$tagBaseClass,
 				$this->tagObjectField,
 				Convert::raw2sql($tagString)
@@ -250,9 +248,9 @@ class TagField extends TextField {
 			$counts = array();
 			foreach($removedTags as $removedTagID) {
 				$removedTagQuery = new SQLQuery(
-					array("COUNT({$q}ID{$q})"),
-					array($q.$relationTable.$q),
-					array(sprintf("{$q}%s{$q} = %d", $tagIDField, (int)$removedTagID))
+					array("COUNT(\"ID\")"),
+					array('"'.$relationTable.'"'),
+					array(sprintf("\"%s\" = %d", $tagIDField, (int)$removedTagID))
 				);
 				$removedTagCount = $removedTagQuery->execute()->value();
 				
@@ -262,7 +260,7 @@ class TagField extends TextField {
 	}
 	
 	protected function saveIntoTextbasedTags($record) {
-		$tagFieldName = $this->Name();
+		$tagFieldName = $this->getName();
 		
 		// necessary step to filter whitespace etc.
 		$RAW_tagsArr = $this->splitTagsToArray($this->value);
@@ -282,9 +280,9 @@ class TagField extends TextField {
 	 * Use only when storing tags in objects
 	 */
 	protected function getTagClass() {
-		$tagManyMany = singleton($this->getTagTopicClass())->many_many($this->Name());
+		$tagManyMany = singleton($this->getTagTopicClass())->many_many($this->getName());
 		if(!$tagManyMany) {
-			user_error('TagField::getTagClass(): Cant find relation with name "' . $this->Name() . '"', E_USER_ERROR);
+			user_error('TagField::getTagClass(): Cant find relation with name "' . $this->getName() . '"', E_USER_ERROR);
 		}
 
 		return $tagManyMany[1];
@@ -294,10 +292,8 @@ class TagField extends TextField {
 		$tagClass = $this->getTagClass();
 		$tagBaseClass = ClassInfo::baseDataClass($tagClass);
 		
-		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
-		
 		//NOTE: using the LOWER function will mean that indexes will not work on this column.
-		$SQL_filter = 'LOWER(' . sprintf("{$q}%s{$q}.{$q}%s{$q}) LIKE LOWER('%%%s%%')",
+		$SQL_filter = 'LOWER(' . sprintf("\"%s\".\"%s\") LIKE LOWER('%%%s%%')",
 			$tagBaseClass,
 			$this->tagObjectField,
 			Convert::raw2sql($searchString)
@@ -305,7 +301,7 @@ class TagField extends TextField {
 		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 		
 		$tagObjs = DataObject::get($tagClass, $SQL_filter, $this->tagSort, "", $this->maxSuggestionsNum);
-		$tagArr = ($tagObjs) ? array_values($tagObjs->map('ID', $this->tagObjectField)) : array();
+		$tagArr = ($tagObjs) ? array_values($tagObjs->map('ID', $this->tagObjectField)->toArray()) : array();
 		
 		return $tagArr;
 	}
@@ -318,22 +314,17 @@ class TagField extends TextField {
 	 * @return array
 	 */
 	protected function getTextbasedTags($searchString) {
-
-		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
-		
 		//NOTE: using the LOWER function will mean that indexes will not work on this column.
-		$SQL_filter = 'LOWER(' . sprintf("{$q}%s{$q}.{$q}%s{$q}) LIKE LOWER('%%%s%%')",
+		$filter = 'LOWER(' . sprintf("\"%s\".\"%s\") LIKE LOWER('%%%s%%')",
 			$this->getTagTopicClass(),
-			$this->Name(),
+			$this->getName(),
 			Convert::raw2sql($searchString)
 		);
-		if($this->tagFilter) $SQL_filter .= ' AND ' . $this->tagFilter;
 
-		$allTopicSQL = singleton($this->getTagTopicClass())->buildSQL($SQL_filter, $this->tagSort);
-		$allTopicSQL->select = array(
-			sprintf("{$q}%s{$q}.{$q}%s{$q}", $this->getTagTopicClass(), $this->Name())
-		);
-		$multipleTagsArr = $allTopicSQL->execute()->column();
+		$q = new DataQuery($this->getTagTopicClass());
+		$q->where($filter)->sort($this->tagSort);
+		if($this->tagFilter) $q->where($this->tagFilter);
+		$multipleTagsArr = $q->column($this->getName());
 
 		$filteredTagArr = array();
 		if($multipleTagsArr) foreach($multipleTagsArr as $multipleTags) {

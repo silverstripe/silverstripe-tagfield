@@ -2,9 +2,16 @@
 	"name": "silverstripe/tagfield",
 	"description": "Static publishing queue for westpac",
 	"type": "silverstripe-module",
-	"keywords": ["silverstripe"],
+	"license": "BSD-3-Clause",
+	"keywords": ["silverstripe", "tags", "forms"],
+	"authors": [
+		{
+			"name": "Ingo Schommer",
+			"homepage": "ingo@silverstripe.com"
+		}	
+	],
 	"require": {
-		"silverstripe/framework": "3.*",
-		"silverstripe/cms": "3.*"
+		"php": ">=5.3.2",
+		"silverstripe/framework": "3.*"
 	}
 }

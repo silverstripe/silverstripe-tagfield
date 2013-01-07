@@ -6,7 +6,7 @@
 
 ## Requirements
 
- * SilverStripe 2.3 or newer
+ * SilverStripe 3.0 or newer
  * Database: MySQL 5+, SQLite3, Postgres 8.3, SQL Server 2008
 
 ## Download/Information

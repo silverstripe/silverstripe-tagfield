@@ -22,7 +22,7 @@ class TagFieldTest extends SapphireTest {
 		$field->saveInto($existingEntry);
 		$existingEntry->write();
 		
-		$compare1=array_values($existingEntry->Tags()->map('ID', 'Title'));
+		$compare1=array_values($existingEntry->Tags()->map('ID', 'Title')->toArray());
 		$compare2=array('tag1','tag3');
 		sort($compare1);
 		sort($compare2);
@@ -40,7 +40,7 @@ class TagFieldTest extends SapphireTest {
 		$field->setValue('tag1 tag2'); // test separator handling as well
 		$field->saveInto($newEntry);
 	
-		$compare1=array_values($newEntry->Tags()->map('ID', 'Title'));
+		$compare1=array_values($newEntry->Tags()->map('ID', 'Title')->toArray());
 		$compare2=array('tag1','tag2');
 		sort($compare1);
 		sort($compare2);
@@ -65,7 +65,7 @@ class TagFieldTest extends SapphireTest {
 	/*
 	function testSuggestRequest() {
 		// partial
-		$response = $this->post('TagFieldTestController/ObjectTestForm/fields/Tags/suggest', array('tag','tag'));
+		$response = $this->post('TagFieldTest_Controller/ObjectTestForm/fields/Tags/suggest', array('tag','tag'));
 		$this->assertEquals($response->getBody(), '["tag1","tag2"]');
 	}
 	*/
@@ -79,7 +79,7 @@ class TagFieldTest extends SapphireTest {
 		// partial
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest', 
+			'TagFieldTest_Controller/ObjectTestForm/fields/Tags/suggest', 
 			null,
 			array('tag' => 'tag')
 		);
@@ -88,7 +88,7 @@ class TagFieldTest extends SapphireTest {
 		// full
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
+			'TagFieldTest_Controller/ObjectTestForm/fields/Tags/suggest',
 			null,
 			array('tag' => 'tag1')
 		);
@@ -98,7 +98,7 @@ class TagFieldTest extends SapphireTest {
 		// case insensitive
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
+			'TagFieldTest_Controller/ObjectTestForm/fields/Tags/suggest',
 			null,
 			array('tag' => 'TAG1')
 		);
@@ -107,7 +107,7 @@ class TagFieldTest extends SapphireTest {
 		// no match
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest',
+			'TagFieldTest_Controller/ObjectTestForm/fields/Tags/suggest',
 			null,
 			array('tag' => 'unknown')
 		);
@@ -123,7 +123,7 @@ class TagFieldTest extends SapphireTest {
 		// partial
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			'TagFieldTest_Controller/TextbasedTestForm/fields/Tags/suggest',
 			null,
 			array('tag' => 'tag')
 		);
@@ -132,7 +132,7 @@ class TagFieldTest extends SapphireTest {
 		// full
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			'TagFieldTest_Controller/TextbasedTestForm/fields/Tags/suggest',
 			null,
 			array('tag' => 'tag1')
 		);
@@ -141,7 +141,7 @@ class TagFieldTest extends SapphireTest {
 		// case insensitive
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			'TagFieldTest_Controller/TextbasedTestForm/fields/Tags/suggest',
 			null,
 			array('tag' => 'TAG1')
 		);
@@ -150,7 +150,7 @@ class TagFieldTest extends SapphireTest {
 		// no match
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/TextbasedTestForm/fields/Tags/suggest',
+			'TagFieldTest_Controller/TextbasedTestForm/fields/Tags/suggest',
 			null,
 			array('tag' => 'unknown')
 		);
@@ -161,10 +161,10 @@ class TagFieldTest extends SapphireTest {
 		$form = new Form(
 			$this,
 			'Form',
-			new FieldSet(
+			new FieldList(
 				$field = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry')
 			),
-			new FieldSet()
+			new FieldList()
 		);
 		$existingEntry = $this->objFromFixture('TagFieldTest_BlogEntry', 'blogentry1');
 		$form->loadDataFrom($existingEntry);
@@ -183,14 +183,13 @@ class TagFieldTest extends SapphireTest {
 		$field->saveInto($entry1);
 		$entry1->write();
 		
-		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
-		$this->assertType(
+		$this->assertInstanceOf(
 			'TagFieldTest_Tag', 
-			DataObject::get_one('TagFieldTest_Tag', "{$q}TagFieldTest_Tag{$q}.{$q}Title{$q} = 'tag1'"),
+			TagFieldTest_Tag::get()->filter('Title', 'tag1')->First(),
 			'Removing a tag relation which is still present in other objects shouldnt remove the tag record'
 		);
-		$this->assertFalse(
-			DataObject::get_one('TagFieldTest_Tag', "{$q}TagFieldTest_Tag{$q}.{$q}Title{$q} = 'tag2'"),
+		$this->assertNull(
+			TagFieldTest_Tag::get()->filter('Title', 'tag2')->First(),
 			'If the only remaining relation of a tag record is removed, the tag should be removed completely'
 		);
 	}
@@ -209,7 +208,7 @@ class TagFieldTest extends SapphireTest {
 		$entry1->write();
 		
 		$q = defined('DB::USE_ANSI_SQL') ? '"' : '`';
-		$this->assertType(
+		$this->assertInstanceOf(
 			'TagFieldTest_Tag', 
 			DataObject::get_one('TagFieldTest_Tag', "{$q}TagFieldTest_Tag{$q}.{$q}Title{$q} = 'tag2'"),
 			'If the only remaining relation of a tag record is removed and $deleteUnusedTags is disabled, the tag record should be retained'
@@ -225,7 +224,7 @@ class TagFieldTest extends SapphireTest {
 		$field->saveInto($newEntry);		
 		
 		$savedEntry = DataObject::get_by_id('TagFieldTest_BlogEntry', $newEntry->ID);
-		$compare1=array_values($newEntry->Tags()->map('ID', 'Title'));
+		$compare1=array_values($newEntry->Tags()->map('ID', 'Title')->toArray());
 		$compare2=array('tag1');
 		sort($compare1);
 		sort($compare2);
@@ -244,7 +243,7 @@ class TagFieldTest extends SapphireTest {
 		$field->saveInto($existingEntry);
 		$existingEntry->write();
 		
-		$compare1=array_values($existingEntry->Tags()->map('ID', 'Title'));
+		$compare1=array_values($existingEntry->Tags()->map('ID', 'Title')->toArray());
 		$compare2=array('tag1','tag3');
 		sort($compare1);
 		sort($compare2);
@@ -265,7 +264,7 @@ class TagFieldTest extends SapphireTest {
 		// partial
 		$request = new $httpReqClass(
 			'get',
-			'TagFieldTestController/ObjectTestForm/fields/Tags/suggest', 
+			'TagFieldTest_Controller/ObjectTestForm/fields/Tags/suggest', 
 			null,
 			array('tag' => 'tag')
 		);
@@ -311,10 +310,10 @@ class TagFieldTest_Controller extends Controller {
 	);
 	
 	public function ObjectTestForm() {
-		$fields = new FieldSet(
+		$fields = new FieldList(
 			$tagField = new TagField('Tags', null, null, 'TagFieldTest_BlogEntry')
 		);
-		$actions = new FieldSet(
+		$actions = new FieldList(
 			new FormAction('ObjectTestForm_submit')
 		);
 		$form = new Form($this, 'ObjectTestForm', $fields, $actions);
@@ -327,10 +326,10 @@ class TagFieldTest_Controller extends Controller {
 	}
 	
 	public function TextbasedTestForm() {
-		$fields = new FieldSet(
+		$fields = new FieldList(
 			$tagField = new TagField('TextbasedTags', null, null, 'TagFieldTest_BlogEntry')
 		);
-		$actions = new FieldSet(
+		$actions = new FieldList(
 			new FormAction('TextbasedTestForm_submit')
 		);
 		$form = new Form($this, 'TextbasedTestForm', $fields, $actions);
@@ -343,8 +342,3 @@ class TagFieldTest_Controller extends Controller {
 	}
 	
 }
-
-Director::addRules(50, array(
-	'TagFieldTestController' => "TagFieldTest_Controller",
-));
-?>
