@@ -108,7 +108,6 @@ class TagField extends TextField {
 	
 	public function Field($properties = array()) {
 		Requirements::javascript(THIRDPARTY_DIR . "/jquery/jquery.js");
-		Requirements::javascript(SAPPHIRE_DIR . "/javascript/jquery_improvements.js");
 
 		// If the request was made via AJAX, we need livequery to init the field.
 		if (Director::is_ajax()) {
@@ -119,29 +118,20 @@ class TagField extends TextField {
 		Requirements::javascript("tagfield/javascript/TagField.js");
 		Requirements::css("tagfield/css/TagField.css");
 
-		// Standard textfield stuff
-		$attributes = array(
-			'type' => 'text',
-			'class' => 'text tagField',
-			'id' => $this->id(),
-			'name' => $this->getName(),
-			'value' => $this->Value(),
-			'tabindex' => $this->getTabIndex(),
-			'autocomplete' => 'off',
-			'maxlength' => ($this->maxLength) ? $this->maxLength : null,
-			'size' => ($this->maxLength) ? min( $this->maxLength, 30 ) : null,
-		);
-		if($this->disabled) $attributes['disabled'] = 'disabled';
-		
-		// Data passed as custom attributes
-		if($this->customTags) {
-			$attributes['tags'] = $this->customTags;
-		} else {
-			$attributes['href'] = parse_url($this->Link(),PHP_URL_PATH) . '/suggest';
-		}
-		$attributes['rel'] = $this->separator;
+		return $this->createTag('input', $this->getAttributes());
+	}
 
-		return $this->createTag('input', $attributes);
+	public function getAttributes() {
+		$attrs = parent::getAttributes();
+		$custom = array(
+			'autocomplete' => 'off',
+			'class' => $attrs['class'] . ' tagField text',
+			// Data passed as custom attributes
+			'tags' => $this->customTags ? $this->customTags : null,
+			'href' => $this->customTags ? null : parse_url($this->Link(),PHP_URL_PATH) . '/suggest',
+			'rel' => $this->separator,
+		);
+		return array_merge($attrs, $custom);
 	}
 	
 	/**
