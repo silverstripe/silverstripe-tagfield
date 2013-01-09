@@ -1,5 +1,7 @@
 # TagField Module
 
+[![Build Status](https://secure.travis-ci.org/chillu/silverstripe-tagfield.png?branch=master)](https://travis-ci.org/chillu/silverstripe-tagfield)
+
 ## Maintainer Contact
 
  * Ingo Schommer (Nickname: ischommer) <ingo (at) silverstripe (dot) com>
