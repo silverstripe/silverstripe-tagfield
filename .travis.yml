@@ -1,0 +1,21 @@
+language: php 
+php: 
+ - 5.3
+ - 5.4
+
+env:
+ - TESTDB=MYSQL
+ - TESTDB=PGSQL
+
+matrix:
+  exclude:
+    - php: 5.4
+      env: TESTDB=PGSQL
+
+before_script:
+ - phpenv rehash
+ - ./tests/travis/before_script ~/builds/ss 
+ - cd ~/builds/ss
+
+script: 
+ - phpunit tagfield/tests/
