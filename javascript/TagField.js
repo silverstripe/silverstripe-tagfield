@@ -9,6 +9,7 @@
 		} else {
 			$(this).tagSuggest({
 				url:  $(this).attr('href'),
+				delay: 300,
 				separator: $(this).attr('rel')
 			});
 		}
