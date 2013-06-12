@@ -274,13 +274,13 @@ class TagFieldTest extends SapphireTest {
 
 class TagFieldTest_Tag extends DataObject implements TestOnly {
 	
-	static $default_sort = '"TagFieldTest_Tag"."ID" ASC';
+	private static $default_sort = '"TagFieldTest_Tag"."ID" ASC';
 	
-	static $db = array(
+	private static $db = array(
 		'Title' => 'Varchar(200)'
 	);
 	
-	static $belongs_many_many = array(
+	private static $belongs_many_many = array(
 		'BlogEntries' => 'TagFieldTest_BlogEntry'
 	);
 	
@@ -288,15 +288,15 @@ class TagFieldTest_Tag extends DataObject implements TestOnly {
 
 class TagFieldTest_BlogEntry extends DataObject implements TestOnly {
 	
-	static $default_sort = '"TagFieldTest_BlogEntry"."ID" ASC';
+	private static $default_sort = '"TagFieldTest_BlogEntry"."ID" ASC';
 	
-	static $db = array(
+	private static $db = array(
 		'Title' => 'Text',
 		'Content' => 'Text',
 		'TextbasedTags' => 'Text'
 	);
 	
-	static $many_many = array(
+	private static $many_many = array(
 		'Tags' => 'TagFieldTest_Tag'
 	);
 	
@@ -304,7 +304,7 @@ class TagFieldTest_BlogEntry extends DataObject implements TestOnly {
 
 class TagFieldTest_Controller extends Controller {
 	
-	static $url_handlers = array(
+	private static $url_handlers = array(
 		// The double-slash is need here to ensure that 
 		'$Action//$ID/$OtherID' => "handleAction",
 	);

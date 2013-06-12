@@ -118,7 +118,7 @@ class TagField extends TextField {
 		Requirements::javascript("tagfield/javascript/TagField.js");
 		Requirements::css("tagfield/css/TagField.css");
 
-		return $this->createTag('input', $this->getAttributes());
+		return parent::Field($properties);
 	}
 
 	public function getAttributes() {
@@ -131,6 +131,7 @@ class TagField extends TextField {
 			'href' => $this->customTags ? null : parse_url($this->Link(),PHP_URL_PATH) . '/suggest',
 			'rel' => $this->separator,
 		);
+
 		return array_merge($attrs, $custom);
 	}
 	
@@ -392,7 +393,5 @@ class TagField extends TextField {
 	 */
 	public function getCustomTags() {
 		return $this->customTags;
-	}
-	
+	}	
 }
-?>
