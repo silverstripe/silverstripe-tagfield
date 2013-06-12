@@ -5,8 +5,8 @@
 	"license": "BSD-3-Clause",
 	"keywords": ["silverstripe", "tags", "forms"],
 	"authors": [{
-		"name": "Ingo Schommer",
-		"email": "ingo@silverstripe.com"
+			"name": "Ingo Schommer",
+			"email": "ingo@silverstripe.com"
 	}],
 	"require": {
 		"php": ">=5.3.2",
