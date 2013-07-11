@@ -36,6 +36,13 @@
 class TagField extends TextField {
 	
 	/**
+	 * @var array
+	 */
+	private static $allowed_actions = array(
+		'suggest'
+	);
+	
+	/**
 	 * @var string $tagTopicClass The DataObject class with a text property
 	 * or many_many relation matching the name of the Field.
 	 */
