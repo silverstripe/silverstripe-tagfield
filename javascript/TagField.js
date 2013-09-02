@@ -3,7 +3,7 @@
 		var tags = $(this).attr('tags');
 		if(tags) {
 			$(this).tagSuggest({
-				tags:  tags,
+				tags: JSON.parse(tags),
 				separator: $(this).attr('rel')
 			});
 		} else {

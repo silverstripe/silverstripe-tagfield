@@ -134,7 +134,7 @@ class TagField extends TextField {
 			'autocomplete' => 'off',
 			'class' => $attrs['class'] . ' tagField text',
 			// Data passed as custom attributes
-			'tags' => $this->customTags ? $this->customTags : null,
+			'tags' => $this->customTags ? Convert::raw2json($this->customTags) : null,
 			'href' => $this->customTags ? null : parse_url($this->Link(),PHP_URL_PATH) . '/suggest',
 			'rel' => $this->separator,
 		);
