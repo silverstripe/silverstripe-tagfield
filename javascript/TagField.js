@@ -17,8 +17,6 @@
 	
 	
 	$(document).ready(function(){
-		if (typeof $(document).livequery != 'undefined') 
-			$('input.tagField').livequery(SSTagFieldLoader);
-		else	$('input.tagField').each(SSTagFieldLoader);
+		$('input.tagField').livequery(SSTagFieldLoader);
 	});
 })(jQuery);
