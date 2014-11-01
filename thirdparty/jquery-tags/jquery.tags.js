@@ -100,8 +100,16 @@ Custom events
                 // we're looking to complete the tag on currentTag.position (to start with)
                 currentTag = { position: currentTags.length-1, tag: '' };
                 
-                for (i = 0; i < currentTags.length && i < workingTags.length; i++) {
-                    if (!tagSelected && 
+                for (i = 0; i < currentTags.length || i < workingTags.length; i++) {
+                    if (typeof currentTags[i] == 'undefined') {
+                        currentTags[i] = '';
+                    }
+                    if (typeof workingTags[i] == 'undefined') {
+                        currentTags.splice(i, 1);
+                        break;
+                    }
+                    
+                    if (!tagSelected &&
                         currentTags[i].toLowerCase() != workingTags[i].toLowerCase()) {
                         currentTag = { position: i, tag: workingTags[i].toLowerCase() };
                         tagSelected = true;
