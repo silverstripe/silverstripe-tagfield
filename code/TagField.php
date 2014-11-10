@@ -70,6 +70,8 @@ class TagField extends TextField {
 	 * @var $separator Determines on which character to split tags in a string.
 	 */
 	protected $separator = ' ';
+        
+        protected $appendToSeparator = '';
 	
 	protected static $separator_to_regex = array(
 		' ' => '\s',
@@ -133,6 +135,7 @@ class TagField extends TextField {
 			'tags' => $this->customTags ? Convert::raw2json($this->customTags) : null,
 			'href' => $this->customTags ? null : parse_url($this->Link(),PHP_URL_PATH) . '/suggest',
 			'rel' => $this->separator,
+                        'data-appendToSeparator' => $this->appendToSeparator,
 		);
 
 		return array_merge($attrs, $custom);
@@ -177,7 +180,7 @@ class TagField extends TextField {
 		if(isset($obj) && is_object($obj) && $obj instanceof DataObject && $obj->many_many($this->getName())) {
 			//if(!$obj->many_many($this->getName())) user_error("TagField::setValue(): Cant find relationship named '$this->getName()' on object", E_USER_ERROR);
 			$tags = $obj->{$this->getName()}();
-			$this->value = implode($this->separator, array_values($tags->map('ID',$this->tagObjectField)->toArray()));
+			$this->value = implode($this->separator.$this->appendToSeparator, array_values($tags->map('ID',$this->tagObjectField)->toArray()));
 		} else {
 			parent::setValue($value, $obj);
 		}
@@ -341,6 +344,10 @@ class TagField extends TextField {
 	public function setTagFilter($sql) {
 		$this->tagFilter = $sql;
 	}
+        
+        public function setAppendToSeparator($string) {
+            $this->appendToSeparator = $string;
+        }
 	
 	public function getTagFilter() {
 		return $this->tagFilter;

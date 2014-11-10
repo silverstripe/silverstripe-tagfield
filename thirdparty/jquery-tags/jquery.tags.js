@@ -58,10 +58,11 @@ Custom events
             'tagWrap' : 'span', 
             'sort' : true,
             'tags' : null,
-            'url' : null
+            'url' : null,
         //    'delay' : 300,
         };
 		defaults['separator'] = $(this).attr('rel');
+                defaults['appendToSeparator'] = $(this).attr('data-appendToSeparator');
 
         var i, tag, userTags = [], settings = $.extend({}, defaults, options);
 
@@ -196,7 +197,7 @@ Custom events
 
                 workingTags[i] = tag;
 
-                tagsElm.val(workingTags.join(settings.separator));
+                tagsElm.val(workingTags.join(settings.separator+settings.appendToSeparator));
                 tagsElm.blur().focus();
 				tagsElm.trigger('tags:tagSelected');
                 setSelection();
