@@ -71,7 +71,7 @@ class TagField extends DropdownField {
 
 		return $this
 			->customise($properties)
-			->renderWith(["templates/TagField"]);
+			->renderWith(array("templates/TagField"));
 	}
 
 	/**
