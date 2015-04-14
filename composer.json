@@ -1,5 +1,5 @@
 {
-	"name": "silverstripe/tag-field",
+	"name": "silverstripe/tagfield",
 	"description": "Tag field for Silverstripe",
 	"license": "BSD-2-Clause",
 	"type": "silverstripe-module",
@@ -16,7 +16,7 @@
 		}
 	],
 	"support": {
-		"issues": "http://github.com/silverstripe-labs/silverstripe-tag-field/issues"
+		"issues": "http://github.com/silverstripe-labs/silverstripe-tagfield/issues"
 	},
 	"require": {
 		"silverstripe/framework": "~3.1"
