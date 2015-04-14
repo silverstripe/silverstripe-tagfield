@@ -1,0 +1,24 @@
+{
+	"name": "silverstripe/tag-field",
+	"description": "Tag field for Silverstripe",
+	"license": "BSD-2-Clause",
+	"type": "silverstripe-module",
+	"keywords": [
+		"silverstripe",
+		"tag",
+		"field"
+	],
+	"authors": [
+		{
+			"name": "Christopher Pitt",
+			"email": "cgpitt@gmail.com",
+			"homepage": "http://github.com/assertchris"
+		}
+	],
+	"support": {
+		"issues": "http://github.com/silverstripe-labs/silverstripe-tag-field/issues"
+	},
+	"require": {
+		"silverstripe/framework": "~3.1"
+	}
+}
