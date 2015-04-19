@@ -1,6 +1,6 @@
 # TagField Module
 
-[![Build Status](https://secure.travis-ci.org/chillu/silverstripe-tagfield.png?branch=master)](https://travis-ci.org/chillu/silverstripe-tagfield)
+[![Build Status](https://secure.travis-ci.org/silverstripe-labs/silverstripe-tagfield.png?branch=master)](https://travis-ci.org/silverstripe-labs/silverstripe-tagfield)
 
 ## Maintainer Contact
 
