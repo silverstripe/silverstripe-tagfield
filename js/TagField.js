@@ -10,7 +10,6 @@
 	 */
 	$.fn.chosenDestroy = function () {
 		$(this)
-			.show()
 			.removeClass('chzn-done')
 			.removeClass('has-chzn')
 			.next()
@@ -21,31 +20,27 @@
 
 	$.entwine('ss', function($) {
 
-		$('.silverstripe-tag-field').entwine({
-			'onadd': function() {
-				var $this = $(this);
+		$('.silverstripe-tag-field + .chzn-container').entwine({
+			onmatch: function() {
+				var $select = $(this).prev();
+
+				$select
+					.chosenDestroy()
+					.select2({
+						'tags': true,
+						'tokenSeparators': [',', ' ']
+					});
 
 				/*
-				 * Delay a cycle so we don't see 2 inputs...
+				 * Delay a cycle so select2 is initialised before
+				 * selecting values (if data-selected-values is present).
 				 */
 				setTimeout(function () {
-					$this.chosenDestroy()
-						.select2({
-							'tags': true,
-							'tokenSeparators': [',', ' ']
-						});
+					if ($select.attr('data-selected-values')) {
+						var values = $select.attr('data-selected-values');
 
-					/*
-					 * Delay a cycle so select2 is initialised before
-					 * selecting values (if data-selected-values is present).
-					 */
-					setTimeout(function () {
-						if ($this.attr('data-selected-values')) {
-							var values = $this.attr('data-selected-values');
-
-							$this.select2('val', values.split(','));
-						}
-					}, 0);
+						$select.select2('val', values.split(','));
+					}
 				}, 0);
 			}
 		});
