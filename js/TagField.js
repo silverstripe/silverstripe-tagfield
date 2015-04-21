@@ -10,6 +10,7 @@
 	 */
 	$.fn.chosenDestroy = function () {
 		$(this)
+			.show() // The field needs to be visible so Select2 evaluates the width correctly.
 			.removeClass('chzn-done')
 			.removeClass('has-chzn')
 			.next()
@@ -21,8 +22,18 @@
 	$.entwine('ss', function($) {
 
 		$('.silverstripe-tag-field + .chzn-container').entwine({
-			onmatch: function() {
-				var $select = $(this).prev();
+			applySelect2: function () {
+				var self = this,
+					$select = $(this).prev();
+
+				// There is a race condition where Select2 might not
+				// be bound to jQuery yet. So here we make sure Select2
+				// is defined before trying to invoke it.
+				if ($.fn.select2 === void 0) {
+					return setTimeout(function () {
+						self.applySelect2();
+					}, 0);
+				}
 
 				$select
 					.chosenDestroy()
@@ -42,6 +53,9 @@
 						$select.select2('val', values.split(','));
 					}
 				}, 0);
+			},
+			onmatch: function() {
+				this.applySelect2();
 			}
 		});
 	});
