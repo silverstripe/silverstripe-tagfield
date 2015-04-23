@@ -14,12 +14,12 @@
 			.removeClass('chzn-done')
 			.removeClass('has-chzn')
 			.next()
-				.remove();
+			.remove();
 
 		return $(this);
 	};
 
-	$.entwine('ss', function($) {
+	$.entwine('ss', function ($) {
 
 		$('.silverstripe-tag-field + .chzn-container').entwine({
 			applySelect2: function () {
@@ -35,12 +35,33 @@
 					}, 0);
 				}
 
+				var options = {
+					'tags': true,
+					'tokenSeparators': [',', ' ']
+				};
+
+				if ($select.attr('data-suggest-url')) {
+					options.ajax = {
+						'url': $select.attr('data-suggest-url'),
+						'dataType': 'json',
+						'delay': 250,
+						'data': function (params) {
+							return {
+								'term': params.term
+							};
+						},
+						'processResults': function (data) {
+							return {
+								'results': data.items
+							};
+						},
+						'cache': true
+					}
+				}
+
 				$select
 					.chosenDestroy()
-					.select2({
-						'tags': true,
-						'tokenSeparators': [',', ' ']
-					});
+					.select2(options);
 
 				/*
 				 * Delay a cycle so select2 is initialised before
@@ -54,7 +75,7 @@
 					}
 				}, 0);
 			},
-			onmatch: function() {
+			onmatch: function () {
 				this.applySelect2();
 			}
 		});
