@@ -86,7 +86,7 @@
     width: 12px;
     height: 13px;
     font-size: 1px;
-    background: url('/framework/admin/thirdparty/chosen/chosen/chosen-sprite.png') right top no-repeat;
+    background: url('../../framework/admin/thirdparty/chosen/chosen/chosen-sprite.png') right top no-repeat;
 }
 
 .select2-results__option--highlighted {
