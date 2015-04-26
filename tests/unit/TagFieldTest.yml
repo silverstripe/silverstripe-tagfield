@@ -1,0 +1,14 @@
+TagFieldTest_BlogTag:
+   Object1:
+      Title: Object1
+   Object2:
+      Title: Object2
+TagFieldTest_BlogPost:
+   BlogPost1:
+      Title: BlogPost1
+   BlogPost2:
+      Title: BlogPost2
+      TextBasedTags: Text1,Text2
+   BlogPost3:
+      Title: BlogPost3
+      Tags: =>TagFieldTest_BlogTag.Object1,=>TagFieldTest_BlogTag.Object2

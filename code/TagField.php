@@ -8,34 +8,142 @@
  */
 class TagField extends DropdownField {
 	/**
+	 * @var array
+	 */
+	public static $allowed_actions = array(
+		'suggest',
+	);
+
+	/**
 	 * @var bool
 	 */
-	protected $readOnly;
+	protected $ajax = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $readOnly = false;
+
+	/**
+	 * @var string
+	 */
+	protected $relationTitle = 'Title';
+
+	/**
+	 * @var int
+	 */
+	protected $ajaxItemLimit = 10;
 
 	/**
 	 * @var null|string
 	 */
-	protected $relationTitleField;
+	protected $recordClass;
 
 	/**
-	 * @param string      $name
+	 * @param string $name
 	 * @param null|string $title
-	 * @param array       $source
-	 * @param array       $value
-	 * @param bool        $readOnly
-	 * @param string      $relationTitleField
+	 * @param array $source
+	 * @param array $value
+	 * @param bool $readOnly
 	 */
-	public function __construct($name, $title = null, $source = array(), $value = array(), $readOnly = false, $relationTitleField = 'Title') {
-		$this->readOnly = $readOnly;
-		$this->relationTitleField = $relationTitleField;
+	public function __construct($name, $title = null, $source = array(), $value = array(), $readOnly = false) {
+		$this->setReadOnly($readOnly);
 
 		parent::__construct($name, $title, $source, $value);
 	}
 
 	/**
-	 * @param array $properties
+	 * @return bool
+	 */
+	public function getAjax() {
+		return $this->ajax;
+	}
+
+	/**
+	 * @param bool $ajax
 	 *
-	 * @return string
+	 * @return static
+	 */
+	public function setAjax($ajax) {
+		$this->ajax = $ajax;
+
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getReadOnly() {
+		return $this->readOnly;
+	}
+
+	/**
+	 * @param bool $readOnly
+	 *
+	 * @return static
+	 */
+	public function setReadOnly($readOnly) {
+		$this->readOnly = $readOnly;
+
+		return $this;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getRelationTitle() {
+		return $this->relationTitle;
+	}
+
+	/**
+	 * @param string $relationTitle
+	 *
+	 * @return static
+	 */
+	public function setRelationTitle($relationTitle) {
+		$this->relationTitle = $relationTitle;
+
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getAjaxItemLimit() {
+		return $this->ajaxItemLimit;
+	}
+
+	/**
+	 * @param int $ajaxItemLimit
+	 *
+	 * @return static
+	 */
+	public function setAjaxItemLimit($ajaxItemLimit) {
+		$this->ajaxItemLimit = $ajaxItemLimit;
+
+		return $this;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getRecordClass() {
+		return $this->recordClass;
+	}
+
+	/**
+	 * @param string $recordClass
+	 *
+	 * @return static
+	 */
+	public function setRecordClass($recordClass) {
+		$this->recordClass = $recordClass;
+
+		return $this;
+	}
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function Field($properties = array()) {
 		Requirements::css(TAG_FIELD_DIR . '/css/select2.min.css');
@@ -43,7 +151,6 @@ class TagField extends DropdownField {
 
 		Requirements::javascript(TAG_FIELD_DIR . '/js/TagField.js');
 		Requirements::javascript(TAG_FIELD_DIR . '/js/select2.js');
-
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
 
@@ -51,11 +158,41 @@ class TagField extends DropdownField {
 
 		$this->setAttribute('multiple', 'multiple');
 
+		if($this->ajax) {
+			$this->setAttribute('data-suggest-url', $this->getSuggestURL());
+		}
+
+		$properties = array_merge($properties, array(
+			'Options' => $this->getOptions()
+		));
+
+		return $this
+			->customise($properties)
+			->renderWith(array("templates/TagField"));
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getSuggestURL() {
+		return Controller::join_links($this->Link(), 'suggest');
+	}
+
+	/**
+	 * @return ArrayList
+	 */
+	protected function getOptions() {
 		$options = ArrayList::create();
+
+		$source = $this->getSource();
+
+		if($source instanceof Iterator) {
+			$source = iterator_to_array($source);
+		}
 
 		$values = $this->Value();
 
-		foreach(iterator_to_array($this->source) as $key => $value) {
+		foreach($source as $key => $value) {
 			$options->push(
 				ArrayData::create(array(
 					"Title" => $value,
@@ -65,53 +202,21 @@ class TagField extends DropdownField {
 			);
 		}
 
-		$properties = array_merge($properties, array(
-			'Options' => $options
-		));
-
-		return $this
-			->customise($properties)
-			->renderWith(array("templates/TagField"));
+		return $options;
 	}
 
 	/**
-	 * Loads the related record values into this field. TagField can be uploaded
-	 * in one of three ways:
-	 *
-	 *  - By passing in a list of object IDs in the $value parameter (an array with a single
-	 *    key 'Files', with the value being the actual array of IDs).
-	 *  - By passing in an explicit list of File objects in the $record parameter, and
-	 *    leaving $value blank.
-	 *  - By passing in a dataobject in the $record parameter, from which file objects
-	 *    will be extracting using the field name as the relation field.
-	 *
-	 * Each of these methods will update both the items (list of File objects) and the
-	 * field value (list of file ID values).
-	 *
-	 * @param array                    $value  Array of submitted form data, if submitting from a
-	 *                                         form
-	 * @param array|DataObject|SS_List $record Full source record, either as a DataObject,
-	 *                                         SS_List of items, or an array of submitted form data
-	 *
-	 * @return UploadField Self reference
+	 * {@inheritdoc}
 	 */
 	public function setValue($value, $record = null) {
-		// If we're not passed a value directly, we can attempt to infer the field
-		// value from the second parameter by inspecting its relations
-
-		// Determine format of presented data
 		if(empty($value) && $record) {
-			// If a record is given as a second parameter, but no submitted values,
-			// then we should inspect this instead for the form values
+			if($record instanceof DataObject) {
+				$name = $this->getName();
 
-			if(($record instanceof DataObject)
-				&& $record->hasMethod($this->getName())
-			) {
-				$value = $record
-					->{$this->getName()}()
-					->getIDList();
+				if($record->hasMethod($name)) {
+					$value = $record->$name()->getIDList();
+				}
 			} elseif($record instanceof SS_List) {
-				// If directly passing a list then save the items directly
 				$value = $record->column('ID');
 			}
 		}
@@ -120,7 +225,7 @@ class TagField extends DropdownField {
 	}
 
 	/**
-	 * @return array
+	 * {@inheritdoc}
 	 */
 	public function getAttributes() {
 		return array_merge(
@@ -130,21 +235,17 @@ class TagField extends DropdownField {
 	}
 
 	/**
-	 * Save the current value of this TagField into a DataObject.
-	 * If the field it is saving to is a has_many or many_many relationship,
-	 * it is saved by setByIDList(), otherwise it creates a comma separated
-	 * list for a standard DB text/varchar field.
-	 *
-	 * @param DataObjectInterface $record
+	 * {@inheritdoc}
 	 */
 	public function saveInto(DataObjectInterface $record) {
 		parent::saveInto($record);
 
-		$name = $this->name;
+		$name = $this->getName();
+		$relationTitle = $this->getRelationTitle();
 
 		$values = $this->Value();
 
-		if(empty($values) || empty($record) || empty($this->relationTitleField)) {
+		if(empty($values) || empty($record) || empty($relationTitle)) {
 			return;
 		}
 
@@ -155,12 +256,12 @@ class TagField extends DropdownField {
 
 			foreach($values as $i => $value) {
 				if(!is_numeric($value)) {
-					if($this->readOnly) {
+					if($this->getReadOnly()) {
 						unset($values[$i]);
 						continue;
 					} else {
 						$instance = new $class();
-						$instance->{$this->relationTitleField} = $value;
+						$instance->{$relationTitle} = $value;
 						$instance->write();
 
 						$values[$i] = $instance->ID;
@@ -172,5 +273,119 @@ class TagField extends DropdownField {
 		} else {
 			$record->$name = implode(',', $values);
 		}
+	}
+
+	/**
+	 * Returns a JSON string of tags, for ajax-based search.
+	 *
+	 * @param SS_HTTPRequest $request
+	 *
+	 * @return SS_HTTPResponse
+	 */
+	public function suggest(SS_HTTPRequest $request) {
+		$recordClass = $this->getRecordClass();
+
+		$response = new SS_HTTPResponse();
+
+		$response->addHeader('Content-Type', 'application/json');
+
+		$response->setBody(Convert::raw2json(
+			array('items' => array())
+		));
+
+		if($recordClass !== null) {
+			$name = $this->getName();
+
+			/**
+			 * @var DataObject $object
+			 */
+			$object = singleton($recordClass);
+
+			$term = $request->getVar('term');
+
+			$tags = array();
+
+			if($object->hasMethod($name)) {
+				$tags = $this->getObjectTags($object, $term);
+			} elseif($object->hasField($name)) {
+				$tags = $this->getStringTags($term);
+			}
+
+			$response->setBody(Convert::raw2json(
+				array('items' => $tags)
+			));
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Returns array of arrays representing DataObject-based tags.
+	 *
+	 * @param DataObject $instance
+	 * @param string $term
+	 *
+	 * @return array
+	 */
+	protected function getObjectTags(DataObject $instance, $term) {
+		$name = $this->getName();
+		$relationTitle = $this->getRelationTitle();
+
+		$relation = $instance->{$name}();
+
+		$term = Convert::raw2sql($term);
+
+		$query = DataList::create($relation->dataClass())
+			->filter($relationTitle . ':PartialMatch:nocase', $term)
+			->sort($relationTitle)
+			->limit($this->getAjaxItemLimit());
+
+		$items = array();
+
+		foreach($query->map('ID', $relationTitle) as $id => $title) {
+			if(!in_array($title, $items)) {
+				$items[] = array(
+					'id' => $id,
+					'text' => $title
+				);
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Returns array of arrays representing string-based tags.
+	 *
+	 * @param string $term
+	 *
+	 * @return array
+	 */
+	protected function getStringTags($term) {
+		$name = $this->getName();
+		$recordClass = $this->getRecordClass();
+
+		$term = Convert::raw2sql($term);
+
+		$query = DataObject::get($recordClass)
+			->filter($name . ':PartialMatch:nocase', $term)
+			->limit($this->getAjaxItemLimit());
+
+		$items = array();
+
+		foreach($query->column($name) as $tags) {
+			$tags = explode(',', $tags);
+
+			foreach($tags as $i => $tag) {
+				if(stripos($tag, $term) !== false && !in_array($tag, $items)) {
+					$items[] = array(
+						'id' => $tag,
+						'text' => $tag
+					);
+				}
+			}
+		}
+
+		return $items;
 	}
 }
