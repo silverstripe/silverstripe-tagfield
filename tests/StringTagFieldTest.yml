@@ -1,0 +1,6 @@
+StringTagFieldTestBlogPost:
+  BlogPost1:
+    Title: BlogPost1
+  BlogPost2:
+    Title: BlogPost2
+    Tags: Tag1,Tag2

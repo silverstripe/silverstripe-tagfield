@@ -21,7 +21,7 @@
 
 	$.entwine('ss', function ($) {
 
-		$('.silverstripe-tag-field + .chzn-container').entwine({
+		$('.ss-tag-field + .chzn-container').entwine({
 			applySelect2: function () {
 				var self = this,
 					$select = $(this).prev();
@@ -40,9 +40,9 @@
 					'tokenSeparators': [',', ' ']
 				};
 
-				if ($select.attr('data-suggest-url')) {
+				if ($select.attr('data-ss-tag-field-suggest-url')) {
 					options.ajax = {
-						'url': $select.attr('data-suggest-url'),
+						'url': $select.attr('data-ss-tag-field-suggest-url'),
 						'dataType': 'json',
 						'delay': 250,
 						'data': function (params) {
@@ -62,18 +62,6 @@
 				$select
 					.chosenDestroy()
 					.select2(options);
-
-				/*
-				 * Delay a cycle so select2 is initialised before
-				 * selecting values (if data-selected-values is present).
-				 */
-				setTimeout(function () {
-					if ($select.attr('data-selected-values')) {
-						var values = $select.attr('data-selected-values');
-
-						$select.select2('val', values.split(','));
-					}
-				}, 0);
 			},
 			onmatch: function () {
 				this.applySelect2();

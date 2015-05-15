@@ -1,12 +1,15 @@
 <?php
 
 /**
- * Provides a tagging interface, storing links between tag DataObjects and a parent DataObject.
+ * Provides a tagging interface, storing comma-delimited tags in a DataObject string field.
+ *
+ * This is intended bridge the gap between 1.x and 2.x, and when possible TagField should be used
+ * instead.
  *
  * @package forms
  * @subpackage fields
  */
-class TagField extends DropdownField {
+class StringTagField extends DropdownField {
 	/**
 	 * @var array
 	 */
@@ -25,22 +28,17 @@ class TagField extends DropdownField {
 	protected $lazyLoadItemLimit = 10;
 
 	/**
-	 * @var bool
+	 * @var null|DataObject
 	 */
-	protected $canCreate = true;
-
-	/**
-	 * @var string
-	 */
-	protected $titleField = 'Title';
+	protected $record;
 
 	/**
 	 * @param string $name
 	 * @param string $title
-	 * @param null|DataList $source
-	 * @param null|DataList $value
+	 * @param array|SS_List $source
+	 * @param array|SS_List $value
 	 */
-	public function __construct($name, $title = '', $source = null, $value = null) {
+	public function __construct($name, $title = '', $source = array(), $value = array()) {
 		parent::__construct($name, $title, $source, $value);
 	}
 
@@ -81,37 +79,27 @@ class TagField extends DropdownField {
 	}
 
 	/**
-	 * @return bool
+	 * @return null|DataObject
 	 */
-	public function getCanCreate() {
-		return $this->canCreate;
+	public function getRecord() {
+		if($this->record) {
+			return $this->record;
+		}
+
+		if($form = $this->getForm()) {
+			return $form->getRecord();
+		}
+
+		return null;
 	}
 
 	/**
-	 * @param bool $canCreate
-	 *
-	 * @return static
-	 */
-	public function setCanCreate($canCreate) {
-		$this->canCreate = $canCreate;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getTitleField() {
-		return $this->titleField;
-	}
-
-	/**
-	 * @param string $titleField
+	 * @param DataObject $record
 	 *
 	 * @return $this
 	 */
-	public function setTitleField($titleField) {
-		$this->titleField = $titleField;
+	public function setRecord(DataObject $record) {
+		$this->record = $record;
 
 		return $this;
 	}
@@ -132,7 +120,7 @@ class TagField extends DropdownField {
 
 		$this->setAttribute('multiple', 'multiple');
 
-		if($this->shouldLazyLoad) {
+		if($this->getShouldLazyLoad()) {
 			$this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
 		} else {
 			$properties = array_merge($properties, array(
@@ -142,7 +130,7 @@ class TagField extends DropdownField {
 
 		return $this
 			->customise($properties)
-			->renderWith(array("templates/TagField"));
+			->renderWith(array("templates/StringTagField"));
 	}
 
 	/**
@@ -160,32 +148,18 @@ class TagField extends DropdownField {
 
 		$source = $this->getSource();
 
-		if(!$source) {
-			$source = new ArrayList();
+		if($source instanceof Iterator) {
+			$source = iterator_to_array($source);
 		}
-
-		$dataClass = $source->dataClass();
 
 		$values = $this->Value();
 
-		if(!$values) {
-			return $options;
-		}
-
-		if(is_array($values)) {
-			$values = DataList::create($dataClass)->filter('ID', $values);
-		}
-
-		$ids = $values->column('ID');
-
-		$titleField = $this->getTitleField();
-
-		foreach($source as $object) {
+		foreach($source as $value) {
 			$options->push(
 				ArrayData::create(array(
-					'Title' => $object->$titleField,
-					'Value' => $object->ID,
-					'Selected' => in_array($object->ID, $ids),
+					'Title' => $value,
+					'Value' => $value,
+					'Selected' => in_array($value, $values),
 				))
 			);
 		}
@@ -197,14 +171,17 @@ class TagField extends DropdownField {
 	 * {@inheritdoc}
 	 */
 	public function setValue($value, $source = null) {
+		if(is_string($value)) {
+			$value = explode(',', $value);
+		}
+
 		if($source instanceof DataObject) {
 			$name = $this->getName();
+			$value = $source->$name;
+		}
 
-			if($source->hasMethod($name)) {
-				$value = $source->$name()->getIDList();
-			}
-		} elseif($value instanceof SS_List) {
-			$value = $value->column('ID');
+		if($source instanceof SS_List) {
+			$value = $source->column('ID');
 		}
 
 		return parent::setValue(array_filter($value));
@@ -227,50 +204,9 @@ class TagField extends DropdownField {
 		parent::saveInto($record);
 
 		$name = $this->getName();
-		$titleField = $this->getTitleField();
 
-		$source = $this->getSource();
-
-		$dataClass = $source->dataClass();
-
-		$values = $this->Value();
-
-		if(!$values) {
-			$values = array();
-		}
-
-		if(empty($record) || empty($source) || empty($titleField)) {
-			return;
-		}
-
-		if(!$record->hasMethod($name)) {
-			throw new Exception(
-				sprintf("%s does not have a %s method", get_class($record), $name)
-			);
-		}
-
-		$relation = $record->$name();
-
-		foreach($values as $i => $value) {
-			if(!is_numeric($value)) {
-				if(!$this->getCanCreate()) {
-					unset($values[$i]);
-					continue;
-				}
-
-				$record = new $dataClass();
-				$record->{$titleField} = $value;
-				$record->write();
-
-				$values[$i] = $record->ID;
-			}
-		}
-
-		if($values instanceof SS_List) {
-			$values = iterator_to_array($values);
-		}
-
-		$relation->setByIDList(array_filter($values));
+		$record->$name = join(',', $this->Value());
+		$record->write();
 	}
 
 	/**
@@ -281,11 +217,27 @@ class TagField extends DropdownField {
 	 * @return SS_HTTPResponse
 	 */
 	public function suggest(SS_HTTPRequest $request) {
-		$tags = $this->getTags($request->getVar('term'));
+		$responseBody = Convert::raw2json(
+			array('items' => array())
+		);
 
 		$response = new SS_HTTPResponse();
 		$response->addHeader('Content-Type', 'application/json');
-		$response->setBody(json_encode(array('items' => $tags)));
+
+		if($record = $this->getRecord()) {
+			$tags = array();
+			$term = $request->getVar('term');
+
+			if($record->hasField($this->getName())) {
+				$tags = $this->getTags($term);
+			}
+
+			$responseBody = Convert::raw2json(
+				array('items' => $tags)
+			);
+		}
+
+		$response->setBody($responseBody);
 
 		return $response;
 	}
@@ -298,30 +250,33 @@ class TagField extends DropdownField {
 	 * @return array
 	 */
 	protected function getTags($term) {
-		/**
-		 * @var DataList $source
-		 */
-		$source = $this->getSource();
+		$record = $this->getRecord();
 
-		$dataClass = $source->dataClass();
+		if(!$record) {
+			return array();
+		}
 
-		$titleField = $this->getTitleField();
+		$fieldName = $this->getName();
+		$className = $record->getClassName();
 
 		$term = Convert::raw2sql($term);
 
-		$query = $dataClass::get()
-			->filter($titleField . ':PartialMatch:nocase', $term)
-			->sort($titleField)
+		$query = $className::get()
+			->filter($fieldName . ':PartialMatch:nocase', $term)
 			->limit($this->getLazyLoadItemLimit());
 
 		$items = array();
 
-		foreach($query->map('ID', $titleField) as $id => $title) {
-			if(!in_array($title, $items)) {
-				$items[] = array(
-					'id' => $id,
-					'text' => $title
-				);
+		foreach($query->column($fieldName) as $tags) {
+			$tags = explode(',', $tags);
+
+			foreach($tags as $i => $tag) {
+				if(stripos($tag, $term) !== false && !in_array($tag, $items)) {
+					$items[] = array(
+						'id' => $tag,
+						'text' => $tag
+					);
+				}
 			}
 		}
 
