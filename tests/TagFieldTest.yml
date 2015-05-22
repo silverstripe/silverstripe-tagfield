@@ -1,0 +1,11 @@
+TagFieldTestBlogTag:
+  Tag1:
+    Title: Tag1
+  Tag2:
+    Title: Tag2
+TagFieldTestBlogPost:
+  BlogPost1:
+    Title: BlogPost1
+  BlogPost2:
+    Title: BlogPost2
+    Tags: =>TagFieldTestBlogTag.Tag1,=>TagFieldTestBlogTag.Tag2

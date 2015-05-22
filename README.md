@@ -1,10 +1,7 @@
 # TagField Module
 
-[![Build Status](https://secure.travis-ci.org/silverstripe-labs/silverstripe-tagfield.png?branch=master)](https://travis-ci.org/silverstripe-labs/silverstripe-tagfield)
-
-## Maintainer Contact
-
-* Christopher Pitt (Nickname: assertchris) <chris (at) silverstripe (dot) com>
+[![Build Status](http://img.shields.io/travis/silverstripe-labs/silverstripe-tagfield.svg?style=flat-square)](https://travis-ci.org/silverstripe-labs/silverstripe-tagfield)
+[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe-labs/silverstripe-tagfield.svg?style=flat-square)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-tagfield)
 
 ## Requirements
 
@@ -16,6 +13,8 @@
 * http://silverstripe.org/tag-field-module
 
 ## Usage
+
+### Relational Tags
 
 ```php
 class BlogPost extends DataObject {
@@ -38,10 +37,28 @@ class BlogTag extends DataObject {
 ```
 
 ```php
-$all    = BlogTags::get()->map();
-$linked = $post->BlogTags()->map();
-
 $field = new TagField(
-	'BlogTags', 'Blog Tags', $all, $linked
+	'BlogTags', 'Blog Tags', BlogTags::get(), $post->BlogTags()
 );
+
+$field->setShouldLazyLoad(true); // tags should be lazy loaded
+$field->setCanCreate(true);      // new tag DataObjects can be created
+```
+
+### String Tags
+
+```php
+class BlogPost extends DataObject {
+	static $db = array(
+		'Tags' => 'Text'
+	);
+}
+```
+
+```php
+$field = new StringTagField(
+	'BlogTags', 'Blog Tags', array('one', 'two'), explode(',', $post->Tags)
+);
+
+$field->setShouldLazyLoad(true); // tags should be lazy loaded
 ```
