@@ -37,7 +37,7 @@
 
 				var options = {
 					'tags': true,
-					'tokenSeparators': [',', ' ']
+					'tokenSeparators': [',']
 				};
 
 				if ($select.attr('data-ss-tag-field-suggest-url')) {
