@@ -38,7 +38,7 @@ class BlogTag extends DataObject {
 
 ```php
 $field = new TagField(
-	'BlogTags', 'Blog Tags', BlogTags::get(), $post->BlogTags()
+	'BlogTags', 'Blog Tags', BlogTag::get(), $post->BlogTags()
 );
 
 $field->setShouldLazyLoad(true); // tags should be lazy loaded
