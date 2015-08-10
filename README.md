@@ -37,12 +37,14 @@ class BlogTag extends DataObject {
 ```
 
 ```php
-$field = new TagField(
-	'BlogTags', 'Blog Tags', BlogTag::get(), $post->BlogTags()
-);
-
-$field->setShouldLazyLoad(true); // tags should be lazy loaded
-$field->setCanCreate(true);      // new tag DataObjects can be created
+$field = TagField::create(
+	'BlogTags',
+	'Blog Tags',
+	BlogTag::get(),
+	$post->BlogTags()
+)
+	->setShouldLazyLoad(true) // tags should be lazy loaded
+	->setCanCreate(true);      // new tag DataObjects can be created
 ```
 
 ### String Tags
@@ -56,7 +58,7 @@ class BlogPost extends DataObject {
 ```
 
 ```php
-$field = new StringTagField(
+$field =  StringTagField::create(
 	'BlogTags', 'Blog Tags', array('one', 'two'), explode(',', $post->Tags)
 );
 
