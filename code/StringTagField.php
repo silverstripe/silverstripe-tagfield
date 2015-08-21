@@ -130,7 +130,7 @@ class StringTagField extends DropdownField {
 
 		return $this
 			->customise($properties)
-			->renderWith(array("templates/StringTagField"));
+			->renderWith(array("templates/TagField"));
 	}
 
 	/**
