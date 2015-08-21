@@ -59,7 +59,7 @@ class BlogPost extends DataObject {
 
 ```php
 $field = StringTagField::create(
-	'Tags', 'Tags', array('one', 'two'), explode(',', this->Tags)
+	'Tags', 'Tags', array('one', 'two'), explode(',', $this->Tags)
 );
 
 $field->setShouldLazyLoad(true); // tags should be lazy loaded
