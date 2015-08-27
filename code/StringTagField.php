@@ -177,7 +177,7 @@ class StringTagField extends DropdownField {
 
 		if($source instanceof DataObject) {
 			$name = $this->getName();
-			$value = $source->$name;
+			$value = explode(',', $source->$name);
 		}
 
 		if($source instanceof SS_List) {
