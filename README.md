@@ -14,6 +14,25 @@
 
 ## Usage
 
+### Relational Tags w/ Extension
+
+```php
+class Tag extends DataObject {
+    static $db = array(
+        'Title' => 'Varchar(200)',
+    );
+
+    static $belongs_many_many = array(
+    	'BlogPosts' => 'BlogPost'
+    );
+}
+```
+
+```yml
+BlogPost:
+  extensions:
+    - TaggableExtension
+```
 ### Relational Tags
 
 ```php

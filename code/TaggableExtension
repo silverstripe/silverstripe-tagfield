@@ -1,0 +1,18 @@
+<?php
+class TaggableExtension extends DataExtension {
+
+  static $many_many = array(
+    'Tags' => 'Tag'
+  );
+
+  public function updateCMSFields(FieldList $fields) {
+    $field = new TagField(
+      'Tags', 'Tags', Tag::get(), $this->owner->Tags()
+    );
+
+    $field->setShouldLazyLoad(true); // tags should be lazy loaded
+    $field->setCanCreate(true);      // new tag DataObjects can be created
+    $fields->removeFieldFromTab('Root', 'Tags'); //Remove Default Tags tab from ModelAdmins
+    $fields->addFieldToTab('Root.Main', $field);
+  }
+}
