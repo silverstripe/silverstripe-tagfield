@@ -18,7 +18,7 @@
 
 ```php
 class BlogPost extends DataObject {
-	static $many_many = array(
+	private static $many_many = array(
 		'BlogTags' => 'BlogTag'
 	);
 }
@@ -26,11 +26,11 @@ class BlogPost extends DataObject {
 
 ```php
 class BlogTag extends DataObject {
-	static $db = array(
+	private static $db = array(
 		'Title' => 'Varchar(200)',
 	);
 
-	static $belongs_many_many = array(
+	private static $belongs_many_many = array(
 		'BlogPosts' => 'BlogPost'
 	);
 }
@@ -41,17 +41,17 @@ $field = TagField::create(
 	'BlogTags',
 	'Blog Tags',
 	BlogTag::get(),
-	$post->BlogTags()
+	$this->BlogTags()
 )
 	->setShouldLazyLoad(true) // tags should be lazy loaded
-	->setCanCreate(true);      // new tag DataObjects can be created
+	->setCanCreate(true);     // new tag DataObjects can be created
 ```
 
 ### String Tags
 
 ```php
 class BlogPost extends DataObject {
-	static $db = array(
+	private static $db = array(
 		'Tags' => 'Text'
 	);
 }
@@ -59,7 +59,10 @@ class BlogPost extends DataObject {
 
 ```php
 $field = StringTagField::create(
-	'Tags', 'Tags', array('one', 'two'), explode(',', $this->Tags)
+	'Tags',
+	'Tags',
+	array('one', 'two'),
+	explode(',', $this->Tags)
 );
 
 $field->setShouldLazyLoad(true); // tags should be lazy loaded
