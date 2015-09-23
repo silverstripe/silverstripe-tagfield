@@ -282,4 +282,16 @@ class StringTagField extends DropdownField {
 
 		return $items;
 	}
+	
+	/**
+	 * DropdownField assumes value will be a scalar so we must
+	 * override validate. This only applies to Silverstripe 3.2+
+	 *
+	 * @param Validator $validator
+	 * @return bool
+	 */
+	public function validate($validator) {
+		return true;
+	}
+
 }
