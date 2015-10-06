@@ -207,6 +207,10 @@ class TagField extends DropdownField {
 			$value = $value->column('ID');
 		}
 
+		if(!is_array($value)) {
+			return parent::setValue($value);
+		}
+
 		return parent::setValue(array_filter($value));
 	}
 
