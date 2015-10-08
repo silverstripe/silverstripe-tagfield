@@ -136,8 +136,6 @@ class StringTagField extends DropdownField {
 
 		$this->addExtraClass('ss-tag-field');
 
-		$this->setAttribute('multiple', 'multiple');
-
         if ($this->getIsMultiple()) {
 		    $this->setAttribute('multiple', 'multiple');
         }
