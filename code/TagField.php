@@ -80,6 +80,24 @@ class TagField extends DropdownField {
 		return $this;
 	}
 
+    /**
+	 * @return bool
+	 */
+	public function getIsMultiple() {
+		return $this->isMultiple;
+	}
+
+	/**
+	 * @param bool $isMultiple
+	 *
+	 * @return static
+	 */
+	public function setIsMultiple($isMultiple) {
+		$this->isMultiple = $isMultiple;
+
+		return $this;
+	}
+
 	/**
 	 * @return bool
 	 */
@@ -130,7 +148,9 @@ class TagField extends DropdownField {
 
 		$this->addExtraClass('ss-tag-field');
 
-		$this->setAttribute('multiple', 'multiple');
+        if ($this->getIsMultiple()) {
+		    $this->setAttribute('multiple', 'multiple');
+        }
 
 		if($this->shouldLazyLoad) {
 			$this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
