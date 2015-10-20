@@ -35,6 +35,11 @@ class TagField extends DropdownField {
 	protected $titleField = 'Title';
 
 	/**
+	 * @var string
+	 */
+	protected $isMultiple;
+
+	/**
 	 * @param string $name
 	 * @param string $title
 	 * @param null|DataList $source
