@@ -287,9 +287,13 @@ class TagField extends DropdownField {
 					continue;
 				}
 
-				$record = new $dataClass();
-				$record->{$titleField} = $value;
-				$record->write();
+				// if a tag with this name already exists, do not create a new one
+				$record = $dataClass::get()->filter($titleField, $value)->first();
+				if (!$record || !$record->exists()) {
+					$record = new $dataClass();
+					$record->{$titleField} = $value;
+					$record->write();
+				}
 
 				$values[$i] = $record->ID;
 			}
