@@ -332,13 +332,11 @@ class TagField extends DropdownField {
 		 */
 		$source = $this->getSource();
 
-		$dataClass = $source->dataClass();
-
 		$titleField = $this->getTitleField();
 
 		$term = Convert::raw2sql($term);
 
-		$query = $dataClass::get()
+		$query = $source
 			->filter($titleField . ':PartialMatch:nocase', $term)
 			->sort($titleField)
 			->limit($this->getLazyLoadItemLimit());
