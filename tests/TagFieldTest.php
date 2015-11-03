@@ -148,6 +148,44 @@ class TagFieldTest extends SapphireTest {
 	}
 
 	/**
+	 * Tests that TagField supports pre-filtered data sources
+	 */
+	public function testRestrictedSuggestions() {
+		$source = TagFieldTestBlogTag::get()->exclude('Title', 'Tag2');
+		$field = new TagField('Tags', '', $source);
+
+		/**
+		 * Partial tag title match.
+		 */
+		$request = $this->getNewRequest(array('term' => 'Tag'));
+
+		$this->assertEquals(
+			'{"items":[{"id":1,"text":"Tag1"}]}',
+			$field->suggest($request)->getBody()
+		);
+
+		/**
+		 * Exact tag title match.
+		 */
+		$request = $this->getNewRequest(array('term' => 'Tag1'));
+
+		$this->assertEquals(
+			'{"items":[{"id":1,"text":"Tag1"}]}',
+			$field->suggest($request)->getBody()
+		);
+
+		/**
+		 * Excluded item doesn't appear in matches
+		 */
+		$request = $this->getNewRequest(array('term' => 'Tag2'));
+
+		$this->assertEquals(
+			'{"items":[]}',
+			$field->suggest($request)->getBody()
+		);
+	}
+
+	/**
 	 * @param array $parameters
 	 *
 	 * @return SS_HTTPRequest
