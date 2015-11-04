@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.1]
+
+- Fixed isMultiple not being initialised
+- Fixed tag rendering as a 100px wide container
+
 ## [1.2.0]
 
 - Corrected issue where tags would show from unrelated sources
