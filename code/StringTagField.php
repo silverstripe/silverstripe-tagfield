@@ -33,9 +33,9 @@ class StringTagField extends DropdownField {
 	protected $record;
 
 	/**
-	 * @var boolean
+	 * @var bool
 	 */
-	protected $isMultiple;
+	protected $isMultiple = true;
 
 	/**
 	 * @param string $name

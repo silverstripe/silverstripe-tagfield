@@ -1,6 +1,7 @@
 .select2-container {
     position: relative;
     max-width: 416px !important;
+    width: 100%;
 }
 
 .select2-selection {
