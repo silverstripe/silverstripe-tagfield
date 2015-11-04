@@ -35,9 +35,9 @@ class TagField extends DropdownField {
 	protected $titleField = 'Title';
 
 	/**
-	 * @var string
+	 * @var bool
 	 */
-	protected $isMultiple;
+	protected $isMultiple = true;
 
 	/**
 	 * @param string $name
@@ -260,8 +260,6 @@ class TagField extends DropdownField {
 
 		$source = $this->getSource();
 
-		$dataClass = $source->dataClass();
-
 		$values = $this->Value();
 
 		if(!$values) {
@@ -287,10 +285,8 @@ class TagField extends DropdownField {
 					continue;
 				}
 
-				$record = new $dataClass();
-				$record->{$titleField} = $value;
-				$record->write();
-
+				// Get or create record
+				$record = $this->getOrCreateTag($value);
 				$values[$i] = $record->ID;
 			}
 		}
@@ -300,6 +296,31 @@ class TagField extends DropdownField {
 		}
 
 		$relation->setByIDList(array_filter($values));
+	}
+
+	/**
+	 * Get or create tag with the given value
+	 *
+	 * @param string $term
+	 * @return DataObject
+	 */
+	protected function getOrCreateTag($term) {
+		// Check if existing record can be found
+		$source = $this->getSource();
+		$titleField = $this->getTitleField();
+		$record = $source
+			->filter($titleField, $term)
+			->first();
+		if($record) {
+			return $record;
+		}
+
+		// Create new instance if not yet saved
+		$dataClass = $source->dataClass();
+		$record = Injector::inst()->create($dataClass);
+		$record->{$titleField} = $term;
+		$record->write();
+		return $record;
 	}
 
 	/**
@@ -334,27 +355,23 @@ class TagField extends DropdownField {
 
 		$titleField = $this->getTitleField();
 
-		$term = Convert::raw2sql($term);
-
 		$query = $source
 			->filter($titleField . ':PartialMatch:nocase', $term)
 			->sort($titleField)
 			->limit($this->getLazyLoadItemLimit());
 
+		// Map into a distinct list
 		$items = array();
-
+		$titleField = $this->getTitleField();
 		foreach($query->map('ID', $titleField) as $id => $title) {
-			if(!in_array($title, $items)) {
-				$items[] = array(
-					'id' => $id,
-					'text' => $title
-				);
-			}
+			$items[$title] = array(
+				'id' => $id,
+				'text' => $title
+			);
 		}
 
-		return $items;
+		return array_values($items);
 	}
-
 
 	/**
 	 * DropdownField assumes value will be a scalar so we must

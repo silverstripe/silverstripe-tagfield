@@ -49,7 +49,17 @@ class TagFieldTest extends SapphireTest {
 	 * @param TagFieldTestBlogPost $record
 	 */
 	protected function compareExpectedAndActualTags(array $expected, TagFieldTestBlogPost $record) {
-		$actual = array_values($record->Tags()->map('ID', 'Title')->toArray());
+		$this->compareTagLists($expected, $record->Tags());
+	}
+
+	/**
+	 * Ensure a source of tags matches the given string tag names
+	 *
+	 * @param array $expected
+	 * @param DataList $actualSource
+	 */
+	protected function compareTagLists(array $expected, DataList $actualSource) {
+		$actual = array_values($actualSource->map('ID', 'Title')->toArray());
 
 		sort($expected);
 		sort($actual);
@@ -101,6 +111,44 @@ class TagFieldTest extends SapphireTest {
 			array('Tag1', 'Tag2'),
 			$record
 		);
+	}
+
+	/**
+	 * Ensure that {@see TagField::saveInto} respects existing tags
+	 */
+	public function testSaveDuplicateTags() {
+		$record = $this->getNewTagFieldTestBlogPost('BlogPost2');
+		$record->write();
+		$tag2ID = $this->idFromFixture('TagFieldTestBlogTag', 'Tag2');
+
+		// Check tags before write
+		$this->compareExpectedAndActualTags(
+			array('Tag1', 'Tag2'),
+			$record
+		);
+		$this->compareTagLists(
+			array('Tag1', 'Tag2'),
+			TagFieldTestBlogTag::get()
+		);
+		$this->assertContains($tag2ID, TagFieldTestBlogTag::get()->column('ID'));
+
+		// Write new tags
+		$field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
+		$field->setValue(array('Tag2', 'Tag3'));
+		$field->saveInto($record);
+
+		// Check only one new tag was added
+		$this->compareExpectedAndActualTags(
+			array('Tag2', 'Tag3'),
+			$record
+		);
+
+		// Ensure that only one new dataobject was added and that tag2s id has not changed
+		$this->compareTagLists(
+			array('Tag1', 'Tag2', 'Tag3'),
+			TagFieldTestBlogTag::get()
+		);
+		$this->assertContains($tag2ID, TagFieldTestBlogTag::get()->column('ID'));
 	}
 
 	function testItSuggestsTags() {
