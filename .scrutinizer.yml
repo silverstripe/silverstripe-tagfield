@@ -1,12 +1,9 @@
 inherit: true
 
-tools:
-    external_code_coverage: true
-
 checks:
-    php:
-        code_rating: true
-        duplication: true
+  php:
+    code_rating: true
+    duplication: true
 
 filter:
-    paths: [code/*, tests/*]
+  paths: [code/*, tests/*]
