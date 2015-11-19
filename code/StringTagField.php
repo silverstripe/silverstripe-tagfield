@@ -9,314 +9,332 @@
  * @package forms
  * @subpackage fields
  */
-class StringTagField extends DropdownField {
-	/**
-	 * @var array
-	 */
-	public static $allowed_actions = array(
-		'suggest',
-	);
-
-	/**
-	 * @var bool
-	 */
-	protected $shouldLazyLoad = false;
-
-	/**
-	 * @var int
-	 */
-	protected $lazyLoadItemLimit = 10;
-
-	/**
-	 * @var null|DataObject
-	 */
-	protected $record;
-
-	/**
-	 * @var bool
-	 */
-	protected $isMultiple = true;
-
-	/**
-	 * @param string $name
-	 * @param string $title
-	 * @param array|SS_List $source
-	 * @param array|SS_List $value
-	 */
-	public function __construct($name, $title = '', $source = array(), $value = array()) {
-		parent::__construct($name, $title, $source, $value);
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getShouldLazyLoad() {
-		return $this->shouldLazyLoad;
-	}
-
-	/**
-	 * @param bool $shouldLazyLoad
-	 *
-	 * @return static
-	 */
-	public function setShouldLazyLoad($shouldLazyLoad) {
-		$this->shouldLazyLoad = $shouldLazyLoad;
-
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getLazyLoadItemLimit() {
-		return $this->lazyLoadItemLimit;
-	}
-
-	/**
-	 * @param int $lazyLoadItemLimit
-	 *
-	 * @return static
-	 */
-	public function setLazyLoadItemLimit($lazyLoadItemLimit) {
-		$this->lazyLoadItemLimit = $lazyLoadItemLimit;
-
-		return $this;
-	}
+class StringTagField extends DropdownField
+{
+    /**
+     * @var array
+     */
+    public static $allowed_actions = array(
+        'suggest',
+    );
 
     /**
-	 * @return bool
-	 */
-	public function getIsMultiple() {
-		return $this->isMultiple;
-	}
+     * @var bool
+     */
+    protected $shouldLazyLoad = false;
 
-	/**
-	 * @param bool $isMultiple
-	 *
-	 * @return static
-	 */
-	public function setIsMultiple($isMultiple) {
-		$this->isMultiple = $isMultiple;
+    /**
+     * @var int
+     */
+    protected $lazyLoadItemLimit = 10;
 
-		return $this;
-	}
+    /**
+     * @var null|DataObject
+     */
+    protected $record;
 
-	/**
-	 * @return null|DataObject
-	 */
-	public function getRecord() {
-		if($this->record) {
-			return $this->record;
-		}
+    /**
+     * @var bool
+     */
+    protected $isMultiple = true;
 
-		if($form = $this->getForm()) {
-			return $form->getRecord();
-		}
+    /**
+     * @param string $name
+     * @param string $title
+     * @param array|SS_List $source
+     * @param array|SS_List $value
+     */
+    public function __construct($name, $title = '', $source = array(), $value = array())
+    {
+        parent::__construct($name, $title, $source, $value);
+    }
 
-		return null;
-	}
+    /**
+     * @return bool
+     */
+    public function getShouldLazyLoad()
+    {
+        return $this->shouldLazyLoad;
+    }
 
-	/**
-	 * @param DataObject $record
-	 *
-	 * @return $this
-	 */
-	public function setRecord(DataObject $record) {
-		$this->record = $record;
+    /**
+     * @param bool $shouldLazyLoad
+     *
+     * @return static
+     */
+    public function setShouldLazyLoad($shouldLazyLoad)
+    {
+        $this->shouldLazyLoad = $shouldLazyLoad;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function Field($properties = array()) {
-		Requirements::css(TAG_FIELD_DIR . '/css/select2.min.css');
-		Requirements::css(TAG_FIELD_DIR . '/css/TagField.css');
+    /**
+     * @return int
+     */
+    public function getLazyLoadItemLimit()
+    {
+        return $this->lazyLoadItemLimit;
+    }
 
-		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-		Requirements::javascript(THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
-		Requirements::javascript(TAG_FIELD_DIR . '/js/select2.js');
-		Requirements::javascript(TAG_FIELD_DIR . '/js/TagField.js');
+    /**
+     * @param int $lazyLoadItemLimit
+     *
+     * @return static
+     */
+    public function setLazyLoadItemLimit($lazyLoadItemLimit)
+    {
+        $this->lazyLoadItemLimit = $lazyLoadItemLimit;
 
-		$this->addExtraClass('ss-tag-field');
+        return $this;
+    }
 
-        if ($this->getIsMultiple()) {
-		    $this->setAttribute('multiple', 'multiple');
+    /**
+     * @return bool
+     */
+    public function getIsMultiple()
+    {
+        return $this->isMultiple;
+    }
+
+    /**
+     * @param bool $isMultiple
+     *
+     * @return static
+     */
+    public function setIsMultiple($isMultiple)
+    {
+        $this->isMultiple = $isMultiple;
+
+        return $this;
+    }
+
+    /**
+     * @return null|DataObject
+     */
+    public function getRecord()
+    {
+        if ($this->record) {
+            return $this->record;
         }
 
-		if($this->getShouldLazyLoad()) {
-			$this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
-		} else {
-			$properties = array_merge($properties, array(
-				'Options' => $this->getOptions()
-			));
-		}
+        if ($form = $this->getForm()) {
+            return $form->getRecord();
+        }
 
-		return $this
-			->customise($properties)
-			->renderWith(array("templates/TagField"));
-	}
+        return null;
+    }
 
-	/**
-	 * @return string
-	 */
-	protected function getSuggestURL() {
-		return Controller::join_links($this->Link(), 'suggest');
-	}
+    /**
+     * @param DataObject $record
+     *
+     * @return $this
+     */
+    public function setRecord(DataObject $record)
+    {
+        $this->record = $record;
 
-	/**
-	 * @return ArrayList
-	 */
-	protected function getOptions() {
-		$options = ArrayList::create();
+        return $this;
+    }
 
-		$source = $this->getSource();
+    /**
+     * {@inheritdoc}
+     */
+    public function Field($properties = array())
+    {
+        Requirements::css(TAG_FIELD_DIR . '/css/select2.min.css');
+        Requirements::css(TAG_FIELD_DIR . '/css/TagField.css');
 
-		if($source instanceof Iterator) {
-			$source = iterator_to_array($source);
-		}
+        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
+        Requirements::javascript(THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
+        Requirements::javascript(TAG_FIELD_DIR . '/js/select2.js');
+        Requirements::javascript(TAG_FIELD_DIR . '/js/TagField.js');
 
-		$values = $this->Value();
+        $this->addExtraClass('ss-tag-field');
 
-		foreach($source as $value) {
-			$options->push(
-				ArrayData::create(array(
-					'Title' => $value,
-					'Value' => $value,
-					'Selected' => in_array($value, $values),
-				))
-			);
-		}
+        if ($this->getIsMultiple()) {
+            $this->setAttribute('multiple', 'multiple');
+        }
 
-		return $options;
-	}
+        if ($this->getShouldLazyLoad()) {
+            $this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
+        } else {
+            $properties = array_merge($properties, array(
+                'Options' => $this->getOptions()
+            ));
+        }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setValue($value, $source = null) {
-		if(is_string($value)) {
-			$value = explode(',', $value);
-		}
+        return $this
+            ->customise($properties)
+            ->renderWith(array("templates/TagField"));
+    }
 
-		if($source instanceof DataObject) {
-			$name = $this->getName();
-			$value = explode(',', $source->$name);
-		}
+    /**
+     * @return string
+     */
+    protected function getSuggestURL()
+    {
+        return Controller::join_links($this->Link(), 'suggest');
+    }
 
-		if($source instanceof SS_List) {
-			$value = $source->column('ID');
-		}
+    /**
+     * @return ArrayList
+     */
+    protected function getOptions()
+    {
+        $options = ArrayList::create();
 
-		return parent::setValue(array_filter($value));
-	}
+        $source = $this->getSource();
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getAttributes() {
-		return array_merge(
-			parent::getAttributes(),
-			array('name' => $this->getName() . '[]')
-		);
-	}
+        if ($source instanceof Iterator) {
+            $source = iterator_to_array($source);
+        }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function saveInto(DataObjectInterface $record) {
-		parent::saveInto($record);
+        $values = $this->Value();
 
-		$name = $this->getName();
+        foreach ($source as $value) {
+            $options->push(
+                ArrayData::create(array(
+                    'Title' => $value,
+                    'Value' => $value,
+                    'Selected' => in_array($value, $values),
+                ))
+            );
+        }
 
-		$record->$name = join(',', $this->Value());
-		$record->write();
-	}
+        return $options;
+    }
 
-	/**
-	 * Returns a JSON string of tags, for lazy loading.
-	 *
-	 * @param SS_HTTPRequest $request
-	 *
-	 * @return SS_HTTPResponse
-	 */
-	public function suggest(SS_HTTPRequest $request) {
-		$responseBody = Convert::raw2json(
-			array('items' => array())
-		);
+    /**
+     * {@inheritdoc}
+     */
+    public function setValue($value, $source = null)
+    {
+        if (is_string($value)) {
+            $value = explode(',', $value);
+        }
 
-		$response = new SS_HTTPResponse();
-		$response->addHeader('Content-Type', 'application/json');
+        if ($source instanceof DataObject) {
+            $name = $this->getName();
+            $value = explode(',', $source->$name);
+        }
 
-		if($record = $this->getRecord()) {
-			$tags = array();
-			$term = $request->getVar('term');
+        if ($source instanceof SS_List) {
+            $value = $source->column('ID');
+        }
 
-			if($record->hasField($this->getName())) {
-				$tags = $this->getTags($term);
-			}
+        return parent::setValue(array_filter($value));
+    }
 
-			$responseBody = Convert::raw2json(
-				array('items' => $tags)
-			);
-		}
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttributes()
+    {
+        return array_merge(
+            parent::getAttributes(),
+            array('name' => $this->getName() . '[]')
+        );
+    }
 
-		$response->setBody($responseBody);
+    /**
+     * {@inheritdoc}
+     */
+    public function saveInto(DataObjectInterface $record)
+    {
+        parent::saveInto($record);
 
-		return $response;
-	}
+        $name = $this->getName();
 
-	/**
-	 * Returns array of arrays representing tags.
-	 *
-	 * @param string $term
-	 *
-	 * @return array
-	 */
-	protected function getTags($term) {
-		$record = $this->getRecord();
+        $record->$name = join(',', $this->Value());
+        $record->write();
+    }
 
-		if(!$record) {
-			return array();
-		}
+    /**
+     * Returns a JSON string of tags, for lazy loading.
+     *
+     * @param SS_HTTPRequest $request
+     *
+     * @return SS_HTTPResponse
+     */
+    public function suggest(SS_HTTPRequest $request)
+    {
+        $responseBody = Convert::raw2json(
+            array('items' => array())
+        );
 
-		$fieldName = $this->getName();
-		$className = $record->getClassName();
+        $response = new SS_HTTPResponse();
+        $response->addHeader('Content-Type', 'application/json');
 
-		$term = Convert::raw2sql($term);
+        if ($record = $this->getRecord()) {
+            $tags = array();
+            $term = $request->getVar('term');
 
-		$query = $className::get()
-			->filter($fieldName . ':PartialMatch:nocase', $term)
-			->limit($this->getLazyLoadItemLimit());
+            if ($record->hasField($this->getName())) {
+                $tags = $this->getTags($term);
+            }
 
-		$items = array();
+            $responseBody = Convert::raw2json(
+                array('items' => $tags)
+            );
+        }
 
-		foreach($query->column($fieldName) as $tags) {
-			$tags = explode(',', $tags);
+        $response->setBody($responseBody);
 
-			foreach($tags as $i => $tag) {
-				if(stripos($tag, $term) !== false && !in_array($tag, $items)) {
-					$items[] = array(
-						'id' => $tag,
-						'text' => $tag
-					);
-				}
-			}
-		}
+        return $response;
+    }
 
-		return $items;
-	}
+    /**
+     * Returns array of arrays representing tags.
+     *
+     * @param string $term
+     *
+     * @return array
+     */
+    protected function getTags($term)
+    {
+        $record = $this->getRecord();
 
-	/**
-	 * DropdownField assumes value will be a scalar so we must
-	 * override validate. This only applies to Silverstripe 3.2+
-	 *
-	 * @param Validator $validator
-	 * @return bool
-	 */
-	public function validate($validator) {
-		return true;
-	}
+        if (!$record) {
+            return array();
+        }
 
+        $fieldName = $this->getName();
+        $className = $record->getClassName();
+
+        $term = Convert::raw2sql($term);
+
+        $query = $className::get()
+            ->filter($fieldName . ':PartialMatch:nocase', $term)
+            ->limit($this->getLazyLoadItemLimit());
+
+        $items = array();
+
+        foreach ($query->column($fieldName) as $tags) {
+            $tags = explode(',', $tags);
+
+            foreach ($tags as $i => $tag) {
+                if (stripos($tag, $term) !== false && !in_array($tag, $items)) {
+                    $items[] = array(
+                        'id' => $tag,
+                        'text' => $tag
+                    );
+                }
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * DropdownField assumes value will be a scalar so we must
+     * override validate. This only applies to Silverstripe 3.2+
+     *
+     * @param Validator $validator
+     * @return bool
+     */
+    public function validate($validator)
+    {
+        return true;
+    }
 }
