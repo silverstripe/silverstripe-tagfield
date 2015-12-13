@@ -223,6 +223,10 @@ class StringTagField extends DropdownField
             $value = $source->column('ID');
         }
 
+        if (is_null($value)) {
+            $value = array();
+        }
+
         return parent::setValue(array_filter($value));
     }
 
