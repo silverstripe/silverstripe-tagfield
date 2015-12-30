@@ -208,15 +208,16 @@ class TagField extends DropdownField
 
         $values = $this->Value();
 
-        if (!$values) {
-            return $options;
+        // Mark selected tags while still returning a full list of possible options
+        $ids = array(); // empty fallback array for comparing
+        $values = $this->Value();
+        if($values){
+            // @TODO conversion from array to DataList to array...(?)
+            if(is_array($values)) {
+                $values = DataList::create($dataClass)->filter('ID', $values);
+            }
+            $ids = $values->column('ID');
         }
-
-        if (is_array($values)) {
-            $values = DataList::create($dataClass)->filter('ID', $values);
-        }
-
-        $ids = $values->column('ID');
 
         $titleField = $this->getTitleField();
 
