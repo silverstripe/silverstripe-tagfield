@@ -169,8 +169,11 @@ class TagFieldTest extends SapphireTest
          */
         $request = $this->getNewRequest(array('term' => 'Tag'));
 
+        $tag1ID = $this->idFromFixture('TagFieldTestBlogTag', 'Tag1');
+        $tag2ID = $this->idFromFixture('TagFieldTestBlogTag', 'Tag2');
+
         $this->assertEquals(
-            '{"items":[{"id":1,"text":"Tag1"},{"id":2,"text":"Tag2"}]}',
+            sprintf('{"items":[{"id":%d,"text":"Tag1"},{"id":%d,"text":"Tag2"}]}', $tag1ID, $tag2ID),
             $field->suggest($request)->getBody()
         );
 
@@ -180,7 +183,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'Tag1'));
 
         $this->assertEquals(
-            '{"items":[{"id":1,"text":"Tag1"}]}',
+            sprintf('{"items":[{"id":%d,"text":"Tag1"}]}', $tag1ID),
             $field->suggest($request)->getBody()
         );
 
@@ -190,7 +193,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'TAG1'));
 
         $this->assertEquals(
-            '{"items":[{"id":1,"text":"Tag1"}]}',
+            sprintf('{"items":[{"id":%d,"text":"Tag1"}]}', $tag1ID),
             $field->suggest($request)->getBody()
         );
 
@@ -212,6 +215,7 @@ class TagFieldTest extends SapphireTest
     {
         $source = TagFieldTestBlogTag::get()->exclude('Title', 'Tag2');
         $field = new TagField('Tags', '', $source);
+        $tag1ID = $this->idFromFixture('TagFieldTestBlogTag', 'Tag1');
 
         /**
          * Partial tag title match.
@@ -219,7 +223,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'Tag'));
 
         $this->assertEquals(
-            '{"items":[{"id":1,"text":"Tag1"}]}',
+            sprintf('{"items":[{"id":%d,"text":"Tag1"}]}', $tag1ID),
             $field->suggest($request)->getBody()
         );
 
@@ -229,7 +233,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'Tag1'));
 
         $this->assertEquals(
-            '{"items":[{"id":1,"text":"Tag1"}]}',
+            sprintf('{"items":[{"id":%d,"text":"Tag1"}]}', $tag1ID),
             $field->suggest($request)->getBody()
         );
 
@@ -276,7 +280,9 @@ class TagFieldTest extends SapphireTest
             $this->objFromFixture('TagFieldTestBlogPost', 'BlogPost2')
         );
 
-        $this->assertEquals($field->Value(), array(1 => 1, 2 => 2));
+        $ids = TagFieldTestBlogTag::get()->map('ID', 'ID')->toArray();
+
+        $this->assertEquals($field->Value(), $ids);
     }
 
     public function testItIgnoresNewTagsIfCannotCreate()
