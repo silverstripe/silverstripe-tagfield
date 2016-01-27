@@ -298,16 +298,14 @@ class TagField extends DropdownField
         $relation = $record->$name();
 
         foreach ($values as $i => $value) {
-            if (!is_numeric($value)) {
-                if (!$this->getCanCreate()) {
-                    unset($values[$i]);
-                    continue;
-                }
-
-                // Get or create record
-                $record = $this->getOrCreateTag($value);
-                $values[$i] = $record->ID;
+            if (!$this->getCanCreate()) {
+                unset($values[$i]);
+                continue;
             }
+
+            // Get or create record
+            $record = $this->getOrCreateTag($value);
+            $values[$i] = $record->ID;
         }
 
         if ($values instanceof SS_List) {
