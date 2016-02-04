@@ -231,7 +231,7 @@ class TagField extends DropdownField
         }
 
         return $options;
- 	}
+     }
 
     /**
      * {@inheritdoc}
@@ -310,7 +310,7 @@ class TagField extends DropdownField
 
         $relation->setByIDList(array_filter($ids));
 
- 	}
+     }
 
     /**
      * Get or create tag with the given value
@@ -321,25 +321,25 @@ class TagField extends DropdownField
     protected function getOrCreateTag($term)
     {
         // Check if existing record can be found
-		$source = $this->getSource();
-		$titleField = $this->getTitleField();
-		$record = $source
-			->filter($titleField, $term)
-			->first();
-		if($record) {
-			return $record;
-		}
+        $source = $this->getSource();
+        $titleField = $this->getTitleField();
+        $record = $source
+            ->filter($titleField, $term)
+            ->first();
+        if($record) {
+            return $record;
+        }
 
-		// Create new instance if not yet saved
-		if ($this->getCanCreate()) {
-			$dataClass = $source->dataClass();
-			$record = Injector::inst()->create($dataClass);
-			$record->{$titleField} = $term;
-			$record->write();
-			return $record;
-		} else {
-			return false;
-		}
+        // Create new instance if not yet saved
+        if ($this->getCanCreate()) {
+            $dataClass = $source->dataClass();
+            $record = Injector::inst()->create($dataClass);
+            $record->{$titleField} = $term;
+            $record->write();
+            return $record;
+        } else {
+            return false;
+        }
     }
 
     /**
