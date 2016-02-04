@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.2.2]
 
+- Alias master as 1.2.x-dev
 - Added standard Scrutinizer config	
 - Converted to PSR-2
 - Added standard editor config
