@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.2]
+
+- Added standard Scrutinizer config	
+- Converted to PSR-2
+- Added standard editor config
+- Added standard Travis config
+- Added standard git attributes
+- Added standard license
+- Added license to composer.json
+- Added standard code of conduct
+- Fixing setValue null value bug
+- Bugfix: show source tags if not lazyloading
+- Updated license year
+- FIX Tests with hard coded IDs
+
 ## [1.2.1]
 
 - Fixed isMultiple not being initialised
