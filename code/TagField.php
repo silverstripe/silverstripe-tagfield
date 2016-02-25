@@ -415,7 +415,7 @@ class TagField extends DropdownField
     public function performReadonlyTransformation()
     {
         $copy = $this->castedCopy('TagField_Readonly');
-        
+        $copy->setSource($this->getSource());
         return $copy;
     }
 }
@@ -431,7 +431,7 @@ class TagField_Readonly extends TagField
     protected $readonly = true;
     
     /**
-     * Render the field as HTML.
+     * Render the readonly field as HTML.
      *
      * @param array $properties
      * @return HTMLText
@@ -440,7 +440,7 @@ class TagField_Readonly extends TagField
     {
         $options = array();
         
-        foreach ($this->getOptions() as $option) {
+        foreach ($this->getOptions()->filter('Selected', true) as $option) {
             $options[] = $option->Title;
         }
         
