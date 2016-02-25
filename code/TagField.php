@@ -448,7 +448,6 @@ class TagField_Readonly extends TagField
         
         $field->setForm($this->form);
         $field->setValue(implode(', ', $options));
-        
         return $field->Field();
     }
 }
