@@ -406,4 +406,48 @@ class TagField extends DropdownField
     {
         return true;
     }
+    
+    /**
+     * Converts the field to a readonly variant.
+     *
+     * @return TagField_Readonly
+     */
+    public function performReadonlyTransformation()
+    {
+        $copy = $this->castedCopy('TagField_Readonly');
+        $copy->setSource($this->getSource());
+        return $copy;
+    }
+}
+
+/**
+ * A readonly extension of TagField useful for non-editable items within the CMS.
+ *
+ * @package forms
+ * @subpackage fields
+ */
+class TagField_Readonly extends TagField
+{
+    protected $readonly = true;
+    
+    /**
+     * Render the readonly field as HTML.
+     *
+     * @param array $properties
+     * @return HTMLText
+     */
+    public function Field($properties = array())
+    {
+        $options = array();
+        
+        foreach ($this->getOptions()->filter('Selected', true) as $option) {
+            $options[] = $option->Title;
+        }
+        
+        $field = ReadonlyField::create($this->name.'_Readonly', $this->title);
+        
+        $field->setForm($this->form);
+        $field->setValue(implode(', ', $options));
+        return $field->Field();
+    }
 }
