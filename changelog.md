@@ -4,10 +4,14 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.0]
+
+* Addition of a readonly TagField for archived pages
+
 ## [1.2.2]
 
 - Alias master as 1.2.x-dev
-- Added standard Scrutinizer config	
+- Added standard Scrutinizer config
 - Converted to PSR-2
 - Added standard editor config
 - Added standard Travis config
