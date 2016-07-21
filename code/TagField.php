@@ -178,6 +178,8 @@ class TagField extends DropdownField
             ));
         }
 
+        $this->setAttribute('data-can-create', (int) $this->getCanCreate());
+
         return $this
             ->customise($properties)
             ->renderWith(array("templates/TagField"));
@@ -406,7 +408,7 @@ class TagField extends DropdownField
     {
         return true;
     }
-    
+
     /**
      * Converts the field to a readonly variant.
      *
@@ -429,7 +431,7 @@ class TagField extends DropdownField
 class TagField_Readonly extends TagField
 {
     protected $readonly = true;
-    
+
     /**
      * Render the readonly field as HTML.
      *
@@ -439,13 +441,13 @@ class TagField_Readonly extends TagField
     public function Field($properties = array())
     {
         $options = array();
-        
+
         foreach ($this->getOptions()->filter('Selected', true) as $option) {
             $options[] = $option->Title;
         }
-        
+
         $field = ReadonlyField::create($this->name.'_Readonly', $this->title);
-        
+
         $field->setForm($this->form);
         $field->setValue(implode(', ', $options));
         return $field->Field();
