@@ -46,6 +46,10 @@
 					'tokenSeparators': [',']
 				};
 
+				if ($select.attr('data-can-create') == 0) {
+					options.tags = false;
+				}
+
 				if ($select.attr('data-ss-tag-field-suggest-url')) {
 					options.ajax = {
 						'url': $select.attr('data-ss-tag-field-suggest-url'),

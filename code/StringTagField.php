@@ -164,6 +164,8 @@ class StringTagField extends DropdownField
             ));
         }
 
+        $this->setAttribute('data-can-create', (int) $this->getCanCreate());
+
         return $this
             ->customise($properties)
             ->renderWith(array("templates/TagField"));
