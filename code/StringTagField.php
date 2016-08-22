@@ -29,6 +29,11 @@ class StringTagField extends DropdownField
     protected $lazyLoadItemLimit = 10;
 
     /**
+     * @var bool
+     */
+    protected $canCreate = true;
+
+    /**
      * @var null|DataObject
      */
     protected $record;
@@ -342,5 +347,25 @@ class StringTagField extends DropdownField
     public function validate($validator)
     {
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCanCreate()
+    {
+        return $this->canCreate;
+    }
+
+    /**
+     * @param bool $canCreate
+     *
+     * @return static
+     */
+    public function setCanCreate($canCreate)
+    {
+        $this->canCreate = $canCreate;
+
+        return $this;
     }
 }
