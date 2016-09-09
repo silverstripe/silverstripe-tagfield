@@ -1,5 +1,19 @@
 <?php
 
+use SilverStripe\View\Requirements;
+use SilverStripe\Control\Controller;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
+use SilverStripe\View\ArrayData;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\ReadonlyField;
+
 /**
  * Provides a tagging interface, storing links between tag DataObjects and a parent DataObject.
  *
@@ -352,11 +366,11 @@ class TagField extends DropdownField
      *
      * @return SS_HTTPResponse
      */
-    public function suggest(SS_HTTPRequest $request)
+    public function suggest(HTTPRequest $request)
     {
         $tags = $this->getTags($request->getVar('term'));
 
-        $response = new SS_HTTPResponse();
+        $response = new HTTPResponse();
         $response->addHeader('Content-Type', 'application/json');
         $response->setBody(json_encode(array('items' => $tags)));
 

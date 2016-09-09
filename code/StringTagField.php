@@ -1,5 +1,17 @@
 <?php
 
+use SilverStripe\ORM\DataObject;
+use SilverStripe\View\Requirements;
+use SilverStripe\Control\Controller;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\View\ArrayData;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Convert;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Forms\DropdownField;
+
 /**
  * Provides a tagging interface, storing comma-delimited tags in a DataObject string field.
  *
@@ -268,13 +280,13 @@ class StringTagField extends DropdownField
      *
      * @return SS_HTTPResponse
      */
-    public function suggest(SS_HTTPRequest $request)
+    public function suggest(HTTPRequest $request)
     {
         $responseBody = Convert::raw2json(
             array('items' => array())
         );
 
-        $response = new SS_HTTPResponse();
+        $response = new HTTPResponse();
         $response->addHeader('Content-Type', 'application/json');
 
         if ($record = $this->getRecord()) {

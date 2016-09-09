@@ -1,5 +1,15 @@
 <?php
 
+use SilverStripe\ORM\DataList;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Control\Controller;
+
 /**
  * @mixin PHPUnit_Framework_TestCase
  */
@@ -255,7 +265,7 @@ class TagFieldTest extends SapphireTest
      */
     protected function getNewRequest(array $parameters)
     {
-        return new SS_HTTPRequest(
+        return new HTTPRequest(
             'get',
             'TagFieldTestController/TagFieldTestForm/fields/Tags/suggest',
             $parameters
@@ -269,7 +279,7 @@ class TagFieldTest extends SapphireTest
 
         $form = new Form(
             new TagFieldTestController($record),
-            'Form',
+            'SilverStripe\\Forms\\Form',
             new FieldList(
                 $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'))
             ),
