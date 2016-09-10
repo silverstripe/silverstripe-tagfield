@@ -11,7 +11,7 @@ use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\ReadonlyField;
 
 /**
@@ -20,7 +20,7 @@ use SilverStripe\Forms\ReadonlyField;
  * @package forms
  * @subpackage fields
  */
-class TagField extends DropdownField
+class TagField extends FormField
 {
     /**
      * @var array
@@ -54,6 +54,12 @@ class TagField extends DropdownField
      */
     protected $isMultiple = true;
 
+
+    /**
+     * @var SilverStripe\ORM\SS_List
+     */
+    protected $source = true;
+
     /**
      * @param string $name
      * @param string $title
@@ -62,7 +68,8 @@ class TagField extends DropdownField
      */
     public function __construct($name, $title = '', $source = null, $value = null)
     {
-        parent::__construct($name, $title, $source, $value);
+        parent::__construct($name, $title, $value);
+        $this->source = $source;
     }
 
     /**
@@ -163,6 +170,14 @@ class TagField extends DropdownField
         $this->titleField = $titleField;
 
         return $this;
+    }
+
+    public function getSource() {
+        return $this->source;
+    }
+
+    public function setSource() {
+        return $this->source;
     }
 
     /**
