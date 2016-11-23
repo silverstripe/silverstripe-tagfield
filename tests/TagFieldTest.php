@@ -293,7 +293,7 @@ class TagFieldTest extends SapphireTest
 
         $tag = TagFieldTestBlogTag::get()->filter('Title', 'Tag1')->first();
 
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'), array($tag->ID, 'Tag3'));
+        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'), array($tag->Title, 'Tag3'));
         $field->setCanCreate(false);
         $field->saveInto($record);
 
