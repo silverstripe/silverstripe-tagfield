@@ -1,12 +1,26 @@
 <?php
 
+use SilverStripe\View\Requirements;
+use SilverStripe\Control\Controller;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
+use SilverStripe\View\ArrayData;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Forms\FormField;
+use SilverStripe\Forms\ReadonlyField;
+
 /**
  * Provides a tagging interface, storing links between tag DataObjects and a parent DataObject.
  *
  * @package forms
  * @subpackage fields
  */
-class TagField extends DropdownField
+class TagField extends FormField
 {
     /**
      * @var array
@@ -40,6 +54,12 @@ class TagField extends DropdownField
      */
     protected $isMultiple = true;
 
+
+    /**
+     * @var SilverStripe\ORM\SS_List
+     */
+    protected $source = true;
+
     /**
      * @param string $name
      * @param string $title
@@ -48,7 +68,8 @@ class TagField extends DropdownField
      */
     public function __construct($name, $title = '', $source = null, $value = null)
     {
-        parent::__construct($name, $title, $source, $value);
+        parent::__construct($name, $title, $value);
+        $this->source = $source;
     }
 
     /**
@@ -149,6 +170,14 @@ class TagField extends DropdownField
         $this->titleField = $titleField;
 
         return $this;
+    }
+
+    public function getSource() {
+        return $this->source;
+    }
+
+    public function setSource() {
+        return $this->source;
     }
 
     /**
@@ -351,11 +380,11 @@ class TagField extends DropdownField
      *
      * @return SS_HTTPResponse
      */
-    public function suggest(SS_HTTPRequest $request)
+    public function suggest(HTTPRequest $request)
     {
         $tags = $this->getTags($request->getVar('term'));
 
-        $response = new SS_HTTPResponse();
+        $response = new HTTPResponse();
         $response->addHeader('Content-Type', 'application/json');
         $response->setBody(json_encode(array('items' => $tags)));
 
