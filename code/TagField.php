@@ -202,7 +202,7 @@ class TagField extends DropdownField
 
         $source = $this->getSource();
 
-        if (!$source) {
+        if(!$source) {
             $source = new ArrayList();
         }
 
@@ -210,31 +210,30 @@ class TagField extends DropdownField
 
         $values = $this->Value();
 
-        // Mark selected tags while still returning a full list of possible options
-        $ids = array(); // empty fallback array for comparing
-        $values = $this->Value();
-        if($values){
-            // @TODO conversion from array to DataList to array...(?)
-            if(is_array($values)) {
-                $values = DataList::create($dataClass)->filter('ID', $values);
-            }
-            $ids = $values->column('ID');
+        if(!$values) {
+            return $options;
         }
+
+        if(is_array($values)) {
+            $values = DataList::create($dataClass)->filter('Title', $values);
+        }
+
+        $ids = $values->column('Title');
 
         $titleField = $this->getTitleField();
 
-        foreach ($source as $object) {
+        foreach($source as $object) {
             $options->push(
-                ArrayData::create(array(
-                    'Title' => $object->$titleField,
-                    'Value' => $object->ID,
-                    'Selected' => in_array($object->ID, $ids),
+            ArrayData::create(array(
+                'Title' => $object->$titleField,
+                'Value' => $object->Title,
+                'Selected' => in_array($object->Title, $ids),
                 ))
             );
         }
 
         return $options;
-    }
+     }
 
     /**
      * {@inheritdoc}
@@ -245,10 +244,10 @@ class TagField extends DropdownField
             $name = $this->getName();
 
             if ($source->hasMethod($name)) {
-                $value = $source->$name()->getIDList();
+                $value = $source->$name()->column('Title');
             }
         } elseif ($value instanceof SS_List) {
-            $value = $value->column('ID');
+            $value = $value->column('Title');
         }
 
         if (!is_array($value)) {
@@ -277,47 +276,43 @@ class TagField extends DropdownField
         parent::saveInto($record);
 
         $name = $this->getName();
+
         $titleField = $this->getTitleField();
 
         $source = $this->getSource();
 
         $values = $this->Value();
 
-        if (!$values) {
+        $relation = $record->$name();
+
+        $ids = array();
+
+        if(!$values) {
             $values = array();
         }
 
-        if (empty($record) || empty($source) || empty($titleField)) {
+        if(empty($record) || empty($source) || empty($titleField)) {
             return;
         }
 
-        if (!$record->hasMethod($name)) {
+        if(!$record->hasMethod($name)) {
             throw new Exception(
                 sprintf("%s does not have a %s method", get_class($record), $name)
             );
         }
 
-        $relation = $record->$name();
-
-        foreach ($values as $i => $value) {
-            if (!is_numeric($value)) {
-                if (!$this->getCanCreate()) {
-                    unset($values[$i]);
-                    continue;
-                }
-
-                // Get or create record
-                $record = $this->getOrCreateTag($value);
-                $values[$i] = $record->ID;
+        foreach ($values as $key => $value) {
+            // Get or create record
+            $record = $this->getOrCreateTag($value);
+            if($record) {
+                $ids[] = $record->ID;
+                $values[$key] = $record->Title;
             }
         }
 
-        if ($values instanceof SS_List) {
-            $values = iterator_to_array($values);
-        }
+        $relation->setByIDList(array_filter($ids));
 
-        $relation->setByIDList(array_filter($values));
-    }
+     }
 
     /**
      * Get or create tag with the given value
@@ -333,16 +328,20 @@ class TagField extends DropdownField
         $record = $source
             ->filter($titleField, $term)
             ->first();
-        if ($record) {
+        if($record) {
             return $record;
         }
 
         // Create new instance if not yet saved
-        $dataClass = $source->dataClass();
-        $record = Injector::inst()->create($dataClass);
-        $record->{$titleField} = $term;
-        $record->write();
-        return $record;
+        if ($this->getCanCreate()) {
+            $dataClass = $source->dataClass();
+            $record = Injector::inst()->create($dataClass);
+            $record->{$titleField} = $term;
+            $record->write();
+            return $record;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -389,7 +388,7 @@ class TagField extends DropdownField
         $titleField = $this->getTitleField();
         foreach ($query->map('ID', $titleField) as $id => $title) {
             $items[$title] = array(
-                'id' => $id,
+                'id' => $title,
                 'text' => $title
             );
         }
