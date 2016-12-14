@@ -1,5 +1,15 @@
 <?php
 
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\TagField\StringTagField;
+
 /**
  * @mixin PHPUnit_Framework_TestCase
  */
@@ -103,11 +113,11 @@ class StringTagFieldTest extends SapphireTest
     /**
      * @param array $parameters
      *
-     * @return SS_HTTPRequest
+     * @return HTTPRequest
      */
     protected function getNewRequest(array $parameters)
     {
-        return new SS_HTTPRequest(
+        return new HTTPRequest(
             'get',
             'StringTagFieldTestController/StringTagFieldTestForm/fields/Tags/suggest',
             $parameters

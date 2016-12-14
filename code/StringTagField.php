@@ -1,12 +1,26 @@
 <?php
 
+namespace SilverStripe\TagField;
+
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\View\ArrayData;
+use SilverStripe\View\Requirements;
+
 /**
  * Provides a tagging interface, storing comma-delimited tags in a DataObject string field.
  *
  * This is intended bridge the gap between 1.x and 2.x, and when possible TagField should be used
  * instead.
  *
- * @package forms
+ * @package    tagfield
  * @subpackage fields
  */
 class StringTagField extends DropdownField
@@ -14,9 +28,9 @@ class StringTagField extends DropdownField
     /**
      * @var array
      */
-    public static $allowed_actions = array(
-        'suggest',
-    );
+    public static $allowed_actions = [
+        'suggest'
+    ];
 
     /**
      * @var bool
@@ -42,17 +56,6 @@ class StringTagField extends DropdownField
      * @var bool
      */
     protected $isMultiple = true;
-
-    /**
-     * @param string $name
-     * @param string $title
-     * @param array|SS_List $source
-     * @param array|SS_List $value
-     */
-    public function __construct($name, $title = '', $source = array(), $value = array())
-    {
-        parent::__construct($name, $title, $source, $value);
-    }
 
     /**
      * @return bool
@@ -264,17 +267,16 @@ class StringTagField extends DropdownField
     /**
      * Returns a JSON string of tags, for lazy loading.
      *
-     * @param SS_HTTPRequest $request
-     *
-     * @return SS_HTTPResponse
+     * @param  HTTPRequest $request
+     * @return HTTPResponse
      */
-    public function suggest(SS_HTTPRequest $request)
+    public function suggest(HTTPRequest $request)
     {
         $responseBody = Convert::raw2json(
             array('items' => array())
         );
 
-        $response = new SS_HTTPResponse();
+        $response = new HTTPResponse;
         $response->addHeader('Content-Type', 'application/json');
 
         if ($record = $this->getRecord()) {

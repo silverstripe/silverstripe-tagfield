@@ -1,5 +1,16 @@
 <?php
 
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\TagField\TagField;
+
 /**
  * @mixin PHPUnit_Framework_TestCase
  */
@@ -21,13 +32,10 @@ class TagFieldTest extends SapphireTest
     public function testItSavesLinksToNewTagsOnNewRecords()
     {
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
-
         $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
         $field->setValue(array('Tag3', 'Tag4'));
         $field->saveInto($record);
-
         $record->write();
-
         $this->compareExpectedAndActualTags(
             array('Tag3', 'Tag4'),
             $record
@@ -65,7 +73,6 @@ class TagFieldTest extends SapphireTest
     protected function compareTagLists(array $expected, DataList $actualSource)
     {
         $actual = array_values($actualSource->map('ID', 'Title')->toArray());
-
         sort($expected);
         sort($actual);
 
@@ -247,11 +254,11 @@ class TagFieldTest extends SapphireTest
     /**
      * @param array $parameters
      *
-     * @return SS_HTTPRequest
+     * @return HTTPRequest
      */
     protected function getNewRequest(array $parameters)
     {
-        return new SS_HTTPRequest(
+        return new HTTPRequest(
             'get',
             'TagFieldTestController/TagFieldTestForm/fields/Tags/suggest',
             $parameters
@@ -283,9 +290,8 @@ class TagFieldTest extends SapphireTest
 
     public function testItIgnoresNewTagsIfCannotCreate()
     {
-
         $this->markTestSkipped(
-          'This test has not been updated yet.'
+            'This test has not been updated yet.'
         );
 
         $record = new TagFieldTestBlogPost();
@@ -320,14 +326,14 @@ class TagFieldTestBlogTag extends DataObject implements TestOnly
      * @var array
      */
     private static $db = array(
-        'Title' => 'Varchar(200)',
+        'Title' => 'Varchar(200)'
     );
 
     /**
      * @var array
      */
     private static $belongs_many_many = array(
-        'BlogPosts' => 'TagFieldTestBlogPost',
+        'BlogPosts' => 'TagFieldTestBlogPost'
     );
 }
 
@@ -340,15 +346,15 @@ class TagFieldTestBlogPost extends DataObject implements TestOnly
      * @var array
      */
     private static $db = array(
-        'Title' => 'Text',
-        'Content' => 'Text',
+        'Title'   => 'Text',
+        'Content' => 'Text'
     );
 
     /**
      * @var array
      */
     private static $many_many = array(
-        'Tags' => 'TagFieldTestBlogTag',
+        'Tags' => 'TagFieldTestBlogTag'
     );
 }
 
