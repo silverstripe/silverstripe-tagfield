@@ -153,8 +153,8 @@ class StringTagField extends DropdownField
         Requirements::css(TAG_FIELD_DIR . '/css/select2.min.css');
         Requirements::css(TAG_FIELD_DIR . '/css/TagField.css');
 
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
+        Requirements::javascript(ADMIN_THIRDPARTY_DIR . '/jquery/jquery.js');
+        Requirements::javascript(ADMIN_THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
         Requirements::javascript(TAG_FIELD_DIR . '/js/select2.js');
         Requirements::javascript(TAG_FIELD_DIR . '/js/TagField.js');
 
@@ -176,7 +176,7 @@ class StringTagField extends DropdownField
 
         return $this
             ->customise($properties)
-            ->renderWith(array("templates/TagField"));
+            ->renderWith(TagField::class);
     }
 
     /**
