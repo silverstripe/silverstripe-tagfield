@@ -27,7 +27,7 @@ class TagField extends DropdownField
     /**
      * @var array
      */
-    public static $allowed_actions = array(
+    private static $allowed_actions = array(
         'suggest'
     );
 
