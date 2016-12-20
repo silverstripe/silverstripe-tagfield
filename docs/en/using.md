@@ -3,19 +3,21 @@
 The primary use, for this module, is as a custom input field interface. For instance, imagine you had the following data objects:
 
 ```php
-class BlogPost extends DataObject {
+class BlogPost extends DataObject
+{
 	private static $many_many = array(
-		'BlogTags' => 'BlogTag'
+		'BlogTags' => 'SilverStripe\\Blog\\Model\\BlogTag'
 	);
 }
 
-class BlogTag extends DataObject {
+class BlogTag extends DataObject
+{
 	private static $db = array(
-		'Title' => 'Varchar(200)',
+		'Title' => 'Varchar(200)'
 	);
 
 	private static $belongs_many_many = array(
-		'BlogPosts' => 'BlogPost'
+		'BlogPosts' => 'SilverStripe\\Blog\\Model\\BlogPost'
 	);
 }
 ```
@@ -32,6 +34,8 @@ $field = TagField::create(
 	->setShouldLazyLoad(true) // tags should be lazy loaded
 	->setCanCreate(true);     // new tag DataObjects can be created
 ```
+
+**Note:** This assumes you have imported the namespaces class, e.g. `use SilverStripe\TagField\TagField;`.
 
 This will present a tag field, in which you can select existing blog tags or create new ones. They will be created/linked after the blog posts are saved.
 
@@ -51,7 +55,8 @@ $field->setShouldLazyLoad(true); // tags should be lazy loaded
 This assumes you are storing tags in the following data object structure:
 
 ```php
-class BlogPost extends DataObject {
+class BlogPost extends DataObject
+{
 	private static $db = array(
 		'Tags' => 'Text'
 	);
