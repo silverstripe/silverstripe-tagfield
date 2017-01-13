@@ -10,11 +10,11 @@
 	 */
 	$.fn.chosenDestroy = function () {
 		var $this = $(this);
-		if ($this.siblings('.chzn-container').length) {
+		if ($this.siblings('.chosen-container').length) {
 			$this
 				.show() // The field needs to be visible so Select2 evaluates the width correctly.
-				.removeClass('chzn-done')
-				.removeClass('has-chzn')
+				.removeClass('chosen-done')
+				.removeClass('has-chosen')
 				.next()
 				.remove();
 		}
@@ -23,7 +23,7 @@
 
 	$.entwine('ss', function ($) {
 
-		$('.ss-tag-field.has-chzn + .chzn-container, .ss-tag-field:not(.has-chzn)').entwine({
+		$('.ss-tag-field.has-chosen + .chosen-container, .ss-tag-field:not(.has-chosen)').entwine({
 			applySelect2: function () {
 				var self = this,
 					$select = $(this);
