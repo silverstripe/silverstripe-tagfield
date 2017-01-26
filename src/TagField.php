@@ -327,8 +327,7 @@ class TagField extends DropdownField
         if (!$values) {
             $values = array();
         }
-
-        if (empty($record) || empty($source) || empty($titleField)) {
+        if (empty($record) || empty($titleField)) {
             return;
         }
 

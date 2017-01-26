@@ -313,6 +313,32 @@ class TagFieldTest extends SapphireTest
             $record
         );
     }
+
+    /**
+     * Test you can save without a source set
+     */
+    public function testSaveEmptySource()
+    {
+        $record = new TagFieldTestBlogPost();
+        $record->write();
+
+        // Clear database of tags
+        TagFieldTestBlogTag::get()->removeAll();
+
+        $field = new TagField('Tags', '', TagFieldTestBlogTag::get());
+        $field->setValue(['New Tag']);
+        $field->setCanCreate(true);
+        $field->saveInto($record);
+
+        $tag = TagFieldTestBlogTag::get()->first();
+        $this->assertNotEmpty($tag);
+        $this->assertEquals('New Tag', $tag->Title);
+        $record = TagFieldTestBlogPost::get()->byID($record->ID);
+        $this->assertEquals(
+            $tag->ID,
+            $record->Tags()->first()->ID
+        );
+    }
 }
 
 class TagFieldTestBlogTag extends DataObject implements TestOnly
