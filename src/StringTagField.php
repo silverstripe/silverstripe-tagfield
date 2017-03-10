@@ -153,8 +153,6 @@ class StringTagField extends DropdownField
         Requirements::css(TAG_FIELD_DIR . '/css/select2.min.css');
         Requirements::css(TAG_FIELD_DIR . '/css/TagField.css');
 
-        Requirements::javascript(ADMIN_THIRDPARTY_DIR . '/jquery/jquery.js');
-        Requirements::javascript(ADMIN_THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
         Requirements::javascript(TAG_FIELD_DIR . '/js/select2.js');
         Requirements::javascript(TAG_FIELD_DIR . '/js/TagField.js');
 
