@@ -161,6 +161,11 @@ class StringTagField extends DropdownField
             $this->setAttribute('multiple', 'multiple');
         }
 
+        if ($this->getHasEmptyDefault()) {
+            $this->setAttribute('data-allow-clear', true);
+            $this->setAttribute('data-placeholder', $this->getEmptyString() ?: ' ');
+        }
+
         if ($this->getShouldLazyLoad()) {
             $this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
         } else {
@@ -198,6 +203,14 @@ class StringTagField extends DropdownField
         }
 
         $values = $this->Value();
+
+        if ($this->getHasEmptyDefault()) {
+            $options->push(ArrayData::create(array(
+                'Value' => '',
+                'Title' => '',
+                'Selected' => empty($values)
+            )));
+        }
 
         foreach ($source as $value) {
             $options->push(
