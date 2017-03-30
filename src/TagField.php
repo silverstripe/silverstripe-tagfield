@@ -251,7 +251,7 @@ class TagField extends DropdownField
         $values = $this->Value();
 
         if (!$values) {
-            return $options;
+            return $source;
         }
 
         if (is_array($values)) {
