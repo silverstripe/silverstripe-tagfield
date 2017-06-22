@@ -1,15 +1,18 @@
 <?php
 
-use SilverStripe\Control\Controller;
+namespace SilverStripe\TagField\Tests;
+
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
-use SilverStripe\Forms\FormAction;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\TagField\TagField;
+use SilverStripe\TagField\Tests\Stub\TagFieldTestBlogPost;
+use SilverStripe\TagField\Tests\Stub\TagFieldTestBlogTag;
+use SilverStripe\TagField\Tests\Stub\TagFieldTestController;
 
 /**
  * @mixin PHPUnit_Framework_TestCase
@@ -19,20 +22,20 @@ class TagFieldTest extends SapphireTest
     /**
      * @var string
      */
-    public static $fixture_file = 'tagfield/tests/TagFieldTest.yml';
+    protected static $fixture_file = 'TagFieldTest.yml';
 
     /**
      * @var array
      */
-    protected $extraDataObjects = array(
-        'TagFieldTestBlogTag',
-        'TagFieldTestBlogPost',
-    );
+    protected static $extra_dataobjects = [
+        TagFieldTestBlogTag::class,
+        TagFieldTestBlogPost::class,
+    ];
 
     public function testItSavesLinksToNewTagsOnNewRecords()
     {
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
         $field->setValue(array('Tag3', 'Tag4'));
         $field->saveInto($record);
         $record->write();
@@ -50,7 +53,7 @@ class TagFieldTest extends SapphireTest
     protected function getNewTagFieldTestBlogPost($name)
     {
         return $this->objFromFixture(
-            'TagFieldTestBlogPost',
+            TagFieldTestBlogPost::class,
             $name
         );
     }
@@ -87,7 +90,7 @@ class TagFieldTest extends SapphireTest
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
         $record->write();
 
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
         $field->setValue(array('Tag3', 'Tag4'));
         $field->saveInto($record);
 
@@ -101,7 +104,7 @@ class TagFieldTest extends SapphireTest
     {
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
 
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
         $field->setValue(array('Tag1', 'Tag2'));
         $field->saveInto($record);
 
@@ -118,7 +121,7 @@ class TagFieldTest extends SapphireTest
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
         $record->write();
 
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
         $field->setValue(array('Tag1', 'Tag2'));
         $field->saveInto($record);
 
@@ -135,7 +138,7 @@ class TagFieldTest extends SapphireTest
     {
         $record = $this->getNewTagFieldTestBlogPost('BlogPost2');
         $record->write();
-        $tag2ID = $this->idFromFixture('TagFieldTestBlogTag', 'Tag2');
+        $tag2ID = $this->idFromFixture(TagFieldTestBlogTag::class, 'Tag2');
 
         // Check tags before write
         $this->compareExpectedAndActualTags(
@@ -149,7 +152,7 @@ class TagFieldTest extends SapphireTest
         $this->assertContains($tag2ID, TagFieldTestBlogTag::get()->column('ID'));
 
         // Write new tags
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
         $field->setValue(array('222', 'Tag3'));
         $field->saveInto($record);
 
@@ -169,7 +172,7 @@ class TagFieldTest extends SapphireTest
 
     public function testItSuggestsTags()
     {
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
 
         /**
          * Partial tag title match.
@@ -274,13 +277,13 @@ class TagFieldTest extends SapphireTest
             new TagFieldTestController($record),
             'Form',
             new FieldList(
-                $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'))
+                $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class))
             ),
             new FieldList()
         );
 
         $form->loadDataFrom(
-            $this->objFromFixture('TagFieldTestBlogPost', 'BlogPost2')
+            $this->objFromFixture(TagFieldTestBlogPost::class, 'BlogPost2')
         );
 
         $ids = TagFieldTestBlogTag::get()->column('Title');
@@ -299,14 +302,14 @@ class TagFieldTest extends SapphireTest
 
         $tag = TagFieldTestBlogTag::get()->filter('Title', 'Tag1')->first();
 
-        $field = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'), array($tag->Title, 'Tag3'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class), array($tag->Title, 'Tag3'));
         $field->setCanCreate(false);
         $field->saveInto($record);
 
         /**
          * @var TagFieldTestBlogPost $record
          */
-        $record = DataObject::get_by_id('TagFieldTestBlogPost', $record->ID);
+        $record = DataObject::get_by_id(TagFieldTestBlogPost::class, $record->ID);
 
         $this->compareExpectedAndActualTags(
             array('Tag1'),
@@ -338,76 +341,5 @@ class TagFieldTest extends SapphireTest
             $tag->ID,
             $record->Tags()->first()->ID
         );
-    }
-}
-
-class TagFieldTestBlogTag extends DataObject implements TestOnly
-{
-    /**
-     * @var string
-     */
-    private static $default_sort = '"TagFieldTestBlogTag"."ID" ASC';
-
-    /**
-     * @var array
-     */
-    private static $db = array(
-        'Title' => 'Varchar(200)'
-    );
-
-    /**
-     * @var array
-     */
-    private static $belongs_many_many = array(
-        'BlogPosts' => 'TagFieldTestBlogPost'
-    );
-}
-
-/**
- * @method ManyManyList Tags()
- */
-class TagFieldTestBlogPost extends DataObject implements TestOnly
-{
-    /**
-     * @var array
-     */
-    private static $db = array(
-        'Title'   => 'Text',
-        'Content' => 'Text'
-    );
-
-    /**
-     * @var array
-     */
-    private static $many_many = array(
-        'Tags' => 'TagFieldTestBlogTag'
-    );
-}
-
-class TagFieldTestController extends Controller implements TestOnly
-{
-    /**
-     * @return Form
-     */
-    public function TagFieldTestForm()
-    {
-        $fields = new FieldList(
-            $tagField = new TagField('Tags', '', new DataList('TagFieldTestBlogTag'))
-        );
-
-        $actions = new FieldList(
-            new FormAction('TagFieldTestFormSubmit')
-        );
-
-        return new Form($this, 'TagFieldTestForm', $fields, $actions);
-    }
-
-    /**
-     * @param DataObject $dataObject
-     * @param Form $form
-     */
-    public function TagFieldTestFormSubmit(DataObject $dataObject, Form $form)
-    {
-        $form->saveInto($dataObject);
     }
 }

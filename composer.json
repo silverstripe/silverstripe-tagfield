@@ -23,7 +23,8 @@
     },
     "autoload": {
         "psr-4": {
-            "SilverStripe\\TagField\\": "src/"
+            "SilverStripe\\TagField\\": "src/",
+            "SilverStripe\\TagField\\Tests\\": "tests/"
         }
     },
     "extra": {

@@ -1,4 +1,4 @@
-StringTagFieldTestBlogPost:
+SilverStripe\TagField\Tests\Stub\StringTagFieldTestBlogPost:
   BlogPost1:
     Title: BlogPost1
   BlogPost2:
