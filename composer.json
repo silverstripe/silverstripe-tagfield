@@ -19,7 +19,8 @@
         "issues": "http://github.com/silverstripe-labs/silverstripe-tagfield/issues"
     },
     "require": {
-        "silverstripe/framework": "^4.0"
+        "silverstripe/framework": "^4@dev",
+        "silverstripe/versioned": "^1@dev"
     },
     "autoload": {
         "psr-4": {
