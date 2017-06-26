@@ -1,14 +1,11 @@
 <?php
 
-use SilverStripe\Control\Controller;
+namespace SilverStripe\TagField\Tests;
+
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Dev\TestOnly;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\Form;
-use SilverStripe\Forms\FormAction;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\TagField\StringTagField;
+use SilverStripe\TagField\Tests\Stub\StringTagFieldTestBlogPost;
 
 /**
  * @mixin PHPUnit_Framework_TestCase
@@ -18,13 +15,13 @@ class StringTagFieldTest extends SapphireTest
     /**
      * @var string
      */
-    public static $fixture_file = 'tagfield/tests/StringTagFieldTest.yml';
+    protected static $fixture_file = 'StringTagFieldTest.yml';
 
     /**
      * @var array
      */
-    protected $extraDataObjects = array(
-        'StringTagFieldTestBlogPost',
+    protected static $extra_dataobjects = array(
+        StringTagFieldTestBlogPost::class,
     );
 
     public function testItSavesTagsOnNewRecords()
@@ -48,7 +45,7 @@ class StringTagFieldTest extends SapphireTest
     protected function getNewStringTagFieldTestBlogPost($name)
     {
         return $this->objFromFixture(
-            'StringTagFieldTestBlogPost',
+            StringTagFieldTestBlogPost::class,
             $name
         );
     }
@@ -122,48 +119,5 @@ class StringTagFieldTest extends SapphireTest
             'StringTagFieldTestController/StringTagFieldTestForm/fields/Tags/suggest',
             $parameters
         );
-    }
-}
-
-/**
- * @property string $Tags
- */
-class StringTagFieldTestBlogPost extends DataObject implements TestOnly
-{
-    /**
-     * @var array
-     */
-    private static $db = array(
-        'Title' => 'Text',
-        'Content' => 'Text',
-        'Tags' => 'Text',
-    );
-}
-
-class StringTagFieldTestController extends Controller implements TestOnly
-{
-    /**
-     * @return Form
-     */
-    public function StringTagFieldTestForm()
-    {
-        $fields = new FieldList(
-            $tagField = new StringTagField('Tags')
-        );
-
-        $actions = new FieldList(
-            new FormAction('StringTagFieldTestFormSubmit')
-        );
-
-        return new Form($this, 'StringTagFieldTestForm', $fields, $actions);
-    }
-
-    /**
-     * @param DataObject $dataObject
-     * @param Form $form
-     */
-    public function StringTagFieldTestFormSubmit(DataObject $dataObject, Form $form)
-    {
-        $form->saveInto($dataObject);
     }
 }
