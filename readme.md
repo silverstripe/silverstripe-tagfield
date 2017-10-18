@@ -2,16 +2,15 @@
 
 Custom tag input field, for SilverStripe.
 
-[![Build Status](http://img.shields.io/travis/silverstripe-labs/silverstripe-tagfield.svg?style=flat-square)](https://travis-ci.org/silverstripe-labs/silverstripe-tagfield)
-[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe-labs/silverstripe-tagfield.svg?style=flat-square)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-tagfield)
-[![Code Coverage](http://img.shields.io/scrutinizer/coverage/g/silverstripe-labs/silverstripe-tagfield.svg?style=flat-square)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-tagfield)
-[![Version](http://img.shields.io/packagist/v/silverstripe/tagfield.svg?style=flat-square)](https://packagist.org/packages/silverstripe/tagfield)
-[![License](http://img.shields.io/packagist/l/silverstripe/tagfield.svg?style=flat-square)](license.md)
+[![Build Status](https://travis-ci.org/silverstripe/silverstripe-tagfield.svg?branch=master)](https://travis-ci.org/silverstripe/silverstripe-tagfield)
+[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe-labs/silverstripe-tagfield.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-tagfield)
+[![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-tagfield/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-tagfield)
+[![Version](http://img.shields.io/packagist/v/silverstripe/tagfield.svg?style=flat)](https://packagist.org/packages/silverstripe/tagfield)
+[![License](http://img.shields.io/packagist/l/silverstripe/tagfield.svg?style=flat)](license.md)
 
 ## Requirements
 
-* SilverStripe 3.1 or newer
-* Database: MySQL 5+, SQLite3, Postgres 8.3, SQL Server 2008
+* SilverStripe 4.0
 
 ## Installing
 
@@ -24,22 +23,28 @@ $ composer require silverstripe/tagfield
 ### Relational Tags
 
 ```php
-class BlogPost extends DataObject {
-	private static $many_many = array(
-		'BlogTags' => 'BlogTag'
-	);
+use SilverStripe\ORM\DataObject;
+
+class BlogPost extends DataObject
+{
+	private static $many_many = [
+		'BlogTags' => BlogTag::class
+	];
 }
 ```
 
 ```php
-class BlogTag extends DataObject {
-	private static $db = array(
-		'Title' => 'Varchar(200)',
-	);
+use SilverStripe\ORM\DataObject;
 
-	private static $belongs_many_many = array(
-		'BlogPosts' => 'BlogPost'
-	);
+class BlogTag extends DataObject
+{
+	private static $db = [
+		'Title' => 'Varchar(200)',
+	];
+
+	private static $belongs_many_many = [
+		'BlogPosts' => BlogPost::class
+	];
 }
 ```
 
@@ -57,10 +62,13 @@ $field = TagField::create(
 ### String Tags
 
 ```php
-class BlogPost extends DataObject {
-	private static $db = array(
-		'Tags' => 'Text'
-	);
+use SilverStripe\ORM\DataObject;
+
+class BlogPost extends DataObject
+{
+	private static $db = [
+		'Tags' => 'Text',
+	];
 }
 ```
 
@@ -68,7 +76,7 @@ class BlogPost extends DataObject {
 $field = StringTagField::create(
 	'Tags',
 	'Tags',
-	array('one', 'two'),
+    ['one', 'two'],
 	explode(',', $this->Tags)
 );
 
@@ -85,4 +93,4 @@ All methods, with `public` visibility, are part of the public API. All other met
 
 ## Reporting Issues
 
-Please [create an issue](http://github.com/silverstripe-labs/silverstripe-tagfield/issues) for any bugs you've found, or features you're missing.
+Please [create an issue](http://github.com/silverstripe/silverstripe-tagfield/issues) for any bugs you've found, or features you're missing.
