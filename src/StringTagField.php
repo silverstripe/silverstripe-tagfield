@@ -150,11 +150,11 @@ class StringTagField extends DropdownField
      */
     public function Field($properties = array())
     {
-        Requirements::css(TAG_FIELD_DIR . '/css/select2.min.css');
-        Requirements::css(TAG_FIELD_DIR . '/css/TagField.css');
+        Requirements::css('silverstripe/tagfield:css/select2.min.css');
+        Requirements::css('silverstripe/tagfield:css/TagField.css');
 
-        Requirements::javascript(TAG_FIELD_DIR . '/js/select2.js');
-        Requirements::javascript(TAG_FIELD_DIR . '/js/TagField.js');
+        Requirements::javascript('silverstripe/tagfield:js/select2.js');
+        Requirements::javascript('silverstripe/tagfield:js/TagField.js');
 
         $this->addExtraClass('ss-tag-field');
 

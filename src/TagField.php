@@ -198,11 +198,11 @@ class TagField extends DropdownField
      */
     public function Field($properties = array())
     {
-        Requirements::css(TAG_FIELD_DIR . '/css/select2.min.css');
-        Requirements::css(TAG_FIELD_DIR . '/css/TagField.css');
+        Requirements::css('silverstripe/tagfield:css/select2.min.css');
+        Requirements::css('silverstripe/tagfield:css/TagField.css');
 
-        Requirements::javascript(TAG_FIELD_DIR . '/js/select2.js');
-        Requirements::javascript(TAG_FIELD_DIR . '/js/TagField.js');
+        Requirements::javascript('silverstripe/tagfield:js/select2.js');
+        Requirements::javascript('silverstripe/tagfield:js/TagField.js');
 
         $this->addExtraClass('ss-tag-field');
 
@@ -242,7 +242,7 @@ class TagField extends DropdownField
 
         $source = $this->getSourceList();
 
-        if(!$source) {
+        if (!$source) {
             $source = ArrayList::create();
         }
 
@@ -262,9 +262,9 @@ class TagField extends DropdownField
 
         $titleField = $this->getTitleField();
 
-        foreach($source as $object) {
+        foreach ($source as $object) {
             $options->push(
-            ArrayData::create(array(
+                ArrayData::create(array(
                 'Title' => $object->$titleField,
                 'Value' => $object->Title,
                 'Selected' => in_array($object->Title, $ids),
@@ -273,7 +273,7 @@ class TagField extends DropdownField
         }
 
         return $options;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -345,7 +345,7 @@ class TagField extends DropdownField
         }
 
         $relation->setByIDList(array_filter($ids));
-     }
+    }
 
     /**
      * Get or create tag with the given value
