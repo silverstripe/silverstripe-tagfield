@@ -1,9 +1,8 @@
 <?php
 
-namespace SilverStripe\TagField\TagField;
+namespace SilverStripe\TagField;
 
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\TagField\TagField;
 
 /**
  * A readonly extension of TagField useful for non-editable items within the CMS.
@@ -11,7 +10,7 @@ use SilverStripe\TagField\TagField;
  * @package forms
  * @subpackage fields
  */
-class Readonly extends TagField
+class ReadonlyTagField extends TagField
 {
     /**
      * {@inheritDoc}

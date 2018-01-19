@@ -368,4 +368,5 @@ class StringTagField extends DropdownField
 
         return $this;
     }
+    
 }
