@@ -355,6 +355,5 @@ class TagFieldTest extends SapphireTest
         $field = new TagField('Tags', '', TagFieldTestBlogTag::get());
         $readOnlyField = $field->performReadonlyTransformation();
         $this->assertEquals(ReadonlyTagField::class, get_class($readOnlyField));
-
     }
 }
