@@ -4,10 +4,8 @@ namespace SilverStripe\TagField\Tests;
 
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Dev\TestOnly;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\TagField\ReadonlyTagField;
@@ -15,7 +13,6 @@ use SilverStripe\TagField\TagField;
 use SilverStripe\TagField\Tests\Stub\TagFieldTestBlogPost;
 use SilverStripe\TagField\Tests\Stub\TagFieldTestBlogTag;
 use SilverStripe\TagField\Tests\Stub\TagFieldTestController;
-use SilverStripe\View\ArrayData;
 
 /**
  * @mixin PHPUnit_Framework_TestCase
@@ -345,7 +342,6 @@ class TagFieldTest extends SapphireTest
             $record->Tags()->first()->ID
         );
     }
-
 
     /**
      * Test read only fields are returned
