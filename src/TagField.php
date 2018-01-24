@@ -7,7 +7,6 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
-use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -67,7 +66,7 @@ class TagField extends DropdownField
      * @param null|DataList $source
      * @param null|DataList $value
      */
-    public function __construct($name, $title = '', $source = null, $value = null)
+    public function __construct($name, $title = '', $source = array(), $value = null)
     {
         $this->setSourceList($source);
         parent::__construct($name, $title, $source, $value);
@@ -447,7 +446,7 @@ class TagField extends DropdownField
      */
     public function performReadonlyTransformation()
     {
-        $copy = $this->castedCopy(TagFieldReadonly::class);
+        $copy = $this->castedCopy(ReadonlyTagField::class);
         $copy->setSourceList($this->getSourceList());
         return $copy;
     }
