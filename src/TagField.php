@@ -66,7 +66,7 @@ class TagField extends DropdownField
      * @param null|DataList $source
      * @param null|DataList $value
      */
-    public function __construct($name, $title = '', $source = array(), $value = null)
+    public function __construct($name, $title = '', $source = [], $value = null)
     {
         $this->setSourceList($source);
         parent::__construct($name, $title, $source, $value);
@@ -303,7 +303,10 @@ class TagField extends DropdownField
     {
         return array_merge(
             parent::getAttributes(),
-            array('name' => $this->getName() . '[]')
+            [
+                'name' => $this->getName() . '[]',
+                'style'=> 'width: 100%'
+            ]
         );
     }
 

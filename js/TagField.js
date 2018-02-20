@@ -43,6 +43,7 @@
 
 				var options = {
 					'tags': true,
+					'width': 'resolve',
 					'tokenSeparators': [',']
 				};
 
