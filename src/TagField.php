@@ -65,10 +65,12 @@ class TagField extends DropdownField
      * @param string $title
      * @param null|DataList $source
      * @param null|DataList $value
+     * @param string $titleField
      */
-    public function __construct($name, $title = '', $source = [], $value = null)
+    public function __construct($name, $title = '', $source = [], $value = null, $titleField = 'Title')
     {
         $this->setSourceList($source);
+        $this->setTitleField($titleField);
         parent::__construct($name, $title, $source, $value);
     }
 
@@ -254,10 +256,10 @@ class TagField extends DropdownField
         }
 
         if (is_array($values)) {
-            $values = DataList::create($dataClass)->filter('Title', $values);
+            $values = DataList::create($dataClass)->filter($this->getTitleField(), $values);
         }
 
-        $ids = $values->column('Title');
+        $ids = $values->column($this->getTitleField());
 
         $titleField = $this->getTitleField();
 
@@ -283,10 +285,10 @@ class TagField extends DropdownField
             $name = $this->getName();
 
             if ($source->hasMethod($name)) {
-                $value = $source->$name()->column('Title');
+                $value = $source->$name()->column($this->getTitleField());
             }
         } elseif ($value instanceof SS_List) {
-            $value = $value->column('Title');
+            $value = $value->column($this->getTitleField());
         }
 
         if (!is_array($value)) {
