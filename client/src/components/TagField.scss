@@ -1,0 +1,36 @@
+@import "~react-select/dist/react-select.css";
+
+// sass-lint:disable class-name-format
+.Select--multi .Select-value {
+  color: $body-color;
+  background-color: $white;
+  border-color: $input-focus-border-color;
+  border-radius: $border-radius;
+
+  &-icon {
+    font-size: $font-size-lg;
+    padding: 0 5px 2px;
+    border-color: $input-focus-border-color;
+  }
+}
+
+.Select-option.is-focused {
+  background-color: $list-group-hover-bg;
+}
+
+.Select-option.is-selected {
+  background-color: $link-color;
+  color: $white;
+}
+
+.is-focused:not(.is-open)>.Select-control,
+.is-open>.Select-control,
+.Select-menu-outer {
+  box-shadow: none;
+  border-color: $brand-primary;
+}
+
+.Select-menu-outer {
+  border-top-color: #e6e6e6;
+}
+// sass-lint:enable class-name-format

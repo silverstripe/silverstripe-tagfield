@@ -1,0 +1,45 @@
+{
+  "name": "silverstripe-tagfield",
+  "version": "2.2.0",
+  "description": "Tag field for SilverStripe",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silverstripe/silverstripe-tagfield.git"
+  },
+  "homepage": "https://github.com/silverstripe/silverstripe-tagfield",
+  "bugs": {
+    "url": "https://github.com/silverstripe/silverstripe-tagfield/issues"
+  },
+  "author": "SilverStripe Ltd.",
+  "engines": {
+    "node": ">=6.x"
+  },
+  "scripts": {
+    "build": "yarn && yarn lint && NODE_ENV=production webpack -p --bail --progress",
+    "dev": "NODE_ENV=development webpack --progress",
+    "watch": "NODE_ENV=development webpack --watch --progress",
+    "css": "WEBPACK_CHILD=css npm run build",
+    "lock": "npm-shrinkwrap --dev",
+    "lint": "eslint client/src && sass-lint client/src",
+    "lint-js": "eslint client/src",
+    "lint-js-fix": "eslint client/src --fix",
+    "lint-sass": "sass-lint client/src"
+  },
+  "devDependencies": {
+    "@silverstripe/eslint-config": "^0.0.4",
+    "@silverstripe/webpack-config": "^0.8.0",
+    "expose-loader": "^0.7.4",
+    "sass-loader": "^6.0.7"
+  },
+  "dependencies": {
+    "babel-polyfill": "6.7.4",
+    "classnames": "^2.2.5",
+    "isomorphic-fetch": "https://registry.npmjs.org/isomorphic-fetch/-/isomorphic-fetch-2.2.1.tgz",
+    "jquery": "^3.1.1",
+    "react": "15.3.1",
+    "react-dom": "15.3.1",
+    "react-select": "^1.0.0-rc.5",
+    "url": "^0.11.0"
+  }
+}
