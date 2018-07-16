@@ -213,8 +213,7 @@ class TagField extends DropdownField
         ];
         if (!$this->getShouldLazyLoad()) {
             $schema['options'] = array_values($this->getOptions()->toNestedArray());
-        }
-        else {
+        } else {
             if ($this->Value()) {
                 $schema['value'] = $this->getOptions(true)->toNestedArray();
             }
