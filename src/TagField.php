@@ -209,12 +209,16 @@ class TagField extends DropdownField
             'creatable' => $this->getCanCreate(),
             'multiple' => $this->getIsMultiple(),
             'value' => $this->Value(),
+            'disabled' => $this->isDisabled() || $this->isReadonly(),
         ];
         if (!$this->getShouldLazyLoad()) {
             $schema['options'] = array_values($this->getOptions()->toNestedArray());
         }
         else {
-            $schema['optionsUrl'] = Controller::join_links($this->getSuggestURL(), '?term=');
+            if ($this->Value()) {
+                $schema['value'] = $this->getOptions(true)->toNestedArray();
+            }
+            $schema['optionUrl'] = $this->getSuggestURL();
         }
         $this->setAttribute('data-schema', Convert::array2json($schema));
 
@@ -234,12 +238,11 @@ class TagField extends DropdownField
     }
 
     /**
+     * @param bool $onlySelected Only return options that are selected
      * @return ArrayList
      */
-    protected function getOptions()
+    protected function getOptions($onlySelected = false)
     {
-        $options = ArrayList::create();
-
         $source = $this->getSourceList();
 
         if (!$source) {
@@ -247,27 +250,35 @@ class TagField extends DropdownField
         }
 
         $dataClass = $source->dataClass();
-
+        $titleField = $this->getTitleField();
         $values = $this->Value();
 
-        if (!$values) {
-            return $options;
+        if ($values) {
+            if (is_array($values)) {
+                $values = DataList::create($dataClass)->filter($titleField, $values);
+            }
+        }
+        if ($onlySelected) {
+            $source = $values;
         }
 
-        if (is_array($values)) {
-            $values = DataList::create($dataClass)->filter($this->getTitleField(), $values);
-        }
+        return $source instanceof DataList ? $this->formatOptions($source) : ArrayList::create();
+    }
 
-        $ids = $values->column($this->getTitleField());
-
+    /**
+     * @param DataList $source
+     * @return ArrayList
+     */
+    protected function formatOptions(DataList $source)
+    {
+        $options = ArrayList::create();
         $titleField = $this->getTitleField();
 
         foreach ($source as $object) {
             $options->push(
                 ArrayData::create(array(
-                'Title' => $object->$titleField,
-                'Value' => $object->Title,
-                'Selected' => in_array($object->Title, $ids),
+                    'Title' => $object->$titleField,
+                    'Value' => $object->Title,
                 ))
             );
         }
@@ -404,17 +415,7 @@ class TagField extends DropdownField
             ->sort($titleField)
             ->limit($this->getLazyLoadItemLimit());
 
-        // Map into a distinct list
-        $items = array();
-        $titleField = $this->getTitleField();
-        foreach ($query->map('ID', $titleField) as $id => $title) {
-            $items[$title] = array(
-                'id' => $title,
-                'text' => $title
-            );
-        }
-
-        return array_values($items);
+        return $this->formatOptions($query)->toNestedArray();
     }
 
     /**
