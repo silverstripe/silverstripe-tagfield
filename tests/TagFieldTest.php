@@ -180,7 +180,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'Tag'));
 
         $this->assertEquals(
-            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
+            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -190,7 +190,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => '222'));
 
         $this->assertEquals(
-            '{"items":[{"Title":"222","Value":"222"}]}',
+            '{"items":[{"id":"222","text":"222"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -200,7 +200,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'TAG1'));
 
         $this->assertEquals(
-            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
+            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -229,7 +229,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'Tag'));
 
         $this->assertEquals(
-            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
+            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -239,7 +239,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(array('term' => 'Tag1'));
 
         $this->assertEquals(
-            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
+            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
