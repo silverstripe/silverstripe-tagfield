@@ -1,6 +1,6 @@
 {
     "name": "silverstripe/tagfield",
-    "description": "Tag field for Silverstripe",
+    "description": "Tag field for SilverStripe",
     "license": "BSD-3-Clause",
     "type": "silverstripe-vendormodule",
     "keywords": [
@@ -37,8 +37,7 @@
             "dev-master": "2.x-dev"
         },
         "expose": [
-            "css",
-            "js"
+            "client/dist"
         ]
     },
     "minimum-stability": "dev",

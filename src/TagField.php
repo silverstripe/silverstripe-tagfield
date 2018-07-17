@@ -5,6 +5,7 @@ namespace SilverStripe\TagField;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\ORM\ArrayList;
@@ -199,27 +200,28 @@ class TagField extends DropdownField
      */
     public function Field($properties = array())
     {
-        Requirements::css('silverstripe/tagfield:css/select2.min.css');
-        Requirements::css('silverstripe/tagfield:css/TagField.css');
+        Requirements::css('silverstripe/tagfield:client/dist/styles/bundle.css');
+        Requirements::javascript('silverstripe/tagfield:client/dist/js/bundle.js');
 
-        Requirements::javascript('silverstripe/tagfield:js/select2.js');
-        Requirements::javascript('silverstripe/tagfield:js/TagField.js');
+        $schema = [
+            'name' => $this->getName() . '[]',
+            'lazyLoad' => $this->getShouldLazyLoad(),
+            'creatable' => $this->getCanCreate(),
+            'multi' => $this->getIsMultiple(),
+            'value' => $this->Value(),
+            'disabled' => $this->isDisabled() || $this->isReadonly(),
+        ];
+        if (!$this->getShouldLazyLoad()) {
+            $schema['options'] = array_values($this->getOptions()->toNestedArray());
+        } else {
+            if ($this->Value()) {
+                $schema['value'] = $this->getOptions(true)->toNestedArray();
+            }
+            $schema['optionUrl'] = $this->getSuggestURL();
+        }
+        $this->setAttribute('data-schema', Convert::array2json($schema));
 
         $this->addExtraClass('ss-tag-field');
-
-        if ($this->getIsMultiple()) {
-            $this->setAttribute('multiple', 'multiple');
-        }
-
-        if ($this->shouldLazyLoad) {
-            $this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
-        } else {
-            $properties = array_merge($properties, array(
-                'Options' => $this->getOptions()
-            ));
-        }
-
-        $this->setAttribute('data-can-create', (int) $this->getCanCreate());
 
         return $this
             ->customise($properties)
@@ -235,12 +237,11 @@ class TagField extends DropdownField
     }
 
     /**
+     * @param bool $onlySelected Only return options that are selected
      * @return ArrayList
      */
-    protected function getOptions()
+    protected function getOptions($onlySelected = false)
     {
-        $options = ArrayList::create();
-
         $source = $this->getSourceList();
 
         if (!$source) {
@@ -248,27 +249,35 @@ class TagField extends DropdownField
         }
 
         $dataClass = $source->dataClass();
-
+        $titleField = $this->getTitleField();
         $values = $this->Value();
 
-        if (!$values) {
-            return $options;
+        if ($values) {
+            if (is_array($values)) {
+                $values = DataList::create($dataClass)->filter($titleField, $values);
+            }
+        }
+        if ($onlySelected) {
+            $source = $values;
         }
 
-        if (is_array($values)) {
-            $values = DataList::create($dataClass)->filter($this->getTitleField(), $values);
-        }
+        return $source instanceof DataList ? $this->formatOptions($source) : ArrayList::create();
+    }
 
-        $ids = $values->column($this->getTitleField());
-
+    /**
+     * @param DataList $source
+     * @return ArrayList
+     */
+    protected function formatOptions(DataList $source)
+    {
+        $options = ArrayList::create();
         $titleField = $this->getTitleField();
 
         foreach ($source as $object) {
             $options->push(
                 ArrayData::create(array(
-                'Title' => $object->$titleField,
-                'Value' => $object->Title,
-                'Selected' => in_array($object->Title, $ids),
+                    'Title' => $object->$titleField,
+                    'Value' => $object->Title,
                 ))
             );
         }
@@ -296,20 +305,6 @@ class TagField extends DropdownField
         }
 
         return parent::setValue(array_filter($value));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAttributes()
-    {
-        return array_merge(
-            parent::getAttributes(),
-            [
-                'name' => $this->getName() . '[]',
-                'style'=> 'width: 100%'
-            ]
-        );
     }
 
     /**
