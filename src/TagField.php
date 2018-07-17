@@ -207,7 +207,7 @@ class TagField extends DropdownField
             'name' => $this->getName() . '[]',
             'lazyLoad' => $this->getShouldLazyLoad(),
             'creatable' => $this->getCanCreate(),
-            'multiple' => $this->getIsMultiple(),
+            'multi' => $this->getIsMultiple(),
             'value' => $this->Value(),
             'disabled' => $this->isDisabled() || $this->isReadonly(),
         ];
@@ -414,7 +414,17 @@ class TagField extends DropdownField
             ->sort($titleField)
             ->limit($this->getLazyLoadItemLimit());
 
-        return $this->formatOptions($query)->toNestedArray();
+        // Map into a distinct list
+        $items = array();
+        $titleField = $this->getTitleField();
+        foreach ($query->map('ID', $titleField) as $id => $title) {
+            $items[$title] = array(
+                'id' => $title,
+                'text' => $title
+            );
+        }
+
+        return array_values($items);
     }
 
     /**

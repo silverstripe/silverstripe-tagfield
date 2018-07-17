@@ -26,45 +26,56 @@ class TagField extends Component {
   }
 
   getOptions(input) {
-    if (!this.props.lazyLoad) {
-      return Promise.resolve({ options: this.props.options });
+    const { lazyLoad, options, optionUrl, labelKey, valueKey } = this.props;
+
+    if (!lazyLoad) {
+      return Promise.resolve({ options });
     }
 
     if (!input) {
       return Promise.resolve({ options: [] });
     }
 
-    const fetchURL = url.parse(this.props.optionUrl, true);
+    const fetchURL = url.parse(optionUrl, true);
     fetchURL.query.term = input;
 
     return fetch(url.format(fetchURL), { credentials: 'same-origin' })
       .then((response) => response.json())
-      .then((json) => ({ options: json.items }));
+      .then((json) => ({
+        options: json.items.map(item => ({
+          [labelKey]: item.id,
+          [valueKey]: item.text,
+        }))
+      }));
   }
 
   render() {
-    const optionAttributes = this.props.lazyLoad
+    const {
+      lazyLoad,
+      options,
+      creatable,
+      ...passThroughAttributes
+    } = this.props;
+
+    const optionAttributes = lazyLoad
       ? { loadOptions: this.getOptions }
-      : { options: this.props.options };
+      : { options };
 
     let SelectComponent = Select;
-    if (this.props.lazyLoad && this.props.creatable) {
+    if (lazyLoad && creatable) {
       SelectComponent = Select.AsyncCreatable;
-    } else if (this.props.lazyLoad) {
+    } else if (lazyLoad) {
       SelectComponent = Select.Async;
-    } else if (this.props.creatable) {
+    } else if (creatable) {
       SelectComponent = Select.Creatable;
     }
 
+    passThroughAttributes.value = this.state.value;
+
     return (
       <SelectComponent
-        name={this.props.name}
-        multi={this.props.multiple}
-        value={this.state.value}
+        {...passThroughAttributes}
         onChange={this.onChange}
-        onBlur={this.props.onBlur}
-        valueKey={this.props.valueKey}
-        labelKey={this.props.labelKey}
         inputProps={{ className: 'no-change-track' }}
         {...optionAttributes}
       />
@@ -73,12 +84,12 @@ class TagField extends Component {
 }
 
 TagField.propTypes = {
-  name: PropTypes.string.required,
-  labelKey: PropTypes.string.required,
-  valueKey: PropTypes.string.required,
-  lazyLoad: PropTypes.bool.required,
-  creatable: PropTypes.bool.required,
-  multiple: PropTypes.bool.required,
+  name: PropTypes.string.isRequired,
+  labelKey: PropTypes.string.isRequired,
+  valueKey: PropTypes.string.isRequired,
+  lazyLoad: PropTypes.bool.isRequired,
+  creatable: PropTypes.bool.isRequired,
+  multi: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
   options: PropTypes.arrayOf(PropTypes.object),
   optionUrl: PropTypes.string,
