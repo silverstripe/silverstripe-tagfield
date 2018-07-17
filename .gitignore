@@ -1,3 +1,6 @@
 composer.lock
 vendor
 framework
+node_modules/
+/**/*.js.map
+/**/*.css.map

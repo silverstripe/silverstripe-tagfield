@@ -2,6 +2,7 @@
   "name": "silverstripe-tagfield",
   "version": "2.2.0",
   "description": "Tag field for SilverStripe",
+  "main": "./client/src/boot/index.js",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -58,9 +59,6 @@
   "devDependencies": {
     "@silverstripe/eslint-config": "^0.0.4",
     "@silverstripe/webpack-config": "^0.8.0",
-    "@storybook/addon-actions": "^3.2.19",
-    "@storybook/addon-options": "^3.2.19",
-    "@storybook/react": "^3.2.19",
     "babel-jest": "^20.0.3",
     "copy-webpack-plugin": "^4.2.0",
     "enzyme": "^3.3.0",
