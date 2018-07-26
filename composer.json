@@ -19,8 +19,8 @@
         "issues": "http://github.com/silverstripe/silverstripe-tagfield/issues"
     },
     "require": {
-        "silverstripe/framework": "^4.0",
-        "silverstripe/versioned": "^1.0"
+        "silverstripe/framework": "^4.3",
+        "silverstripe/versioned": "^1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7",
@@ -33,9 +33,6 @@
         }
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.x-dev"
-        },
         "expose": [
             "client/dist"
         ]
