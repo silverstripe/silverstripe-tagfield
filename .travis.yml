@@ -23,9 +23,9 @@ before_script:
   - phpenv config-rm xdebug.ini
 
   - composer validate
-  - composer require --prefer-dist --no-update silverstripe/recipe-cms:4.3.x-dev
-  - if [[ $DB == PGSQL ]]; then composer require --prefer-dist --no-update silverstripe/postgresql:2.1.x-dev; fi
-  - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+  - composer require --no-update silverstripe/recipe-cms:4.3.x-dev silverstripe/admin:1.3.x-dev
+  - if [[ $DB == PGSQL ]]; then composer require --no-update silverstripe/postgresql:2.1.x-dev; fi
+  - composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
   # Install NPM dependencies
   - if [[ $NPM_TEST ]]; then nvm install $TRAVIS_NODE_VERSION && nvm use $TRAVIS_NODE_VERSION && npm install -g yarn && yarn install --network-concurrency 1 && (cd vendor/silverstripe/admin && yarn install --network-concurrency 1) && yarn run build; fi
