@@ -71,7 +71,7 @@ class TagField extends DropdownField
     {
         $this->setSourceList($source);
         $this->setTitleField($titleField);
-        parent::__construct($name, $title, $source, $value);
+        parent::__construct($name, $title, [], $value);
     }
 
     /**
