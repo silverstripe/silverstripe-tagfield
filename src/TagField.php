@@ -262,6 +262,20 @@ class TagField extends DropdownField
         $ids = $values->column($this->getTitleField());
 
         $titleField = $this->getTitleField();
+        
+        if ($this->shouldLazyLoad) {
+            // only render options that are selected as everything else should be lazy loaded, and or loaded by the form
+            foreach ($values as $value) {
+                $options->push(
+                    ArrayData::create(array(
+                        'Title' => $value->$titleField,
+                        'Value' => $value->Title,
+                        'Selected' => true, // only values are iterated.
+                    ))
+                );
+            }
+            return $options;
+        }
 
         foreach ($source as $object) {
             $options->push(
