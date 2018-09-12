@@ -313,6 +313,21 @@ class TagField extends DropdownField
     }
 
     /**
+     * Gets the source array if required
+     *
+     * Note: this is expensive for a SS_List
+     *
+     * @return array
+     */
+    public function getSource()
+    {
+        if (is_null($this->source)) {
+            $this->setSource($this->getSourceList());
+        }
+        return $this->source;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAttributes()
