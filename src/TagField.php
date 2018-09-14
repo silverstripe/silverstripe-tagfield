@@ -71,7 +71,7 @@ class TagField extends DropdownField
     {
         $this->setSourceList($source);
         $this->setTitleField($titleField);
-        parent::__construct($name, $title, $source, $value);
+        parent::__construct($name, $title, [], $value);
     }
 
     /**
@@ -262,6 +262,20 @@ class TagField extends DropdownField
         $ids = $values->column($this->getTitleField());
 
         $titleField = $this->getTitleField();
+        
+        if ($this->shouldLazyLoad) {
+            // only render options that are selected as everything else should be lazy loaded, and or loaded by the form
+            foreach ($values as $value) {
+                $options->push(
+                    ArrayData::create(array(
+                        'Title' => $value->$titleField,
+                        'Value' => $value->Title,
+                        'Selected' => true, // only values are iterated.
+                    ))
+                );
+            }
+            return $options;
+        }
 
         foreach ($source as $object) {
             $options->push(
@@ -296,6 +310,21 @@ class TagField extends DropdownField
         }
 
         return parent::setValue(array_filter($value));
+    }
+
+    /**
+     * Gets the source array if required
+     *
+     * Note: this is expensive for a SS_List
+     *
+     * @return array
+     */
+    public function getSource()
+    {
+        if (is_null($this->source)) {
+            $this->setSource($this->getSourceList());
+        }
+        return $this->source;
     }
 
     /**
