@@ -216,7 +216,7 @@ class TagField extends DropdownField
             $this->setAttribute('multiple', 'multiple');
         }
 
-        if ($this->shouldLazyLoad) {
+        if ($this->getShouldLazyLoad()) {
             $this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
         } else {
             $properties = array_merge($properties, array(
@@ -268,7 +268,7 @@ class TagField extends DropdownField
 
         $titleField = $this->getTitleField();
         
-        if ($this->shouldLazyLoad) {
+        if ($this->getShouldLazyLoad()) {
             // only render options that are selected as everything else should be lazy loaded, and or loaded by the form
             foreach ($values as $value) {
                 $options->push(
