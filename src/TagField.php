@@ -66,11 +66,11 @@ class TagField extends DropdownField
     /**
      * @param string $name
      * @param string $title
-     * @param null|DataList $source
+     * @param null|DataList|array $source
      * @param null|DataList $value
      * @param string $titleField
      */
-    public function __construct($name, $title = '', $source = null, $value = null, $titleField = 'Title')
+    public function __construct($name, $title = '', $source = [], $value = null, $titleField = 'Title')
     {
         $this->setTitleField($titleField);
         parent::__construct($name, $title, $source, $value);
