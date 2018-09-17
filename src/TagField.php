@@ -2,15 +2,18 @@
 
 namespace SilverStripe\TagField;
 
+use Exception;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\Relation;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\Requirements;
@@ -63,13 +66,12 @@ class TagField extends DropdownField
     /**
      * @param string $name
      * @param string $title
-     * @param null|DataList $source
+     * @param null|DataList|array $source
      * @param null|DataList $value
      * @param string $titleField
      */
     public function __construct($name, $title = '', $source = [], $value = null, $titleField = 'Title')
     {
-        $this->setSourceList($source);
         $this->setTitleField($titleField);
         parent::__construct($name, $title, $source, $value);
     }
@@ -175,7 +177,9 @@ class TagField extends DropdownField
     }
 
     /**
-     * Get the DataList source. The 4.x upgrade for SelectField::setSource starts to convert this to an array
+     * Get the DataList source. The 4.x upgrade for SelectField::setSource starts to convert this to an array.
+     * If empty use getSource() for array version
+     *
      * @return DataList
      */
     public function getSourceList()
@@ -185,7 +189,8 @@ class TagField extends DropdownField
 
     /**
      * Set the model class name for tags
-     * @param  DataList $className
+     *
+     * @param DataList $sourceList
      * @return self
      */
     public function setSourceList($sourceList)
@@ -211,7 +216,7 @@ class TagField extends DropdownField
             $this->setAttribute('multiple', 'multiple');
         }
 
-        if ($this->shouldLazyLoad) {
+        if ($this->getShouldLazyLoad()) {
             $this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
         } else {
             $properties = array_merge($properties, array(
@@ -262,6 +267,20 @@ class TagField extends DropdownField
         $ids = $values->column($this->getTitleField());
 
         $titleField = $this->getTitleField();
+        
+        if ($this->getShouldLazyLoad()) {
+            // only render options that are selected as everything else should be lazy loaded, and or loaded by the form
+            foreach ($values as $value) {
+                $options->push(
+                    ArrayData::create(array(
+                        'Title' => $value->$titleField,
+                        'Value' => $value->Title,
+                        'Selected' => true, // only values are iterated.
+                    ))
+                );
+            }
+            return $options;
+        }
 
         foreach ($source as $object) {
             $options->push(
@@ -299,6 +318,39 @@ class TagField extends DropdownField
     }
 
     /**
+     * Gets the source array if required
+     *
+     * Note: this is expensive for a SS_List
+     *
+     * @return array
+     */
+    public function getSource()
+    {
+        if (is_null($this->source)) {
+            $this->source = $this->getListMap($this->getSourceList());
+        }
+        return $this->source;
+    }
+
+    /**
+     * Intercept DataList source
+     *
+     * @param mixed $source
+     * @return $this
+     */
+    public function setSource($source)
+    {
+        // When setting a datalist force internal list to null
+        if ($source instanceof DataList) {
+            $this->source = null;
+            $this->setSourceList($source);
+        } else {
+            parent::setSource($source);
+        }
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAttributes()
@@ -313,7 +365,8 @@ class TagField extends DropdownField
     }
 
     /**
-     * {@inheritdoc}
+     * @param DataObject|DataObjectInterface $record DataObject to save data into
+     * @throws Exception
      */
     public function saveInto(DataObjectInterface $record)
     {
@@ -321,8 +374,9 @@ class TagField extends DropdownField
 
         $name = $this->getName();
         $titleField = $this->getTitleField();
-        $source = $this->getSource();
         $values = $this->Value();
+
+        /** @var Relation $relation */
         $relation = $record->$name();
         $ids = array();
 
@@ -355,13 +409,16 @@ class TagField extends DropdownField
      * Get or create tag with the given value
      *
      * @param  string $term
-     * @return DataObject
+     * @return DataObject|false
      */
     protected function getOrCreateTag($term)
     {
         // Check if existing record can be found
-        /** @var DataList $source */
         $source = $this->getSourceList();
+        if (!$source) {
+            return false;
+        }
+
         $titleField = $this->getTitleField();
         $record = $source
             ->filter($titleField, $term)
@@ -407,10 +464,10 @@ class TagField extends DropdownField
      */
     protected function getTags($term)
     {
-        /**
-         * @var array $source
-         */
         $source = $this->getSourceList();
+        if (!$source) {
+            return [];
+        }
 
         $titleField = $this->getTitleField();
 
@@ -447,10 +504,11 @@ class TagField extends DropdownField
     /**
      * Converts the field to a readonly variant.
      *
-     * @return TagField_Readonly
+     * @return ReadonlyTagField
      */
     public function performReadonlyTransformation()
     {
+        /** @var ReadonlyTagField $copy */
         $copy = $this->castedCopy(ReadonlyTagField::class);
         $copy->setSourceList($this->getSourceList());
         return $copy;
