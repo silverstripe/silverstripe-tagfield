@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
 import fetch from 'isomorphic-fetch';
+import fieldHolder from 'components/FieldHolder/FieldHolder';
 import url from 'url';
 import debounce from 'debounce-promise';
 import PropTypes from 'prop-types';
@@ -15,6 +16,7 @@ class TagField extends Component {
     };
 
     this.onChange = this.onChange.bind(this);
+    this.handleOnBlur = this.handleOnBlur.bind(this);
     this.getOptions = this.getOptions.bind(this);
     this.fetchOptions = debounce(this.fetchOptions, 500);
   }
@@ -43,6 +45,15 @@ class TagField extends Component {
     return this.fetchOptions(input);
   }
 
+  /**
+   * Required to prevent TagField being cleared on blur
+   *
+   * @link https://github.com/JedWatson/react-select/issues/805
+   */
+  handleOnBlur() {
+
+  }
+
   fetchOptions(input) {
     const { optionUrl, labelKey, valueKey } = this.props;
     const fetchURL = url.parse(optionUrl, true);
@@ -52,8 +63,8 @@ class TagField extends Component {
       .then((response) => response.json())
       .then((json) => ({
         options: json.items.map(item => ({
-          [labelKey]: item.id,
-          [valueKey]: item.text,
+          [labelKey]: item.Title,
+          [valueKey]: item.Value,
         }))
       }));
   }
@@ -85,6 +96,7 @@ class TagField extends Component {
       <SelectComponent
         {...passThroughAttributes}
         onChange={this.onChange}
+        onBlur={this.handleOnBlur}
         inputProps={{ className: 'no-change-track' }}
         {...optionAttributes}
       />
@@ -113,4 +125,6 @@ TagField.defaultProps = {
   disabled: false
 };
 
-export default TagField;
+export { TagField as Component };
+
+export default fieldHolder(TagField);
