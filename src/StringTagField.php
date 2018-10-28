@@ -270,7 +270,7 @@ class StringTagField extends DropdownField
      */
     public function suggest(HTTPRequest $request)
     {
-        $responseBody = Convert::raw2json(
+        $responseBody = json_encode(
             array('items' => array())
         );
 
@@ -285,7 +285,7 @@ class StringTagField extends DropdownField
                 $tags = $this->getTags($term);
             }
 
-            $responseBody = Convert::raw2json(
+            $responseBody = json_encode(
                 array('items' => $tags)
             );
         }
