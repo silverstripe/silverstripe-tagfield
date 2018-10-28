@@ -219,7 +219,7 @@ class TagField extends DropdownField
             }
             $schema['optionUrl'] = $this->getSuggestURL();
         }
-        $this->setAttribute('data-schema', Convert::array2json($schema));
+        $this->setAttribute('data-schema', json_encode($schema));
 
         $this->addExtraClass('ss-tag-field');
 
