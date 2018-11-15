@@ -450,4 +450,14 @@ class TagField extends DropdownField
         $copy->setSourceList($this->getSourceList());
         return $copy;
     }
+
+    /**
+     * Prevent the default, which would return "tag"
+     *
+     * @return string
+     */
+    public function Type()
+    {
+        return '';
+    }
 }
