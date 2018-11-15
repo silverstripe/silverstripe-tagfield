@@ -6,11 +6,9 @@ use Iterator;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Core\Convert;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\SS_List;
@@ -144,9 +142,6 @@ class StringTagField extends DropdownField
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function Field($properties = [])
     {
         Requirements::css('silverstripe/tagfield:client/dist/styles/bundle.css');
@@ -154,23 +149,66 @@ class StringTagField extends DropdownField
 
         $this->addExtraClass('ss-tag-field');
 
-        if ($this->getIsMultiple()) {
-            $this->setAttribute('multiple', 'multiple');
-        }
-
-        if ($this->getShouldLazyLoad()) {
-            $this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
-        } else {
-            $properties = array_merge($properties, [
-                'Options' => $this->getOptions()
-            ]);
-        }
-
-        $this->setAttribute('data-can-create', (int) $this->getCanCreate());
-
         return $this
             ->customise($properties)
             ->renderWith(TagField::class);
+    }
+
+    /**
+     * Provide TagField data to the JSON schema for the frontend component
+     *
+     * @return array
+     */
+    public function getSchemaDataDefaults()
+    {
+        $schema = array_merge(
+            parent::getSchemaDataDefaults(),
+            [
+                'name' => $this->getName() . '[]',
+                'lazyLoad' => $this->getShouldLazyLoad(),
+                'creatable' => $this->getCanCreate(),
+                'multi' => $this->getIsMultiple(),
+                'value' => $this->formatOptions($this->Value()),
+                'disabled' => $this->isDisabled() || $this->isReadonly(),
+            ]
+        );
+
+        if (!$this->getShouldLazyLoad()) {
+            $schema['options'] = $this->getOptions()->toNestedArray();
+        } else {
+            $schema['optionUrl'] = $this->getSuggestURL();
+        }
+
+        return $schema;
+    }
+
+    protected function formatOptions($fieldValue)
+    {
+        if (empty($fieldValue)) {
+            return [];
+        }
+
+        $formattedValue = [];
+        foreach ($fieldValue as $value) {
+            $formattedValue[] = [
+                'Title' => $value,
+                'Value' => $value,
+            ];
+        }
+        return $formattedValue;
+    }
+
+    /**
+     * When not used in a React form factory context, this adds the schema data to SilverStripe template
+     * rendered attributes lists
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        $attributes = parent::getAttributes();
+        $attributes['data-schema'] = json_encode($this->getSchemaData());
+        return $attributes;
     }
 
     /**
@@ -194,14 +232,11 @@ class StringTagField extends DropdownField
             $source = iterator_to_array($source);
         }
 
-        $values = $this->Value();
-
         foreach ($source as $value) {
             $options->push(
                 ArrayData::create([
                     'Title' => $value,
                     'Value' => $value,
-                    'Selected' => in_array($value, $values),
                 ])
             );
         }
@@ -209,9 +244,6 @@ class StringTagField extends DropdownField
         return $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValue($value, $source = null)
     {
         if (is_string($value)) {
@@ -234,20 +266,6 @@ class StringTagField extends DropdownField
         return parent::setValue(array_filter($value));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAttributes()
-    {
-        return array_merge(
-            parent::getAttributes(),
-            ['name' => $this->getName() . '[]']
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function saveInto(DataObjectInterface $record)
     {
         parent::saveInto($record);
@@ -267,69 +285,38 @@ class StringTagField extends DropdownField
     public function suggest(HTTPRequest $request)
     {
         $responseBody = json_encode(
-            ['items' => []]
+            ['items' => $this->getTags($request->getVar('term'))]
         );
 
         $response = HTTPResponse::create();
         $response->addHeader('Content-Type', 'application/json');
-
-        if ($record = $this->getRecord()) {
-            $tags = [];
-            $term = $request->getVar('term');
-
-            if ($record->hasField($this->getName())) {
-                $tags = $this->getTags($term);
-            }
-
-            $responseBody = json_encode(
-                ['items' => $tags]
-            );
-        }
-
         $response->setBody($responseBody);
 
         return $response;
     }
 
     /**
-     * Returns array of arrays representing tags.
+     * Returns array of arrays representing tags that partially match the given search term
      *
      * @param string $term
      * @return array
      */
     protected function getTags($term)
     {
-        $record = $this->getRecord();
-
-        if (!$record) {
-            return [];
-        }
-
-        $fieldName = $this->getName();
-        $className = $record->getClassName();
-
-        $term = Convert::raw2sql($term);
-
-        $query = DataList::create($className)
-            ->filter($fieldName . ':PartialMatch:nocase', $term)
-            ->limit($this->getLazyLoadItemLimit());
-
-        $items = array();
-
-        foreach ($query->column($fieldName) as $tags) {
-            $tags = explode(',', $tags);
-
-            foreach ($tags as $i => $tag) {
-                if (stripos($tag, $term) !== false && !in_array($tag, $items)) {
-                    $items[] = [
-                        'id' => $tag,
-                        'text' => $tag,
-                    ];
-                }
+        $items = [];
+        foreach ($this->getOptions() as $i => $tag) {
+            /** @var ArrayData $tag */
+            $tagValue = $tag->Value;
+            // Map into a distinct list (prevent duplicates)
+            if (stripos($tagValue, $term) !== false && !array_key_exists($tagValue, $items)) {
+                $items[$tagValue] = [
+                    'id' => $tag->Title,
+                    'text' => $tag->Value,
+                ];
             }
         }
-
-        return $items;
+        // @todo do we actually need lazy loading limits for StringTagField?
+        return array_slice(array_values($items), 0, $this->getLazyLoadItemLimit());
     }
 
     /**

@@ -64,15 +64,12 @@ class StringTagFieldTest extends SapphireTest
 
     public function testItSuggestsTags()
     {
-        $record = $this->getNewStringTagFieldTestBlogPost('BlogPost2');
-
-        $field = new StringTagField('Tags');
-        $field->setRecord($record);
+        $field = new StringTagField('SomeField', 'Some field', ['Tag1', 'Tag2'], []);
 
         /**
          * Partial tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'Tag'));
+        $request = $this->getNewRequest(['term' => 'Tag']);
 
         $this->assertEquals(
             '{"items":[{"id":"Tag1","text":"Tag1"},{"id":"Tag2","text":"Tag2"}]}',
@@ -82,14 +79,14 @@ class StringTagFieldTest extends SapphireTest
         /**
          * Exact tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'Tag1'));
+        $request = $this->getNewRequest(['term' => 'Tag1']);
 
         $this->assertEquals($field->suggest($request)->getBody(), '{"items":[{"id":"Tag1","text":"Tag1"}]}');
 
         /**
          * Case-insensitive tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'TAG1'));
+        $request = $this->getNewRequest(['term' => 'TAG1']);
 
         $this->assertEquals(
             '{"items":[{"id":"Tag1","text":"Tag1"}]}',
@@ -99,7 +96,7 @@ class StringTagFieldTest extends SapphireTest
         /**
          * No tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'unknown'));
+        $request = $this->getNewRequest(['term' => 'unknown']);
 
         $this->assertEquals(
             '{"items":[]}',
