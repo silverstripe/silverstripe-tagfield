@@ -2,12 +2,15 @@
 
 namespace SilverStripe\TagField;
 
+use Iterator;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Convert;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\SS_List;
@@ -29,7 +32,7 @@ class StringTagField extends DropdownField
      * @var array
      */
     private static $allowed_actions = [
-        'suggest'
+        'suggest',
     ];
 
     /**
@@ -67,8 +70,7 @@ class StringTagField extends DropdownField
 
     /**
      * @param bool $shouldLazyLoad
-     *
-     * @return static
+     * @return $this
      */
     public function setShouldLazyLoad($shouldLazyLoad)
     {
@@ -87,8 +89,7 @@ class StringTagField extends DropdownField
 
     /**
      * @param int $lazyLoadItemLimit
-     *
-     * @return static
+     * @return $this
      */
     public function setLazyLoadItemLimit($lazyLoadItemLimit)
     {
@@ -107,8 +108,7 @@ class StringTagField extends DropdownField
 
     /**
      * @param bool $isMultiple
-     *
-     * @return static
+     * @return $this
      */
     public function setIsMultiple($isMultiple)
     {
@@ -135,7 +135,6 @@ class StringTagField extends DropdownField
 
     /**
      * @param DataObject $record
-     *
      * @return $this
      */
     public function setRecord(DataObject $record)
@@ -148,7 +147,7 @@ class StringTagField extends DropdownField
     /**
      * {@inheritdoc}
      */
-    public function Field($properties = array())
+    public function Field($properties = [])
     {
         Requirements::css('silverstripe/tagfield:css/select2.min.css');
         Requirements::css('silverstripe/tagfield:css/TagField.css');
@@ -165,9 +164,9 @@ class StringTagField extends DropdownField
         if ($this->getShouldLazyLoad()) {
             $this->setAttribute('data-ss-tag-field-suggest-url', $this->getSuggestURL());
         } else {
-            $properties = array_merge($properties, array(
+            $properties = array_merge($properties, [
                 'Options' => $this->getOptions()
-            ));
+            ]);
         }
 
         $this->setAttribute('data-can-create', (int) $this->getCanCreate());
@@ -202,11 +201,11 @@ class StringTagField extends DropdownField
 
         foreach ($source as $value) {
             $options->push(
-                ArrayData::create(array(
+                ArrayData::create([
                     'Title' => $value,
                     'Value' => $value,
                     'Selected' => in_array($value, $values),
-                ))
+                ])
             );
         }
 
@@ -231,8 +230,8 @@ class StringTagField extends DropdownField
             $value = $source->column('ID');
         }
 
-        if (is_null($value)) {
-            $value = array();
+        if ($value === null) {
+            $value = [];
         }
 
         return parent::setValue(array_filter($value));
@@ -245,7 +244,7 @@ class StringTagField extends DropdownField
     {
         return array_merge(
             parent::getAttributes(),
-            array('name' => $this->getName() . '[]')
+            ['name' => $this->getName() . '[]']
         );
     }
 
@@ -258,7 +257,7 @@ class StringTagField extends DropdownField
 
         $name = $this->getName();
 
-        $record->$name = join(',', $this->Value());
+        $record->$name = implode(',', $this->Value());
         $record->write();
     }
 
@@ -271,14 +270,14 @@ class StringTagField extends DropdownField
     public function suggest(HTTPRequest $request)
     {
         $responseBody = json_encode(
-            array('items' => array())
+            ['items' => []]
         );
 
-        $response = new HTTPResponse;
+        $response = HTTPResponse::create();
         $response->addHeader('Content-Type', 'application/json');
 
         if ($record = $this->getRecord()) {
-            $tags = array();
+            $tags = [];
             $term = $request->getVar('term');
 
             if ($record->hasField($this->getName())) {
@@ -286,7 +285,7 @@ class StringTagField extends DropdownField
             }
 
             $responseBody = json_encode(
-                array('items' => $tags)
+                ['items' => $tags]
             );
         }
 
@@ -299,7 +298,6 @@ class StringTagField extends DropdownField
      * Returns array of arrays representing tags.
      *
      * @param string $term
-     *
      * @return array
      */
     protected function getTags($term)
@@ -307,7 +305,7 @@ class StringTagField extends DropdownField
         $record = $this->getRecord();
 
         if (!$record) {
-            return array();
+            return [];
         }
 
         $fieldName = $this->getName();
@@ -315,7 +313,7 @@ class StringTagField extends DropdownField
 
         $term = Convert::raw2sql($term);
 
-        $query = $className::get()
+        $query = DataList::create($className)
             ->filter($fieldName . ':PartialMatch:nocase', $term)
             ->limit($this->getLazyLoadItemLimit());
 
@@ -326,10 +324,10 @@ class StringTagField extends DropdownField
 
             foreach ($tags as $i => $tag) {
                 if (stripos($tag, $term) !== false && !in_array($tag, $items)) {
-                    $items[] = array(
+                    $items[] = [
                         'id' => $tag,
-                        'text' => $tag
-                    );
+                        'text' => $tag,
+                    ];
                 }
             }
         }
@@ -359,8 +357,7 @@ class StringTagField extends DropdownField
 
     /**
      * @param bool $canCreate
-     *
-     * @return static
+     * @return $this
      */
     public function setCanCreate($canCreate)
     {
