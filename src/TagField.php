@@ -5,9 +5,9 @@ namespace SilverStripe\TagField;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -27,9 +27,9 @@ class TagField extends DropdownField
     /**
      * @var array
      */
-    private static $allowed_actions = array(
-        'suggest'
-    );
+    private static $allowed_actions = [
+        'suggest',
+    ];
 
     /**
      * @var bool
@@ -198,7 +198,7 @@ class TagField extends DropdownField
     /**
      * {@inheritdoc}
      */
-    public function Field($properties = array())
+    public function Field($properties = [])
     {
         Requirements::css('silverstripe/tagfield:client/dist/styles/bundle.css');
         Requirements::javascript('silverstripe/tagfield:client/dist/js/bundle.js');
@@ -219,6 +219,7 @@ class TagField extends DropdownField
             }
             $schema['optionUrl'] = $this->getSuggestURL();
         }
+
         $this->setAttribute('data-schema', json_encode($schema));
 
         $this->addExtraClass('ss-tag-field');
@@ -275,10 +276,10 @@ class TagField extends DropdownField
 
         foreach ($source as $object) {
             $options->push(
-                ArrayData::create(array(
+                ArrayData::create([
                     'Title' => $object->$titleField,
                     'Value' => $object->Title,
-                ))
+                ])
             );
         }
 
@@ -316,13 +317,12 @@ class TagField extends DropdownField
 
         $name = $this->getName();
         $titleField = $this->getTitleField();
-        $source = $this->getSource();
         $values = $this->Value();
         $relation = $record->$name();
-        $ids = array();
+        $ids = [];
 
         if (!$values) {
-            $values = array();
+            $values = [];
         }
         if (empty($record) || empty($titleField)) {
             return;
@@ -350,12 +350,11 @@ class TagField extends DropdownField
      * Get or create tag with the given value
      *
      * @param  string $term
-     * @return DataObject
+     * @return DataObject|bool
      */
     protected function getOrCreateTag($term)
     {
         // Check if existing record can be found
-        /** @var DataList $source */
         $source = $this->getSourceList();
         $titleField = $this->getTitleField();
         $record = $source
@@ -372,9 +371,9 @@ class TagField extends DropdownField
             $record->{$titleField} = $term;
             $record->write();
             return $record;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -387,9 +386,9 @@ class TagField extends DropdownField
     {
         $tags = $this->getTags($request->getVar('term'));
 
-        $response = new HTTPResponse();
+        $response = HTTPResponse::create();
         $response->addHeader('Content-Type', 'application/json');
-        $response->setBody(json_encode(array('items' => $tags)));
+        $response->setBody(json_encode(['items' => $tags]));
 
         return $response;
     }
@@ -402,9 +401,6 @@ class TagField extends DropdownField
      */
     protected function getTags($term)
     {
-        /**
-         * @var array $source
-         */
         $source = $this->getSourceList();
 
         $titleField = $this->getTitleField();
@@ -415,13 +411,13 @@ class TagField extends DropdownField
             ->limit($this->getLazyLoadItemLimit());
 
         // Map into a distinct list
-        $items = array();
+        $items = [];
         $titleField = $this->getTitleField();
         foreach ($query->map('ID', $titleField) as $id => $title) {
-            $items[$title] = array(
+            $items[$title] = [
                 'id' => $title,
-                'text' => $title
-            );
+                'text' => $title,
+            ];
         }
 
         return array_values($items);
@@ -442,10 +438,11 @@ class TagField extends DropdownField
     /**
      * Converts the field to a readonly variant.
      *
-     * @return TagField_Readonly
+     * @return ReadonlyTagField
      */
     public function performReadonlyTransformation()
     {
+        /** @var ReadonlyTagField $copy */
         $copy = $this->castedCopy(ReadonlyTagField::class);
         $copy->setSourceList($this->getSourceList());
         return $copy;
