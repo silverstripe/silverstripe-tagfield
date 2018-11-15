@@ -203,14 +203,30 @@ class TagField extends DropdownField
         Requirements::css('silverstripe/tagfield:client/dist/styles/bundle.css');
         Requirements::javascript('silverstripe/tagfield:client/dist/js/bundle.js');
 
-        $schema = [
-            'name' => $this->getName() . '[]',
-            'lazyLoad' => $this->getShouldLazyLoad(),
-            'creatable' => $this->getCanCreate(),
-            'multi' => $this->getIsMultiple(),
-            'value' => $this->Value(),
-            'disabled' => $this->isDisabled() || $this->isReadonly(),
-        ];
+        $this->addExtraClass('ss-tag-field');
+
+        return $this->customise($properties)->renderWith(self::class);
+    }
+
+    /**
+     * Provide TagField data to the JSON schema for the frontend component
+     *
+     * @return array
+     */
+    public function getSchemaDataDefaults()
+    {
+        $schema = array_merge(
+            parent::getSchemaDataDefaults(),
+            [
+                'name' => $this->getName() . '[]',
+                'lazyLoad' => $this->getShouldLazyLoad(),
+                'creatable' => $this->getCanCreate(),
+                'multi' => $this->getIsMultiple(),
+                'value' => $this->Value(),
+                'disabled' => $this->isDisabled() || $this->isReadonly(),
+            ]
+        );
+
         if (!$this->getShouldLazyLoad()) {
             $schema['options'] = array_values($this->getOptions()->toNestedArray());
         } else {
@@ -220,13 +236,20 @@ class TagField extends DropdownField
             $schema['optionUrl'] = $this->getSuggestURL();
         }
 
-        $this->setAttribute('data-schema', json_encode($schema));
+        return $schema;
+    }
 
-        $this->addExtraClass('ss-tag-field');
-
-        return $this
-            ->customise($properties)
-            ->renderWith(self::class);
+    /**
+     * When not used in a React form factory context, this adds the schema data to SilverStripe template
+     * rendered attributes lists
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        $attributes = parent::getAttributes();
+        $attributes['data-schema'] = json_encode($this->getSchemaData());
+        return $attributes;
     }
 
     /**
