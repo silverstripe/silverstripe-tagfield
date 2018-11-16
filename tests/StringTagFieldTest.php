@@ -2,8 +2,11 @@
 
 namespace SilverStripe\TagField\Tests;
 
+use PHPUnit_Framework_TestCase;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
 use SilverStripe\TagField\StringTagField;
 use SilverStripe\TagField\Tests\Stub\StringTagFieldTestBlogPost;
 
@@ -20,16 +23,16 @@ class StringTagFieldTest extends SapphireTest
     /**
      * @var array
      */
-    protected static $extra_dataobjects = array(
+    protected static $extra_dataobjects = [
         StringTagFieldTestBlogPost::class,
-    );
+    ];
 
     public function testItSavesTagsOnNewRecords()
     {
         $record = $this->getNewStringTagFieldTestBlogPost('BlogPost1');
 
         $field = new StringTagField('Tags');
-        $field->setValue(array('Tag1', 'Tag2'));
+        $field->setValue(['Tag1', 'Tag2']);
         $field->saveInto($record);
 
         $record->write();
@@ -56,7 +59,7 @@ class StringTagFieldTest extends SapphireTest
         $record->write();
 
         $field = new StringTagField('Tags');
-        $field->setValue(array('Tag1', 'Tag2'));
+        $field->setValue(['Tag1', 'Tag2']);
         $field->saveInto($record);
 
         $this->assertEquals('Tag1,Tag2', $record->Tags);
@@ -104,9 +107,44 @@ class StringTagFieldTest extends SapphireTest
         );
     }
 
+    public function testGetSchemaDataDefaults()
+    {
+        $form = new Form(null, 'Form', new FieldList(), new FieldList());
+        $field = new StringTagField('TestField', 'Test Field', ['one', 'two']);
+        $field->setForm($form);
+
+        $field
+            ->setShouldLazyLoad(false)
+            ->setCanCreate(false);
+
+        $schema = $field->getSchemaDataDefaults();
+        $this->assertSame('TestField[]', $schema['name']);
+        $this->assertFalse($schema['lazyLoad']);
+        $this->assertFalse($schema['creatable']);
+        $this->assertEquals([
+            ['Title' => 'one', 'Value' => 'one'],
+            ['Title' => 'two', 'Value' => 'two'],
+        ], $schema['options']);
+
+        $field
+            ->setShouldLazyLoad(true)
+            ->setCanCreate(true);
+
+        $schema = $field->getSchemaDataDefaults();
+        $this->assertTrue($schema['lazyLoad']);
+        $this->assertTrue($schema['creatable']);
+        $this->assertContains('suggest', $schema['optionUrl']);
+    }
+
+    public function testSchemaIsAddedToAttributes()
+    {
+        $field = new StringTagField('TestField');
+        $attributes = $field->getAttributes();
+        $this->assertNotEmpty($attributes['data-schema']);
+    }
+
     /**
      * @param array $parameters
-     *
      * @return HTTPRequest
      */
     protected function getNewRequest(array $parameters)

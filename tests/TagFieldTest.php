@@ -2,6 +2,7 @@
 
 namespace SilverStripe\TagField\Tests;
 
+use PHPUnit_Framework_TestCase;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forms\FieldList;
@@ -36,11 +37,11 @@ class TagFieldTest extends SapphireTest
     {
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
         $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
-        $field->setValue(array('Tag3', 'Tag4'));
+        $field->setValue(['Tag3', 'Tag4']);
         $field->saveInto($record);
         $record->write();
         $this->compareExpectedAndActualTags(
-            array('Tag3', 'Tag4'),
+            ['Tag3', 'Tag4'],
             $record
         );
     }
@@ -91,7 +92,7 @@ class TagFieldTest extends SapphireTest
         $record->write();
 
         $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
-        $field->setValue(array('Tag3', 'Tag4'));
+        $field->setValue(['Tag3', 'Tag4']);
         $field->saveInto($record);
 
         $this->compareExpectedAndActualTags(
@@ -105,13 +106,13 @@ class TagFieldTest extends SapphireTest
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
 
         $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
-        $field->setValue(array('Tag1', 'Tag2'));
+        $field->setValue(['Tag1', 'Tag2']);
         $field->saveInto($record);
 
         $record->write();
 
         $this->compareExpectedAndActualTags(
-            array('Tag1', 'Tag2'),
+            ['Tag1', 'Tag2'],
             $record
         );
     }
@@ -122,11 +123,11 @@ class TagFieldTest extends SapphireTest
         $record->write();
 
         $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
-        $field->setValue(array('Tag1', 'Tag2'));
+        $field->setValue(['Tag1', 'Tag2']);
         $field->saveInto($record);
 
         $this->compareExpectedAndActualTags(
-            array('Tag1', 'Tag2'),
+            ['Tag1', 'Tag2'],
             $record
         );
     }
@@ -142,29 +143,29 @@ class TagFieldTest extends SapphireTest
 
         // Check tags before write
         $this->compareExpectedAndActualTags(
-            array('Tag1', '222'),
+            ['Tag1', '222'],
             $record
         );
         $this->compareTagLists(
-            array('Tag1', '222'),
+            ['Tag1', '222'],
             TagFieldTestBlogTag::get()
         );
         $this->assertContains($tag2ID, TagFieldTestBlogTag::get()->column('ID'));
 
         // Write new tags
         $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
-        $field->setValue(array('222', 'Tag3'));
+        $field->setValue(['222', 'Tag3']);
         $field->saveInto($record);
 
         // Check only one new tag was added
         $this->compareExpectedAndActualTags(
-            array('222', 'Tag3'),
+            ['222', 'Tag3'],
             $record
         );
 
         // Ensure that only one new dataobject was added and that tag2s id has not changed
         $this->compareTagLists(
-            array('Tag1', '222', 'Tag3'),
+            ['Tag1', '222', 'Tag3'],
             TagFieldTestBlogTag::get()
         );
         $this->assertContains($tag2ID, TagFieldTestBlogTag::get()->column('ID'));
@@ -177,7 +178,7 @@ class TagFieldTest extends SapphireTest
         /**
          * Partial tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'Tag'));
+        $request = $this->getNewRequest(['term' => 'Tag']);
 
         $this->assertEquals(
             '{"items":[{"id":"Tag1","text":"Tag1"}]}',
@@ -187,7 +188,7 @@ class TagFieldTest extends SapphireTest
         /**
          * Exact tag title match.
          */
-        $request = $this->getNewRequest(array('term' => '222'));
+        $request = $this->getNewRequest(['term' => '222']);
 
         $this->assertEquals(
             '{"items":[{"id":"222","text":"222"}]}',
@@ -197,7 +198,7 @@ class TagFieldTest extends SapphireTest
         /**
          * Case-insensitive tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'TAG1'));
+        $request = $this->getNewRequest(['term' => 'TAG1']);
 
         $this->assertEquals(
             '{"items":[{"id":"Tag1","text":"Tag1"}]}',
@@ -207,7 +208,7 @@ class TagFieldTest extends SapphireTest
         /**
          * No tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'unknown'));
+        $request = $this->getNewRequest(['term' => 'unknown']);
 
         $this->assertEquals(
             '{"items":[]}',
@@ -226,7 +227,7 @@ class TagFieldTest extends SapphireTest
         /**
          * Partial tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'Tag'));
+        $request = $this->getNewRequest(['term' => 'Tag']);
 
         $this->assertEquals(
             '{"items":[{"id":"Tag1","text":"Tag1"}]}',
@@ -236,7 +237,7 @@ class TagFieldTest extends SapphireTest
         /**
          * Exact tag title match.
          */
-        $request = $this->getNewRequest(array('term' => 'Tag1'));
+        $request = $this->getNewRequest(['term' => 'Tag1']);
 
         $this->assertEquals(
             '{"items":[{"id":"Tag1","text":"Tag1"}]}',
@@ -246,7 +247,7 @@ class TagFieldTest extends SapphireTest
         /**
          * Excluded item doesn't appear in matches
          */
-        $request = $this->getNewRequest(array('term' => 'Tag2'));
+        $request = $this->getNewRequest(['term' => 'Tag2']);
 
         $this->assertEquals(
             '{"items":[]}',
@@ -274,7 +275,7 @@ class TagFieldTest extends SapphireTest
         $record->write();
 
         $form = new Form(
-            new TagFieldTestController($record),
+            new TagFieldTestController(),
             'Form',
             new FieldList(
                 $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class))
@@ -302,7 +303,7 @@ class TagFieldTest extends SapphireTest
 
         $tag = TagFieldTestBlogTag::get()->filter('Title', 'Tag1')->first();
 
-        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class), array($tag->Title, 'Tag3'));
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class), [$tag->Title, 'Tag3']);
         $field->setCanCreate(false);
         $field->saveInto($record);
 
@@ -312,7 +313,7 @@ class TagFieldTest extends SapphireTest
         $record = DataObject::get_by_id(TagFieldTestBlogPost::class, $record->ID);
 
         $this->compareExpectedAndActualTags(
-            array('Tag1'),
+            ['Tag1'],
             $record
         );
     }
@@ -350,6 +351,42 @@ class TagFieldTest extends SapphireTest
     {
         $field = new TagField('Tags', '', TagFieldTestBlogTag::get());
         $readOnlyField = $field->performReadonlyTransformation();
-        $this->assertEquals(ReadonlyTagField::class, get_class($readOnlyField));
+        $this->assertInstanceOf(ReadonlyTagField::class, $readOnlyField);
+    }
+
+    public function testGetSchemaDataDefaults()
+    {
+        $form = new Form(null, 'Form', new FieldList(), new FieldList());
+        $field = new TagField('TestField', 'Test Field', TagFieldTestBlogTag::get());
+        $field->setForm($form);
+
+        $field
+            ->setShouldLazyLoad(false)
+            ->setCanCreate(false);
+
+        $schema = $field->getSchemaDataDefaults();
+        $this->assertSame('TestField[]', $schema['name']);
+        $this->assertFalse($schema['lazyLoad']);
+        $this->assertFalse($schema['creatable']);
+        $this->assertEquals([
+            ['Title' => 'Tag1', 'Value' => 'Tag1'],
+            ['Title' => '222', 'Value' => '222'],
+        ], $schema['options']);
+
+        $field
+            ->setShouldLazyLoad(true)
+            ->setCanCreate(true);
+
+        $schema = $field->getSchemaDataDefaults();
+        $this->assertTrue($schema['lazyLoad']);
+        $this->assertTrue($schema['creatable']);
+        $this->assertContains('suggest', $schema['optionUrl']);
+    }
+
+    public function testSchemaIsAddedToAttributes()
+    {
+        $field = new TagField('TestField');
+        $attributes = $field->getAttributes();
+        $this->assertNotEmpty($attributes['data-schema']);
     }
 }
