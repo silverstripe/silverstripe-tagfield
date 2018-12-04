@@ -17,7 +17,7 @@
     "node": ">=6.x"
   },
   "scripts": {
-    "build": "yarn && yarn lint && NODE_ENV=production webpack -p --bail --progress",
+    "build": "yarn && yarn lint && yarn test && NODE_ENV=production webpack -p --bail --progress",
     "dev": "NODE_ENV=development webpack --progress",
     "watch": "NODE_ENV=development webpack --watch --progress",
     "css": "WEBPACK_CHILD=css npm run build",
@@ -72,6 +72,7 @@
     "classnames": "^2.2.5",
     "isomorphic-fetch": "https://registry.npmjs.org/isomorphic-fetch/-/isomorphic-fetch-2.2.1.tgz",
     "jquery": "^3.1.1",
+    "lodash.debounce": "^4.0.8",
     "react": "15.3.1",
     "react-dom": "15.3.1",
     "react-select": "^1.0.0-rc.5",
