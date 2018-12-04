@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import Select from 'react-select';
 import fetch from 'isomorphic-fetch';
 import url from 'url';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import debounce from 'lodash/debounce';
 
 class TagField extends Component {
   constructor(props) {
@@ -13,6 +15,7 @@ class TagField extends Component {
 
     this.onChange = this.onChange.bind(this);
     this.getOptions = this.getOptions.bind(this);
+    this.fetchOptions = debounce(this.fetchOptions, 500);
   }
 
   onChange(value) {
@@ -26,7 +29,7 @@ class TagField extends Component {
   }
 
   getOptions(input) {
-    const { lazyLoad, options, optionUrl, labelKey, valueKey } = this.props;
+    const { lazyLoad, options } = this.props;
 
     if (!lazyLoad) {
       return Promise.resolve({ options });
@@ -36,6 +39,11 @@ class TagField extends Component {
       return Promise.resolve({ options: [] });
     }
 
+    return this.fetchOptions(input);
+  }
+
+  fetchOptions(input) {
+    const { optionUrl, labelKey, valueKey } = this.props;
     const fetchURL = url.parse(optionUrl, true);
     fetchURL.query.term = input;
 
