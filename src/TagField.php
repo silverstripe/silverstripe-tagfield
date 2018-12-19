@@ -200,9 +200,6 @@ class TagField extends DropdownField
      */
     public function Field($properties = [])
     {
-        Requirements::css('silverstripe/tagfield:client/dist/styles/bundle.css');
-        Requirements::javascript('silverstripe/tagfield:client/dist/js/bundle.js');
-
         $this->addExtraClass('ss-tag-field');
 
         return $this->customise($properties)->renderWith(self::class);
