@@ -1,0 +1,9 @@
+---
+Name: tagfieldrequirements
+---
+
+SilverStripe\Admin\LeftAndMain:
+  extra_requirements_javascript:
+    - 'silverstripe/tagfield:client/dist/js/bundle.js'
+  extra_requirements_css:
+    - 'silverstripe/tagfield:client/dist/styles/bundle.css'
