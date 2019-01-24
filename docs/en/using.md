@@ -39,17 +39,19 @@ $field = TagField::create(
 
 This will present a tag field, in which you can select existing blog tags or create new ones. They will be created/linked after the blog posts are saved.
 
-You can also store string-based tags, for blog posts, with the following field type:
+### StringTagField
+
+You can also store string-based tags, with the following field type:
 
 ```php
 $field = StringTagField::create(
 	'Tags',
 	'Tags',
-	array('one', 'two'),
+	['one', 'two'],
 	explode(',', $this->Tags)
-);
-
-$field->setShouldLazyLoad(true); // tags should be lazy loaded
+)
+    ->setCanCreate(true)
+    ->setShouldLazyLoad(true);
 ```
 
 This assumes you are storing tags in the following data object structure:
@@ -57,12 +59,12 @@ This assumes you are storing tags in the following data object structure:
 ```php
 class BlogPost extends DataObject
 {
-	private static $db = array(
-		'Tags' => 'Text'
-	);
+    private static $db = [
+        'Tags' => 'Text',
+	];
 }
 ```
 
-These tag field classes extend the `DropdownField` class. Their template(s) don't alter the underlying select element structure, so you can interact with them as with any normal select element. You can also interact with the Select2 instance applied to each field, as you would any other time when using Select2.
-
-> Chosen is applied to all select elements in the CMS, so this module attempts to remove it before applying Select2. Review the companion JS files to see how that happens...
+In the above code example, the options available (whether lazy loaded or not) would be "one" and "two", and the
+user would be able to create new options. Whichever tags are chosen would be stored in the BlogPost's `Tags` field
+as a comma-delimited string.

@@ -3,13 +3,13 @@
 namespace SilverStripe\TagField\Tests\Stub;
 
 use SilverStripe\Control\Controller;
-use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
-use SilverStripe\TagField\StringTagField;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\TagField\TagField;
 
 class TagFieldTestController extends Controller implements TestOnly
 {

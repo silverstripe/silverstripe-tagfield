@@ -73,9 +73,13 @@ describe('TagField', () => {
       }));
     });
 
-    it('should fetch the URL for results', () => {
+    it('should fetch the URL for results', done => {
       wrapper.instance().getOptions('a');
-      expect(fetch).toBeCalledWith('localhost/some-fetch-url?term=a', expect.anything());
+
+      setTimeout(() => {
+        expect(fetch).toBeCalledWith('localhost/some-fetch-url?term=a', expect.anything());
+        done();
+      }, 500);
     });
   });
 });
