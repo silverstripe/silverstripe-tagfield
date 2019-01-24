@@ -2,8 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Select from 'react-select';
 import fetch from 'isomorphic-fetch';
 import url from 'url';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import debounce from 'lodash/debounce';
+import debounce from 'debounce-promise';
 
 class TagField extends Component {
   constructor(props) {
