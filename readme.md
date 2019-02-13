@@ -59,6 +59,7 @@ $field = TagField::create(
 	->setShouldLazyLoad(true) // tags should be lazy loaded
 	->setCanCreate(true);     // new tag DataObjects can be created
 ```
+**Note:** This assumes you have imported the namespaces class, e.g. use SilverStripe\TagField\TagField;
 
 ### String Tags
 
