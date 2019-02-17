@@ -1,8 +1,10 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import Select from 'react-select';
 import fetch from 'isomorphic-fetch';
 import url from 'url';
 import debounce from 'debounce-promise';
+import PropTypes from 'prop-types';
+
 
 class TagField extends Component {
   constructor(props) {
