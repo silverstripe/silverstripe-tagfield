@@ -65,6 +65,7 @@
     "enzyme-adapter-react-15.4": "^1.0.5",
     "html-loader": "^0.5.1",
     "jest-cli": "^19.0.2",
+    "react-addons-test-utils": "15.3.1",
     "webpack": "^2"
   },
   "dependencies": {
