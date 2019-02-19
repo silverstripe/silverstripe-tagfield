@@ -269,8 +269,18 @@ class StringTagField extends DropdownField
 
         $name = $this->getName();
 
-        $record->$name = implode(',', $this->Value());
+        $record->$name = $this->dataValue();
         $record->write();
+    }
+
+    /**
+     * Ensure that arrays are imploded before being saved
+     *
+     * @return mixed|string
+     */
+    public function dataValue()
+    {
+        return implode(',', $this->value);
     }
 
     /**
