@@ -205,9 +205,19 @@ class StringTagField extends DropdownField {
 
 		$name = $this->getName();
 
-		$record->$name = join(',', $this->Value());
-		$record->write();
-	}
+        $record->$name = $this->dataValue();
+        $record->write();
+    }
+
+    /**
+     * Ensure that arrays are imploded before being saved
+     *
+     * @return mixed|string
+     */
+    public function dataValue()
+    {
+        return implode(',', $this->value);
+    }
 
 	/**
 	 * Returns a JSON string of tags, for lazy loading.
