@@ -21,9 +21,5 @@
 	"require": {
 		"silverstripe/framework": "~3.1"
 	},
-	"extra": {
-		"branch-alias": {
-			"1.x-dev": "1.4.x-dev"
-		}
-	}
+	"extra": []
 }
