@@ -275,7 +275,7 @@ class TagField extends DropdownField
 
         if ($values) {
             if (is_array($values)) {
-                $values = DataList::create($dataClass)->filter($titleField, $values);
+                $values = $source->filter($titleField, $values); // DataList::create($dataClass)->filter($titleField, $values);
             }
         }
         if ($onlySelected) {
@@ -390,6 +390,9 @@ class TagField extends DropdownField
             $record = Injector::inst()->create($dataClass);
             $record->{$titleField} = $term;
             $record->write();
+            if($source instanceof SS_List) {
+                $source->add($record);
+            }
             return $record;
         }
 
