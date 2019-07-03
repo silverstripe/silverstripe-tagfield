@@ -9,6 +9,15 @@ Custom tag input field, for SilverStripe.
 [![License](http://img.shields.io/packagist/l/silverstripe/tagfield.svg?style=flat)](license.md)
 [![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 
+## Overview
+
+Allows storing tags as a relationship, or comma-delimited strings.
+Supports autocompletion with lazy-loading.
+
+Note: The field is optimised for usage in the SilverStripe CMS UI.
+The form field class itself can be used outside of the CMS,
+but you'll need to build your own frontend to interpret the raw field data (`data-schema` attribute).
+
 ## Requirements
 
 * SilverStripe 4.0
