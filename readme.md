@@ -11,6 +11,8 @@ Custom tag input field, for SilverStripe.
 
 ## Overview
 
+![Screenshot](docs/en/screenshot.png)
+
 Allows storing tags as a relationship, or comma-delimited strings.
 Supports autocompletion with lazy-loading.
 
