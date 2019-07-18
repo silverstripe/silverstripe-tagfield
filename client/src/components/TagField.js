@@ -108,9 +108,9 @@ TagField.propTypes = {
   name: PropTypes.string.isRequired,
   labelKey: PropTypes.string.isRequired,
   valueKey: PropTypes.string.isRequired,
-  lazyLoad: PropTypes.bool.isRequired,
-  creatable: PropTypes.bool.isRequired,
-  multi: PropTypes.bool.isRequired,
+  lazyLoad: PropTypes.bool,
+  creatable: PropTypes.bool,
+  multi: PropTypes.bool,
   disabled: PropTypes.bool,
   options: PropTypes.arrayOf(PropTypes.object),
   optionUrl: PropTypes.string,
@@ -122,7 +122,10 @@ TagField.propTypes = {
 TagField.defaultProps = {
   labelKey: 'Title',
   valueKey: 'Value',
-  disabled: false
+  disabled: false,
+  lazyLoad: false,
+  creatable: false,
+  multi: false,
 };
 
 export { TagField as Component };

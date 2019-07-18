@@ -5,6 +5,7 @@ namespace SilverStripe\TagField;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\MultiSelectField;
 use SilverStripe\Forms\Validator;
@@ -74,6 +75,8 @@ class TagField extends MultiSelectField
         $this->setSourceList($source);
         $this->setTitleField($titleField);
         parent::__construct($name, $title, $source, $value);
+
+        $this->addExtraClass('ss-tag-field');
     }
 
     /**
@@ -201,7 +204,7 @@ class TagField extends MultiSelectField
      */
     public function Field($properties = [])
     {
-        $this->addExtraClass('ss-tag-field');
+        $this->addExtraClass('entwine');
 
         return $this->customise($properties)->renderWith(self::class);
     }
@@ -213,6 +216,7 @@ class TagField extends MultiSelectField
      */
     public function getSchemaDataDefaults()
     {
+        $options = $this->getOptions(true);
         $schema = array_merge(
             parent::getSchemaDataDefaults(),
             [
@@ -220,7 +224,7 @@ class TagField extends MultiSelectField
                 'lazyLoad' => $this->getShouldLazyLoad(),
                 'creatable' => $this->getCanCreate(),
                 'multi' => $this->getIsMultiple(),
-                'value' => $this->Value(),
+                'value' => $options->count() ? $options->toNestedArray() : null,
                 'disabled' => $this->isDisabled() || $this->isReadonly(),
             ]
         );
@@ -228,11 +232,9 @@ class TagField extends MultiSelectField
         if (!$this->getShouldLazyLoad()) {
             $schema['options'] = array_values($this->getOptions()->toNestedArray());
         } else {
-            if ($this->Value()) {
-                $schema['value'] = $this->getOptions(true)->toNestedArray();
-            }
             $schema['optionUrl'] = $this->getSuggestURL();
         }
+        $this->setAttribute('data-schema', json_encode($schema));
 
         return $schema;
     }
@@ -248,43 +250,50 @@ class TagField extends MultiSelectField
     /**
      * @return ArrayList
      */
-    protected function getOptions()
+    protected function getOptions($onlySelected = false)
     {
         $options = ArrayList::create();
-
         $source = $this->getSourceList();
 
+        // No source means we have no options
         if (!$source) {
-            $source = ArrayList::create();
+            return ArrayList::create();
         }
 
         $dataClass = $source->dataClass();
 
         $values = $this->Value();
 
-        if (!$values) {
+        // If we have no values and we only want selected options we can bail here
+        if (empty($values) && $onlySelected) {
+            return ArrayList::create();
+        }
+
+        // Convert an array of values into a datalist of options
+        if (is_array($values) && !empty($values)) {
+            $values = DataList::create($dataClass)
+                ->filter($this->getTitleField(), $values);
+        } else {
+            $values = ArrayList::create();
+        }
+
+        // Prep a function to parse a dataobject into an option
+        $addOption = function (DataObject $item) use ($options, $values) {
+            $titleField = $this->getTitleField();
+            $options->push(ArrayData::create([
+                'Title' => $item->$titleField,
+                'Value' => $item->ID,
+                'Selected' => (bool) $values->find('ID', $item->ID)
+            ]));
+        };
+
+        // Only parse the values if we only want the selected items in the values list (this is for lazy-loading)
+        if ($onlySelected) {
+            $values->each($addOption);
             return $options;
         }
 
-        if (is_array($values)) {
-            $values = DataList::create($dataClass)
-                ->filter($this->getTitleField(), $values);
-        }
-
-        $ids = $values->column($this->getTitleField());
-
-        $titleField = $this->getTitleField();
-
-        foreach ($source as $object) {
-            $options->push(
-                ArrayData::create([
-                    'Title' => $object->$titleField,
-                    'Value' => $object->ID,
-                    'Selected' => in_array($object->$titleField, $ids),
-                ])
-            );
-        }
-
+        $source->each($addOption);
         return $options;
     }
 
@@ -297,18 +306,7 @@ class TagField extends MultiSelectField
             $name = $this->getName();
 
             if ($source->hasMethod($name)) {
-                $values = [];
-                $titleField = $this->getTitleField();
-
-                foreach ($source->$name() as $tag) {
-                    $values[] = [
-                        'Title' => $tag->$titleField,
-                        'Value' => $tag->ID,
-                        'Selected' => true
-                    ];
-                }
-
-                return parent::setValue($values);
+                $value = $source->$name()->column($this->getTitleField());
             }
         }
 
@@ -316,7 +314,7 @@ class TagField extends MultiSelectField
             return parent::setValue($value);
         }
 
-        return parent::setValue($value);
+        return parent::setValue(array_filter($value));
     }
 
     /**
@@ -500,8 +498,8 @@ class TagField extends MultiSelectField
         $data['multi'] = $this->getIsMultiple();
         $data['optionUrl'] = $this->getSuggestURL();
         $data['creatable'] = $this->getCanCreate();
-        $data['value'] = $this->Value();
-
+        $options = $this->getOptions(true);
+        $data['value'] = $options->count() ? $options->toNestedArray() : null;
 
         return $data;
     }
