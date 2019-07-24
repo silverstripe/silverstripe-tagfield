@@ -283,7 +283,7 @@ class TagField extends MultiSelectField
             $option = $item->$titleField;
             $options->push(ArrayData::create([
                 'Title' => $option,
-                'Value' => strtolower($option),
+                'Value' => $option,
                 'Selected' => (bool) $values->find('ID', $item->ID)
             ]));
         };
@@ -448,7 +448,7 @@ class TagField extends MultiSelectField
         foreach ($query->map('ID', $titleField) as $id => $title) {
             $items[$title] = [
                 'Title' => $title,
-                'Value' => strtolower($title),
+                'Value' => $title,
             ];
         }
 
