@@ -504,4 +504,3 @@ class TagField extends MultiSelectField
         return $data;
     }
 }
-
