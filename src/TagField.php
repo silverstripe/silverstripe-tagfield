@@ -280,9 +280,10 @@ class TagField extends MultiSelectField
         // Prep a function to parse a dataobject into an option
         $addOption = function (DataObject $item) use ($options, $values) {
             $titleField = $this->getTitleField();
+            $option = $item->$titleField;
             $options->push(ArrayData::create([
-                'Title' => $item->$titleField,
-                'Value' => $item->ID,
+                'Title' => $option,
+                'Value' => strtolower($option),
                 'Selected' => (bool) $values->find('ID', $item->ID)
             ]));
         };
@@ -447,7 +448,7 @@ class TagField extends MultiSelectField
         foreach ($query->map('ID', $titleField) as $id => $title) {
             $items[$title] = [
                 'Title' => $title,
-                'Value' => $id,
+                'Value' => strtolower($title),
             ];
         }
 

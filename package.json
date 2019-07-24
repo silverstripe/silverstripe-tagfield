@@ -58,14 +58,14 @@
   },
   "devDependencies": {
     "@silverstripe/eslint-config": "^0.0.5",
-    "@silverstripe/webpack-config": "^0.8.0",
+    "@silverstripe/webpack-config": "^0.10.0",
     "@storybook/react": "^3.2.19",
-    "babel-jest": "^20.0.3",
+    "babel-jest": "^23.6.0",
     "copy-webpack-plugin": "^4.2.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-15.4": "^1.0.5",
     "html-loader": "^0.5.1",
-    "jest-cli": "^19.0.2",
+    "jest-cli": "^23.6.0",
     "react-addons-test-utils": "15.3.1",
     "webpack": "^2"
   },
@@ -78,7 +78,7 @@
     "prop-types": "^15.7.2",
     "react": "15.3.1",
     "react-dom": "15.3.1",
-    "react-select": "^1.0.0-rc.5",
+    "react-select": "^1.2.1",
     "url": "^0.11.0"
   }
 }

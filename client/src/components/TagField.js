@@ -6,31 +6,29 @@ import url from 'url';
 import debounce from 'debounce-promise';
 import PropTypes from 'prop-types';
 
-
 class TagField extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      value: props.value,
-    };
+    if (!this.isControlled()) {
+      this.state = {
+        value: props.value,
+      };
+    }
 
-    this.onChange = this.onChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.handleOnBlur = this.handleOnBlur.bind(this);
     this.getOptions = this.getOptions.bind(this);
     this.fetchOptions = debounce(this.fetchOptions, 500);
   }
 
-  onChange(value) {
-    this.setState({
-      value
-    });
-
-    if (typeof this.props.onChange === 'function') {
-      this.props.onChange(value);
-    }
-  }
-
+  /**
+   * Get the options that should be shown to the user for this tagfield, optionally filtering by the
+   * given string input
+   *
+   * @param {string} input
+   * @return {Promise<Array<Object>>|Promise<{options: Array<Object>}>}
+   */
   getOptions(input) {
     const { lazyLoad, options } = this.props;
 
@@ -46,6 +44,34 @@ class TagField extends Component {
   }
 
   /**
+   * Handle a change, either calling the change handler provided (if controlled) or updating
+   * internal state of this component
+   *
+   * @param value
+   */
+  handleChange(value) {
+    if (this.isControlled()) {
+      this.props.onChange(value);
+      return;
+    }
+
+    this.setState({
+      value
+    });
+  }
+
+  /**
+   * Determine if this input should be "controlled" or not. Controlled inputs should rely on their
+   * value coming from props and a change handler provided to update the state stored elsewhere.
+   * This is specifically the case for use with `redux-form`.
+   *
+   * @return {boolean}
+   */
+  isControlled() {
+    return typeof this.props.onChange === 'function';
+  }
+
+  /**
    * Required to prevent TagField being cleared on blur
    *
    * @link https://github.com/JedWatson/react-select/issues/805
@@ -54,6 +80,12 @@ class TagField extends Component {
 
   }
 
+  /**
+   * Initiate a request to fetch options, optionally using the given string as a filter.
+   *
+   * @param {string} input
+   * @return {Promise<{options: Array<Object>}>}
+   */
   fetchOptions(input) {
     const { optionUrl, labelKey, valueKey } = this.props;
     const fetchURL = url.parse(optionUrl, true);
@@ -90,12 +122,16 @@ class TagField extends Component {
       SelectComponent = Select.Creatable;
     }
 
-    passThroughAttributes.value = this.state.value;
+    // Update the value to passthrough with the kept state provided this component is not
+    // "controlled"
+    if (!this.isControlled()) {
+      passThroughAttributes.value = this.state.value;
+    }
 
     return (
       <SelectComponent
         {...passThroughAttributes}
-        onChange={this.onChange}
+        onChange={this.handleChange}
         onBlur={this.handleOnBlur}
         inputProps={{ className: 'no-change-track' }}
         {...optionAttributes}
