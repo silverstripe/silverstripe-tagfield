@@ -4,7 +4,7 @@ import { Component as TagField } from '../TagField';
 
 storiesOf('TagField/TagField', module)
   .addDecorator(storyFn => (
-    <div style={{ width: '250px' }}>
+    <div style={{ width: '250px' }} className="ss-tag-field">
       {storyFn()}
     </div>
   ))

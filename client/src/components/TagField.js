@@ -47,7 +47,7 @@ class TagField extends Component {
    * Handle a change, either calling the change handler provided (if controlled) or updating
    * internal state of this component
    *
-   * @param value
+   * @param {string} value
    */
   handleChange(value) {
     if (this.isControlled()) {

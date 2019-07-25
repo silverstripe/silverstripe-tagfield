@@ -234,7 +234,6 @@ class TagField extends MultiSelectField
         } else {
             $schema['optionUrl'] = $this->getSuggestURL();
         }
-        $this->setAttribute('data-schema', json_encode($schema));
 
         return $schema;
     }
