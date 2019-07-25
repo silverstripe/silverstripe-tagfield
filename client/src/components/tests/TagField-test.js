@@ -6,7 +6,7 @@ jest.mock('isomorphic-fetch');
 import React from 'react';
 import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15.4';
-import TagField from '../TagField';
+import { Component as TagField } from '../TagField';
 import Select from 'react-select';
 import fetch from 'isomorphic-fetch';
 

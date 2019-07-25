@@ -181,7 +181,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(['term' => 'Tag']);
 
         $this->assertEquals(
-            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
+            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -191,7 +191,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(['term' => '222']);
 
         $this->assertEquals(
-            '{"items":[{"id":"222","text":"222"}]}',
+            '{"items":[{"Title":"222","Value":"222"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -201,7 +201,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(['term' => 'TAG1']);
 
         $this->assertEquals(
-            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
+            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -230,7 +230,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(['term' => 'Tag']);
 
         $this->assertEquals(
-            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
+            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -240,7 +240,7 @@ class TagFieldTest extends SapphireTest
         $request = $this->getNewRequest(['term' => 'Tag1']);
 
         $this->assertEquals(
-            '{"items":[{"id":"Tag1","text":"Tag1"}]}',
+            '{"items":[{"Title":"Tag1","Value":"Tag1"}]}',
             $field->suggest($request)->getBody()
         );
 
@@ -369,8 +369,16 @@ class TagFieldTest extends SapphireTest
         $this->assertFalse($schema['lazyLoad']);
         $this->assertFalse($schema['creatable']);
         $this->assertEquals([
-            ['Title' => 'Tag1', 'Value' => 'Tag1'],
-            ['Title' => '222', 'Value' => '222'],
+            ['Title' => 'Tag1', 'Value' => 'Tag1', 'Selected' => false],
+            ['Title' => '222', 'Value' => '222', 'Selected' => false],
+        ], $schema['options']);
+
+        $field->setValue(['222']);
+        $schema = $field->getSchemaDataDefaults();
+
+        $this->assertEquals([
+            ['Title' => 'Tag1', 'Value' => 'Tag1', 'Selected' => false],
+            ['Title' => '222', 'Value' => '222', 'Selected' => true],
         ], $schema['options']);
 
         $field

@@ -5,16 +5,15 @@ namespace SilverStripe\TagField;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\MultiSelectField;
 use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
-use SilverStripe\ORM\SS_List;
 use SilverStripe\View\ArrayData;
-use SilverStripe\View\Requirements;
 
 /**
  * Provides a tagging interface, storing links between tag DataObjects and a parent DataObject.
@@ -22,7 +21,7 @@ use SilverStripe\View\Requirements;
  * @package forms
  * @subpackage fields
  */
-class TagField extends DropdownField
+class TagField extends MultiSelectField
 {
     /**
      * @var array
@@ -61,6 +60,9 @@ class TagField extends DropdownField
      */
     protected $isMultiple = true;
 
+    /** @skipUpgrade */
+    protected $schemaComponent = 'TagField';
+
     /**
      * @param string $name
      * @param string $title
@@ -73,6 +75,8 @@ class TagField extends DropdownField
         $this->setSourceList($source);
         $this->setTitleField($titleField);
         parent::__construct($name, $title, $source, $value);
+
+        $this->addExtraClass('ss-tag-field');
     }
 
     /**
@@ -200,7 +204,7 @@ class TagField extends DropdownField
      */
     public function Field($properties = [])
     {
-        $this->addExtraClass('ss-tag-field');
+        $this->addExtraClass('entwine');
 
         return $this->customise($properties)->renderWith(self::class);
     }
@@ -212,6 +216,7 @@ class TagField extends DropdownField
      */
     public function getSchemaDataDefaults()
     {
+        $options = $this->getOptions(true);
         $schema = array_merge(
             parent::getSchemaDataDefaults(),
             [
@@ -219,7 +224,7 @@ class TagField extends DropdownField
                 'lazyLoad' => $this->getShouldLazyLoad(),
                 'creatable' => $this->getCanCreate(),
                 'multi' => $this->getIsMultiple(),
-                'value' => $this->Value(),
+                'value' => $options->count() ? $options->toNestedArray() : null,
                 'disabled' => $this->isDisabled() || $this->isReadonly(),
             ]
         );
@@ -227,26 +232,10 @@ class TagField extends DropdownField
         if (!$this->getShouldLazyLoad()) {
             $schema['options'] = array_values($this->getOptions()->toNestedArray());
         } else {
-            if ($this->Value()) {
-                $schema['value'] = $this->getOptions(true)->toNestedArray();
-            }
             $schema['optionUrl'] = $this->getSuggestURL();
         }
 
         return $schema;
-    }
-
-    /**
-     * When not used in a React form factory context, this adds the schema data to SilverStripe template
-     * rendered attributes lists
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        $attributes = parent::getAttributes();
-        $attributes['data-schema'] = json_encode($this->getSchemaData());
-        return $attributes;
     }
 
     /**
@@ -258,51 +247,53 @@ class TagField extends DropdownField
     }
 
     /**
-     * @param bool $onlySelected Only return options that are selected
      * @return ArrayList
      */
     protected function getOptions($onlySelected = false)
     {
+        $options = ArrayList::create();
         $source = $this->getSourceList();
 
+        // No source means we have no options
         if (!$source) {
-            $source = ArrayList::create();
+            return ArrayList::create();
         }
 
         $dataClass = $source->dataClass();
-        $titleField = $this->getTitleField();
+
         $values = $this->Value();
 
-        if ($values) {
-            if (is_array($values)) {
-                $values = $source->filter($titleField, $values);
-            }
+        // If we have no values and we only want selected options we can bail here
+        if (empty($values) && $onlySelected) {
+            return ArrayList::create();
         }
+
+        // Convert an array of values into a datalist of options
+        if (is_array($values) && !empty($values)) {
+            $values = DataList::create($dataClass)
+                ->filter($this->getTitleField(), $values);
+        } else {
+            $values = ArrayList::create();
+        }
+
+        // Prep a function to parse a dataobject into an option
+        $addOption = function (DataObject $item) use ($options, $values) {
+            $titleField = $this->getTitleField();
+            $option = $item->$titleField;
+            $options->push(ArrayData::create([
+                'Title' => $option,
+                'Value' => $option,
+                'Selected' => (bool) $values->find('ID', $item->ID)
+            ]));
+        };
+
+        // Only parse the values if we only want the selected items in the values list (this is for lazy-loading)
         if ($onlySelected) {
-            $source = $values;
+            $values->each($addOption);
+            return $options;
         }
 
-        return $source instanceof DataList ? $this->formatOptions($source) : ArrayList::create();
-    }
-
-    /**
-     * @param DataList $source
-     * @return ArrayList
-     */
-    protected function formatOptions(DataList $source)
-    {
-        $options = ArrayList::create();
-        $titleField = $this->getTitleField();
-
-        foreach ($source as $object) {
-            $options->push(
-                ArrayData::create([
-                    'Title' => $object->$titleField,
-                    'Value' => $object->Title,
-                ])
-            );
-        }
-
+        $source->each($addOption);
         return $options;
     }
 
@@ -317,8 +308,6 @@ class TagField extends DropdownField
             if ($source->hasMethod($name)) {
                 $value = $source->$name()->column($this->getTitleField());
             }
-        } elseif ($value instanceof SS_List) {
-            $value = $value->column($this->getTitleField());
         }
 
         if (!is_array($value)) {
@@ -331,10 +320,23 @@ class TagField extends DropdownField
     /**
      * {@inheritdoc}
      */
+    public function getAttributes()
+    {
+        return array_merge(
+            parent::getAttributes(),
+            [
+                'name' => $this->getName() . '[]',
+                'style' => 'width: 100%',
+                'data-schema' => json_encode($this->getSchemaData()),
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function saveInto(DataObjectInterface $record)
     {
-        parent::saveInto($record);
-
         $name = $this->getName();
         $titleField = $this->getTitleField();
         $values = $this->Value();
@@ -344,6 +346,7 @@ class TagField extends DropdownField
         if (!$values) {
             $values = [];
         }
+
         if (empty($record) || empty($titleField)) {
             return;
         }
@@ -388,6 +391,11 @@ class TagField extends DropdownField
         if ($this->getCanCreate()) {
             $dataClass = $source->dataClass();
             $record = Injector::inst()->create($dataClass);
+
+            if (is_array($term)) {
+                $term = $term['Value'];
+            }
+
             $record->{$titleField} = $term;
             $record->write();
             if ($source instanceof SS_List) {
@@ -438,8 +446,8 @@ class TagField extends DropdownField
         $titleField = $this->getTitleField();
         foreach ($query->map('ID', $titleField) as $id => $title) {
             $items[$title] = [
-                'id' => $title,
-                'text' => $title,
+                'Title' => $title,
+                'Value' => $title,
             ];
         }
 
@@ -479,5 +487,20 @@ class TagField extends DropdownField
     public function Type()
     {
         return '';
+    }
+
+    public function getSchemaStateDefaults()
+    {
+        $data = parent::getSchemaStateDefaults();
+
+        // Add options to 'data'
+        $data['lazyLoad'] = $this->getShouldLazyLoad();
+        $data['multi'] = $this->getIsMultiple();
+        $data['optionUrl'] = $this->getSuggestURL();
+        $data['creatable'] = $this->getCanCreate();
+        $options = $this->getOptions(true);
+        $data['value'] = $options->count() ? $options->toNestedArray() : null;
+
+        return $data;
     }
 }

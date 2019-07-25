@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { loadComponent } from 'lib/Injector';
 
 window.jQuery.entwine('ss', ($) => {
-  $('.js-injector-boot .ss-tag-field').entwine({
+  $('.js-injector-boot .ss-tag-field.entwine').entwine({
     onmatch() {
       const cmsContent = this.closest('.cms-content').attr('id');
       const context = (cmsContent)
@@ -20,6 +20,7 @@ window.jQuery.entwine('ss', ($) => {
 
       ReactDOM.render(
         <TagField
+          noHolder
           {...dataSchema}
         />,
         this[0]
