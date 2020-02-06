@@ -4,6 +4,7 @@ namespace SilverStripe\TagField\Tests;
 
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\TagField\ReadonlyStringTagField;
 use SilverStripe\TagField\StringTagField;
 use SilverStripe\TagField\Tests\Stub\StringTagFieldTestBlogPost;
 
@@ -119,5 +120,18 @@ class StringTagFieldTest extends SapphireTest
             'StringTagFieldTestController/StringTagFieldTestForm/fields/Tags/suggest',
             $parameters
         );
+    }
+
+    /**
+     * Test read only fields are returned
+     */
+    public function testReadonlyTransformation()
+    {
+        $record = $this->getNewStringTagFieldTestBlogPost('BlogPost2');
+        $field = new StringTagField('Tags');
+        $field->setRecord($record);
+
+        $readOnlyField = $field->performReadonlyTransformation();
+        $this->assertEquals(ReadonlyStringTagField::class, get_class($readOnlyField));
     }
 }

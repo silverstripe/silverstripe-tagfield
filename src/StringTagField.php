@@ -360,6 +360,18 @@ class StringTagField extends DropdownField
     }
 
     /**
+     * Converts the field to a readonly variant.
+     *
+     * @return ReadonlyTagField
+     */
+    public function performReadonlyTransformation()
+    {
+        /** @var ReadonlyTagField $copy */
+        $copy = $this->castedCopy(ReadonlyStringTagField::class);
+        return $copy;
+    }
+
+    /**
      * @return bool
      */
     public function getCanCreate()
