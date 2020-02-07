@@ -15,6 +15,32 @@ use SilverStripe\Forms\SingleLookupField;
 class ReadonlyStringTagField extends SingleLookupField
 {
     /**
+     * Generate a string to load into thie readonly field's value
+     *
+     * @return string
+     */
+    public function getFieldValue()
+    {
+        if (!is_array($this->value)) {
+            $value_array = [$this->value];
+        } else {
+            $value_array = $this->value;
+        }
+
+        $source = $this->getSource();
+        $source = ($source instanceof Map) ? $source->toArray() : $source;
+        $return = [];
+
+        foreach ($value_array as $value) {
+            if (in_array($value, $source)) {
+                $return[] = $value;
+            }
+        }
+
+        return implode(', ', $return);
+    }
+
+    /**
      * Render the readonly field as HTML.
      *
      * @param array $properties
@@ -22,20 +48,9 @@ class ReadonlyStringTagField extends SingleLookupField
      */
     public function Field($properties = array())
     {
-        $value_array = $this->value;
-        $source = $this->getSource();
-        $source = ($source instanceof Map) ? $source->toArray() : $source;
-        $return = [];
-
-        foreach ($value_array as $key => $value) {
-            if (in_array($value, $source)) {
-                $return[] = $value;
-            }
-        }
-
         $field = ReadonlyField::create($this->name . '_Readonly', $this->title);
         $field->setForm($this->form);
-        $field->setValue(implode(', ', $return));
+        $field->setValue($this->getFieldValue());
 
         return $field->Field();
     }

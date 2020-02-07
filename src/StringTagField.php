@@ -368,6 +368,7 @@ class StringTagField extends DropdownField
     {
         /** @var ReadonlyTagField $copy */
         $copy = $this->castedCopy(ReadonlyStringTagField::class);
+        $copy->setSource($this->getSource());
         return $copy;
     }
 

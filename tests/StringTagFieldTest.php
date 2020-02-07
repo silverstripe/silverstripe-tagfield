@@ -133,5 +133,22 @@ class StringTagFieldTest extends SapphireTest
 
         $readOnlyField = $field->performReadonlyTransformation();
         $this->assertEquals(ReadonlyStringTagField::class, get_class($readOnlyField));
+        $this->assertEquals('', $readOnlyField->Value());
+
+        $field_two = new StringTagField('Tags');
+        $field_two->setSource(['Test1', 'Test2', 'Test3']);
+
+        $field_two->setValue(['Test1', 'Test2']);
+        $field_two_readonly = $field_two->performReadonlyTransformation();
+        $this->assertEquals('Test1, Test2', $field_two_readonly->getFieldValue());
+
+        // Ensure an invalid value isn't rendered
+        $field_two->setValue(['Test', 'Test1']);
+        $field_two_readonly = $field_two->performReadonlyTransformation();
+        $this->assertEquals('Test1', $field_two_readonly->getFieldValue());
+
+        $field_two->setValue(['Test2']);
+        $field_two_readonly = $field_two->performReadonlyTransformation();
+        $this->assertEquals('Test2', $field_two_readonly->getFieldValue());
     }
 }
