@@ -2,6 +2,7 @@
 
 namespace SilverStripe\TagField;
 
+use Exception;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
@@ -13,6 +14,8 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\Relation;
+use SilverStripe\ORM\SS_List;
 use SilverStripe\View\ArrayData;
 
 /**
@@ -66,13 +69,12 @@ class TagField extends MultiSelectField
     /**
      * @param string $name
      * @param string $title
-     * @param null|DataList $source
+     * @param null|DataList|array $source
      * @param null|DataList $value
      * @param string $titleField
      */
     public function __construct($name, $title = '', $source = [], $value = null, $titleField = 'Title')
     {
-        $this->setSourceList($source);
         $this->setTitleField($titleField);
         parent::__construct($name, $title, $source, $value);
 
@@ -180,7 +182,9 @@ class TagField extends MultiSelectField
     }
 
     /**
-     * Get the DataList source. The 4.x upgrade for SelectField::setSource starts to convert this to an array
+     * Get the DataList source. The 4.x upgrade for SelectField::setSource starts to convert this to an array.
+     * If empty use getSource() for array version
+     *
      * @return DataList
      */
     public function getSourceList()
@@ -190,7 +194,8 @@ class TagField extends MultiSelectField
 
     /**
      * Set the model class name for tags
-     * @param  DataList $className
+     *
+     * @param DataList $sourceList
      * @return self
      */
     public function setSourceList($sourceList)
@@ -318,7 +323,41 @@ class TagField extends MultiSelectField
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the source array if required
+     *
+     * Note: this is expensive for a SS_List
+     *
+     * @return array
+     */
+    public function getSource()
+    {
+        if (is_null($this->source)) {
+            $this->source = $this->getListMap($this->getSourceList());
+        }
+        return $this->source;
+    }
+
+    /**
+     * Intercept DataList source
+     *
+     * @param mixed $source
+     * @return $this
+     */
+    public function setSource($source)
+    {
+        // When setting a datalist force internal list to null
+        if ($source instanceof DataList) {
+            $this->source = null;
+            $this->setSourceList($source);
+        } else {
+            parent::setSource($source);
+        }
+        return $this;
+    }
+
+    /**
+     * @param DataObject|DataObjectInterface $record DataObject to save data into
+     * @throws Exception
      */
     public function getAttributes()
     {
@@ -340,6 +379,8 @@ class TagField extends MultiSelectField
         $name = $this->getName();
         $titleField = $this->getTitleField();
         $values = $this->Value();
+
+        /** @var Relation $relation */
         $relation = $record->$name();
         $ids = [];
 
@@ -379,6 +420,10 @@ class TagField extends MultiSelectField
     {
         // Check if existing record can be found
         $source = $this->getSourceList();
+        if (!$source) {
+            return false;
+        }
+
         $titleField = $this->getTitleField();
         $record = $source
             ->filter($titleField, $term)
@@ -433,6 +478,9 @@ class TagField extends MultiSelectField
     protected function getTags($term)
     {
         $source = $this->getSourceList();
+        if (!$source) {
+            return [];
+        }
 
         $titleField = $this->getTitleField();
 
