@@ -380,8 +380,6 @@ class TagField extends MultiSelectField
         $titleField = $this->getTitleField();
         $values = $this->Value();
 
-        /** @var Relation $relation */
-        $relation = $record->$name();
         $ids = [];
 
         if (!$values) {
@@ -397,6 +395,9 @@ class TagField extends MultiSelectField
                 sprintf("%s does not have a %s method", get_class($record), $name)
             );
         }
+
+        /** @var Relation $relation */
+        $relation = $record->$name();
 
         foreach ($values as $key => $value) {
             // Get or create record
