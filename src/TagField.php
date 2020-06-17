@@ -525,6 +525,8 @@ class TagField extends MultiSelectField
         /** @var ReadonlyTagField $copy */
         $copy = $this->castedCopy(ReadonlyTagField::class);
         $copy->setSourceList($this->getSourceList());
+        $copy->setTitleField($this->getTitleField());
+
         return $copy;
     }
 
