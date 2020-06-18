@@ -5,7 +5,7 @@ dist: trusty
 env:
   global:
     - COMPOSER_ROOT_VERSION=2.x-dev
-    - TRAVIS_NODE_VERSION="6"
+    - TRAVIS_NODE_VERSION="10"
 
 matrix:
   include:
@@ -16,7 +16,7 @@ matrix:
     - php: 7.2
       env: DB=PGSQL PHPUNIT_TEST=1
     - php: 7.3
-      env: DB=MYSQL PHPUNIT_TEST=1NPM_TEST=1
+      env: DB=MYSQL PHPUNIT_TEST=1 NPM_TEST=1
     - php: 7.4
       env: DB=MYSQL PHPUNIT_TEST=1 NPM_TEST=1
 
