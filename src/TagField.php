@@ -322,7 +322,7 @@ class TagField extends MultiSelectField
         $values = [];
         foreach ($value as $item) {
             if ($item) {
-                $values[] = $item['Value'] ?? $item;
+                $values[] = isset($item['Value']) ? $item['Value'] : $item;
             }
         }
 
