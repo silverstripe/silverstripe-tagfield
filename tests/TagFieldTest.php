@@ -376,6 +376,12 @@ class TagFieldTest extends SapphireTest
         $field = new TagField('Tags', '', TagFieldTestBlogTag::get());
         $readOnlyField = $field->performReadonlyTransformation();
         $this->assertInstanceOf(ReadonlyTagField::class, $readOnlyField);
+
+        // Custom title field
+        $field = new TagField('Tags', '', TagFieldTestBlogTag::get());
+        $field->setTitleField('Name');
+        $readOnlyField = $field->performReadonlyTransformation();
+        $this->assertEquals('Name', $readOnlyField->getTitleField());
     }
 
     public function testGetSchemaDataDefaults()
