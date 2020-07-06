@@ -6,7 +6,6 @@ use Exception;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\MultiSelectField;
 use SilverStripe\Forms\Validator;
@@ -317,6 +316,14 @@ class TagField extends MultiSelectField
 
         if (!is_array($value)) {
             return parent::setValue($value);
+        }
+
+        // Safely map php / react-select values to flat list
+        $values = [];
+        foreach ($value as $item) {
+            if ($item) {
+                $values[] = $item['Value'] ?? $item;
+            }
         }
 
         return parent::setValue(array_filter($value));
