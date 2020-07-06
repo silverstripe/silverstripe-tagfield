@@ -326,7 +326,7 @@ class TagField extends MultiSelectField
             }
         }
 
-        return parent::setValue(array_filter($value));
+        return parent::setValue($values);
     }
 
     /**
