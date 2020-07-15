@@ -360,6 +360,24 @@ class TagFieldTest extends SapphireTest
         $this->assertEquals('Name', $readOnlyField->getTitleField());
     }
 
+    public function testItDisplaysWithSelectedValuesFromDataList()
+    {
+        $source = TagFieldTestBlogTag::get();
+        $selectedTag = $source->First();
+        $unselectedTag = $source->Last();
+        $value = $source->filter('ID', $selectedTag->ID); // arbitrary subset
+        $field = new TagField('TestField', null, $source, $value);
+
+        // Not the cleanest way to assert this, but getOptions() is protected
+        $schema = $field->getSchemaDataDefaults();
+        $this->assertTrue(
+            $this->getFromOptionsByTitle($schema['options'], $selectedTag->Title)['Selected']
+        );
+        $this->assertFalse(
+            $this->getFromOptionsByTitle($schema['options'], $unselectedTag->Title)['Selected']
+        );
+    }
+
     public function testGetSchemaDataDefaults()
     {
         $form = new Form(null, 'Form', new FieldList(), new FieldList());
@@ -402,5 +420,21 @@ class TagFieldTest extends SapphireTest
         $field = new TagField('TestField');
         $attributes = $field->getAttributes();
         $this->assertNotEmpty($attributes['data-schema']);
+    }
+
+    /**
+     * @param array $options
+     * @param string $title
+     * @return array|null
+     */
+    protected function getFromOptionsByTitle(array $options, $title)
+    {
+        foreach ($options as $option) {
+            if ($option['Title'] == $title) {
+                return $option;
+            }
+        }
+
+        return null;
     }
 }
