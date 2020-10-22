@@ -131,6 +131,30 @@ class TagFieldTest extends SapphireTest
             $record
         );
     }
+    
+    public function testSavesReactTags()
+    {
+        $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
+        $record->write();
+
+        $field = new TagField('Tags', '', new DataList(TagFieldTestBlogTag::class));
+        $field->setValue([
+            [
+                'Title' => 'Tag1',
+                'Value' => 'Tag1',
+            ],
+            [
+                'Title' => 'Tag2',
+                'Value' => 'Tag2',
+            ],
+        ]);
+        $field->saveInto($record);
+
+        $this->compareExpectedAndActualTags(
+            ['Tag1', 'Tag2'],
+            $record
+        );
+    }
 
     /**
      * Ensure that {@see TagField::saveInto} respects existing tags
