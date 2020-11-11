@@ -1,46 +1,4 @@
-language: php
+version: ~> 1.0
 
-dist: trusty
-
-env:
-  global:
-    - COMPOSER_ROOT_VERSION=2.x-dev
-    - TRAVIS_NODE_VERSION="10"
-
-matrix:
-  include:
-    - php: 5.6
-      env: DB=MYSQL PHPCS_TEST=1 PHPUNIT_TEST=1
-    - php: 7.1
-      env: DB=MYSQL PHPUNIT_COVERAGE_TEST=1
-    - php: 7.2
-      env: DB=PGSQL PHPUNIT_TEST=1
-    - php: 7.3
-      env: DB=MYSQL PHPUNIT_TEST=1 NPM_TEST=1
-    - php: 7.4
-      env: DB=MYSQL PHPUNIT_TEST=1 NPM_TEST=1
-
-before_script:
-  - phpenv rehash
-  - phpenv config-rm xdebug.ini
-
-  - composer validate
-  - composer require --no-update silverstripe/recipe-cms:^4
-  - if [[ $DB == PGSQL ]]; then composer require --no-update silverstripe/postgresql:^2; fi
-  - composer require --no-update sminnee/phpunit-mock-objects:^3
-  - composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
-
-  # Install NPM dependencies
-  - if [[ $NPM_TEST ]]; then nvm install $TRAVIS_NODE_VERSION && nvm use $TRAVIS_NODE_VERSION && npm install -g yarn && yarn install --network-concurrency 1 && (cd vendor/silverstripe/admin && yarn install --network-concurrency 1) && yarn run build; fi
-
-script:
-  - if [[ $PHPUNIT_TEST ]]; then vendor/bin/phpunit; fi
-  - if [[ $PHPUNIT_COVERAGE_TEST ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml; fi
-  - if [[ $PHPCS_TEST ]]; then vendor/bin/phpcs src/ tests/ *.php; fi
-  - if [[ $NPM_TEST ]]; then git diff-files --quiet -w --relative=client; fi
-  - if [[ $NPM_TEST ]]; then git diff --name-status --relative=client; fi
-  - if [[ $NPM_TEST ]]; then yarn run test; fi
-  - if [[ $NPM_TEST ]]; then yarn run lint; fi
-
-after_success:
-  - if [[ $PHPUNIT_COVERAGE_TEST ]]; then bash <(curl -s https://codecov.io/bash) -f coverage.xml; fi
+import:
+  - silverstripe/silverstripe-travis-shared:config/provision/standard-jobs-range-npm.yml
