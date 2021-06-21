@@ -144,7 +144,7 @@ class StringTagField extends DropdownField
 
     public function Field($properties = [])
     {
-        $this->addExtraClass('ss-tag-field');
+        $this->addExtraClass('entwine');
 
         return $this
             ->customise($properties)
