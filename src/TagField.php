@@ -275,8 +275,12 @@ class TagField extends MultiSelectField
         // Convert an array of values into a datalist of options
         if (!$values instanceof SS_List) {
             if (is_array($values) && !empty($values)) {
-                $values = DataList::create($dataClass)
-                    ->filter($this->getTitleField(), $values);
+                if (is_a($source, DataList::class)) {
+                    $values = $source->filter($this->getTitleField(), $values);
+                } else {
+                    $values = DataList::create($dataClass)
+                        ->filter($this->getTitleField(), $values);
+                }
             } else {
                 $values = ArrayList::create();
             }
