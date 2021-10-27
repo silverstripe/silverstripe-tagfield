@@ -2,7 +2,6 @@
 
 namespace SilverStripe\TagField\Tests;
 
-use PHPUnit_Framework_TestCase;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forms\FieldList;
@@ -15,9 +14,6 @@ use SilverStripe\TagField\Tests\Stub\TagFieldTestBlogPost;
 use SilverStripe\TagField\Tests\Stub\TagFieldTestBlogTag;
 use SilverStripe\TagField\Tests\Stub\TagFieldTestController;
 
-/**
- * @mixin PHPUnit_Framework_TestCase
- */
 class TagFieldTest extends SapphireTest
 {
     /**
@@ -436,7 +432,7 @@ class TagFieldTest extends SapphireTest
         $schema = $field->getSchemaDataDefaults();
         $this->assertTrue($schema['lazyLoad']);
         $this->assertTrue($schema['creatable']);
-        $this->assertContains('suggest', $schema['optionUrl']);
+        $this->assertStringContainsString('suggest', $schema['optionUrl']);
     }
 
     public function testSchemaIsAddedToAttributes()
