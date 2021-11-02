@@ -1,2 +1,2 @@
-require('legacy/entwine/TagField.js');
+require('legacy/entwine/TagField');
 require('boot');
