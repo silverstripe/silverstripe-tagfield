@@ -57,7 +57,7 @@
     ]
   },
   "devDependencies": {
-    "@silverstripe/eslint-config": "^0.0.5",
+    "@silverstripe/eslint-config": "^0.0.6",
     "@silverstripe/webpack-config": "^0.10.0",
     "@storybook/react": "^3.2.19",
     "babel-jest": "^23.6.0",
