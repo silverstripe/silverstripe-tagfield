@@ -2,27 +2,23 @@
 
 Custom tag input field, for SilverStripe.
 
-[![Build
-Status](https://api.travis-ci.com/silverstripe/silverstripe-tagfield.svg?branch=2)](https://travis-ci.com/silverstripe/silverstripe-tagfield)
-[![Code
-Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-tagfield.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-tagfield)
-[![Code
-coverage](https://codecov.io/gh/silverstripe/silverstripe-tagfield/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-tagfield)
+[![Build Status](https://api.travis-ci.com/silverstripe/silverstripe-tagfield.svg?branch=2)](https://travis-ci.com/silverstripe/silverstripe-tagfield)
+[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-tagfield.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-tagfield)
+[![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-tagfield/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-tagfield)
 [![Version](http://img.shields.io/packagist/v/silverstripe/tagfield.svg?style=flat)](https://packagist.org/packages/silverstripe/tagfield)
 [![License](http://img.shields.io/packagist/l/silverstripe/tagfield.svg?style=flat)](license.md)
-[![SilverStripe supported
-module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
+[![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 
 ## Overview
 
 ![Screenshot](docs/en/screenshot.png)
 
-Allows storing tags as a relationship, or comma-delimited strings. Supports
-autocompletion with lazy-loading.
+Allows storing tags as a relationship, or comma-delimited strings.
+Supports autocompletion with lazy-loading.
 
-Note: The field is optimised for usage in the SilverStripe CMS UI. The form
-field class itself can be used outside of the CMS, but you'll need to build your
-own frontend to interpret the raw field data (`data-schema` attribute).
+Note: The field is optimised for usage in the SilverStripe CMS UI.
+The form field class itself can be used outside of the CMS,
+but you'll need to build your own frontend to interpret the raw field data (`data-schema` attribute).
 
 ## Requirements
 

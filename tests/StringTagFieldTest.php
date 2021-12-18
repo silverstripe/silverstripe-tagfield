@@ -172,6 +172,24 @@ class StringTagFieldTest extends SapphireTest
     }
 
     /**
+     * Ensure a source of tags matches the given string tag names
+     *
+     * @param array $expected
+     * @param DataList $actualSource
+     */
+    protected function compareTagLists(array $expected, DataList $actualSource)
+    {
+        $actual = array_keys($actualSource->map('ID', 'Title')->toArray());
+        sort($expected);
+        sort($actual);
+
+        $this->assertEquals(
+            $expected,
+            $actual
+        );
+    }
+
+    /**
      * @param array $parameters
      * @return HTTPRequest
      */

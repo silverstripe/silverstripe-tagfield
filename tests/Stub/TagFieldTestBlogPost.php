@@ -18,4 +18,8 @@ class TagFieldTestBlogPost extends DataObject implements TestOnly
     private static $many_many = [
         'Tags' => TagFieldTestBlogTag::class
     ];
+
+    private static $has_one = [
+        'PrimaryTag' => TagFieldTestBlogTag::class
+    ];
 }
