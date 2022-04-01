@@ -273,7 +273,10 @@ class StringTagField extends DropdownField
         $name = $this->getName();
 
         $record->$name = $this->dataValue();
-        $record->write();
+
+        if (self::config()->get('immediate_write_enabled')) {
+            $record->write();
+        }
     }
 
     /**
