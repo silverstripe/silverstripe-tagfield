@@ -34,6 +34,13 @@ class StringTagField extends DropdownField
     ];
 
     /**
+     * @var bool Triggers a write call within the saveInto function if enabled
+     *
+     * @deprecated 3.0.0
+     */
+    private static $immediate_write_enabled = true;
+
+    /**
      * @var bool
      */
     protected $shouldLazyLoad = false;
@@ -273,7 +280,10 @@ class StringTagField extends DropdownField
         $name = $this->getName();
 
         $record->$name = $this->dataValue();
-        $record->write();
+
+        if (self::config()->get('immediate_write_enabled')) {
+            $record->write();
+        }
     }
 
     /**
