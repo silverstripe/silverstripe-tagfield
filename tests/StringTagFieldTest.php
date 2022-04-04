@@ -61,6 +61,38 @@ class StringTagFieldTest extends SapphireTest
         $this->assertEquals('Tag1,Tag2', $record->Tags);
     }
 
+    public function testImmediateWriteEnabled()
+    {
+        $record = $this->getNewStringTagFieldTestBlogPost('BlogPost1');
+        $record->write();
+
+        StringTagField::config()->update('immediate_write_enabled', true);
+
+        $field = new StringTagField('Tags');
+        $field->setValue(['Tag1', 'Tag2']);
+        $field->saveInto($record);
+
+        $this->assertEquals('Tag1,Tag2', StringTagFieldTestBlogPost::get()->byID($record->ID)->Tags);
+    }
+
+    public function testImmediateWriteDisabled()
+    {
+        $record = $this->getNewStringTagFieldTestBlogPost('BlogPost1');
+        $record->write();
+
+        StringTagField::config()->update('immediate_write_enabled', false);
+
+        $field = new StringTagField('Tags');
+        $field->setValue(['Tag1', 'Tag2']);
+        $field->saveInto($record);
+
+        $this->assertNull(StringTagFieldTestBlogPost::get()->byID($record->ID)->Tags);
+
+        $record->write();
+
+        $this->assertEquals('Tag1,Tag2', StringTagFieldTestBlogPost::get()->byID($record->ID)->Tags);
+    }
+
     public function testItSuggestsTags()
     {
         $field = new StringTagField('SomeField', 'Some field', ['Tag1', 'Tag2'], []);
