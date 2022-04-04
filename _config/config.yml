@@ -7,9 +7,3 @@ SilverStripe\Admin\LeftAndMain:
     - 'silverstripe/tagfield:client/dist/js/bundle.js'
   extra_requirements_css:
     - 'silverstripe/tagfield:client/dist/styles/bundle.css'
-
----
-Name: tagfieldconfig
----
-SilverStripe\TagField\StringTagField:
-  immediate_write_enabled: true
