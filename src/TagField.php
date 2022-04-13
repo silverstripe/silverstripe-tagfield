@@ -234,7 +234,7 @@ class TagField extends MultiSelectField
         );
 
         if (!$this->getShouldLazyLoad()) {
-            $schema['options'] = array_values($this->getOptions()->toNestedArray());
+            $schema['options'] = array_values($this->getOptions()->toNestedArray() ?? []);
         } else {
             $schema['optionUrl'] = $this->getSuggestURL();
         }
@@ -421,7 +421,7 @@ class TagField extends MultiSelectField
             }
         }
 
-        $relation->setByIDList(array_filter($ids));
+        $relation->setByIDList(array_filter($ids ?? []));
     }
 
     /**
@@ -513,7 +513,7 @@ class TagField extends MultiSelectField
             ];
         }
 
-        return array_values($items);
+        return array_values($items ?? []);
     }
 
     /**

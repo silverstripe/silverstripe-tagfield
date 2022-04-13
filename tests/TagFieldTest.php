@@ -72,7 +72,7 @@ class TagFieldTest extends SapphireTest
      */
     protected function compareTagLists(array $expected, DataList $actualSource)
     {
-        $actual = array_values($actualSource->map('ID', 'Title')->toArray());
+        $actual = array_values($actualSource->map('ID', 'Title')->toArray() ?? []);
         sort($expected);
         sort($actual);
 
