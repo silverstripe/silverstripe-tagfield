@@ -254,12 +254,12 @@ class StringTagField extends DropdownField
     public function setValue($value, $source = null)
     {
         if (is_string($value)) {
-            $value = explode(',', $value);
+            $value = explode(',', $value ?? '');
         }
 
         if ($source instanceof DataObject) {
             $name = $this->getName();
-            $value = explode(',', $source->$name);
+            $value = explode(',', $source->$name ?? '');
         }
 
         if ($source instanceof SS_List) {
@@ -270,7 +270,7 @@ class StringTagField extends DropdownField
             $value = [];
         }
 
-        return parent::setValue(array_filter($value));
+        return parent::setValue(array_filter($value ?? []));
     }
 
     public function saveInto(DataObjectInterface $record)
@@ -328,7 +328,7 @@ class StringTagField extends DropdownField
             /** @var ArrayData $tag */
             $tagValue = $tag->Value;
             // Map into a distinct list (prevent duplicates)
-            if (stripos($tagValue, $term) !== false && !array_key_exists($tagValue, $items)) {
+            if (stripos($tagValue ?? '', $term ?? '') !== false && !array_key_exists($tagValue, $items ?? [])) {
                 $items[$tagValue] = [
                     'id' => $tag->Title,
                     'text' => $tag->Value,
@@ -336,7 +336,7 @@ class StringTagField extends DropdownField
             }
         }
         // @todo do we actually need lazy loading limits for StringTagField?
-        return array_slice(array_values($items), 0, $this->getLazyLoadItemLimit());
+        return array_slice(array_values($items ?? []), 0, $this->getLazyLoadItemLimit());
     }
 
     /**
