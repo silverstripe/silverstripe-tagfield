@@ -284,16 +284,22 @@ class TagField extends MultiSelectField
         // Convert an array of values into a datalist of options
         if (!$values instanceof SS_List) {
             if (is_array($values) && !empty($values)) {
+                // if values is an array of Ids then we should look up via
+                // ID.
+                if (array_filter($values, 'is_int')) {
+                    $queryField = 'ID';
+                } else {
+                    $queryField = $titleField;
+                }
+
                 if (is_a($source, DataList::class)) {
                     $values = $source->filterAny([
-                        'ID' => $values,
-                        $titleField => $values
+                        $queryField => $values
                     ]);
                 } else {
                     $values = DataList::create($dataClass)
                         ->filterAny([
-                            'ID' => $values,
-                            $titleField => $values
+                            $queryField => $values
                         ]);
                 }
             } else {
@@ -308,7 +314,7 @@ class TagField extends MultiSelectField
             $options->push(ArrayData::create([
                 'Title' => $option,
                 'Value' => $option,
-                'Selected' => (bool) ($values->find($titleField, $option) || $values->find('ID', $option))
+                'Selected' => (bool) $values->find($titleField, $option)
             ]));
         };
 

@@ -416,6 +416,7 @@ class TagFieldTest extends SapphireTest
         $selectedTag = $source->First();
         $unselectedTag = $source->Last();
         $value = $source->filter('ID', $selectedTag->ID); // arbitrary subset
+
         $field = new TagField('TestField', null, $source, $value);
 
         // Not the cleanest way to assert this, but getOptions() is protected
