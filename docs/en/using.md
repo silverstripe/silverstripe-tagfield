@@ -68,3 +68,17 @@ class BlogPost extends DataObject
 In the above code example, the options available (whether lazy loaded or not) would be "one" and "two", and the
 user would be able to create new options. Whichever tags are chosen would be stored in the BlogPost's `Tags` field
 as a comma-delimited string.
+
+## Using TagField with silverstripe-taxonomy
+
+TagField assumes a `Title` field on objects. For classes without a `Title` field
+use `setTitleField` to modify accordingly.
+
+```php
+$field = TagField::create(
+    'Tags',
+    'Blog Tags',
+    TaxonomyTerm::get(),
+)
+    ->setTitleField('Name');
+```

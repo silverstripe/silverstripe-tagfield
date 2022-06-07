@@ -36,10 +36,38 @@ class TagFieldTest extends SapphireTest
         $field->setValue(['Tag3', 'Tag4']);
         $field->saveInto($record);
         $record->write();
+
         $this->compareExpectedAndActualTags(
             ['Tag3', 'Tag4'],
             $record
         );
+    }
+
+    public function testItSavesToHasOne()
+    {
+        $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
+        $tag = new TagFieldTestBlogTag();
+        $tag->Title = 'Foobar';
+        $tag->write();
+
+        $field = new TagField('PrimaryTagID', '', new DataList(TagFieldTestBlogTag::class));
+        $field->setIsMultiple(false);
+
+        $field->setValue('Foobar');
+        $field->saveInto($record);
+        $record->write();
+
+        $this->assertEquals($tag->ID, $record->PrimaryTagID, 'The tag is saved to a has_one');
+
+        $tag = new TagFieldTestBlogTag();
+        $tag->Title = 'Foobarbaz';
+        $tag->write();
+
+        $field->setValue(['Foobarbaz']);
+        $field->saveInto($record);
+        $record->write();
+
+        $this->assertEquals($tag->ID, $record->PrimaryTagID, 'The tag is saved to a has_one');
     }
 
     /**
@@ -127,7 +155,7 @@ class TagFieldTest extends SapphireTest
             $record
         );
     }
-    
+
     public function testSavesReactTags()
     {
         $record = $this->getNewTagFieldTestBlogPost('BlogPost1');
@@ -307,7 +335,7 @@ class TagFieldTest extends SapphireTest
             $this->objFromFixture(TagFieldTestBlogPost::class, 'BlogPost2')
         );
 
-        $ids = TagFieldTestBlogTag::get()->column('Title');
+        $ids = TagFieldTestBlogTag::get()->column('ID');
 
         $this->assertEquals($field->Value(), $ids);
     }
@@ -357,7 +385,9 @@ class TagFieldTest extends SapphireTest
         $tag = TagFieldTestBlogTag::get()->first();
         $this->assertNotEmpty($tag);
         $this->assertEquals('New Tag', $tag->Title);
+
         $record = TagFieldTestBlogPost::get()->byID($record->ID);
+
         $this->assertEquals(
             $tag->ID,
             $record->Tags()->first()->ID
@@ -386,6 +416,7 @@ class TagFieldTest extends SapphireTest
         $selectedTag = $source->First();
         $unselectedTag = $source->Last();
         $value = $source->filter('ID', $selectedTag->ID); // arbitrary subset
+
         $field = new TagField('TestField', null, $source, $value);
 
         // Not the cleanest way to assert this, but getOptions() is protected

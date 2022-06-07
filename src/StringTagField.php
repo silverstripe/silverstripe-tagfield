@@ -316,6 +316,49 @@ class StringTagField extends DropdownField
     }
 
     /**
+     * Get or create tag with the given value
+     *
+     * @param  string $term
+     * @return DataObject|bool
+     */
+    protected function getOrCreateTag($term)
+    {
+        // Check if existing record can be found
+        $source = $this->getSourceList();
+        if (!$source) {
+            return false;
+        }
+
+        $titleField = $this->getTitleField();
+        $record = $source
+            ->filter($titleField, $term)
+            ->first();
+        if ($record) {
+            return $record;
+        }
+
+        // Create new instance if not yet saved
+        if ($this->getCanCreate()) {
+            $dataClass = $source->dataClass();
+            $record = Injector::inst()->create($dataClass);
+
+            if (is_array($term)) {
+                $term = $term['Value'];
+            }
+
+            $record->{$titleField} = $term;
+            $record->write();
+            if ($source instanceof SS_List) {
+                $source->add($record);
+            }
+            return $record;
+        }
+
+        return false;
+    }
+
+
+    /**
      * Returns array of arrays representing tags that partially match the given search term
      *
      * @param string $term

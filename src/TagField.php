@@ -13,6 +13,7 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\FieldType\DBMultiEnum;
 use SilverStripe\ORM\Relation;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\View\ArrayData;
@@ -221,10 +222,16 @@ class TagField extends MultiSelectField
     public function getSchemaDataDefaults()
     {
         $options = $this->getOptions(true);
+        $name = $this->getName();
+
+        if ($this->getIsMultiple() && strpos($name, '[') === false) {
+            $name .= '[]';
+        }
+
         $schema = array_merge(
             parent::getSchemaDataDefaults(),
             [
-                'name' => $this->getName() . '[]',
+                'name' => $name,
                 'lazyLoad' => $this->getShouldLazyLoad(),
                 'creatable' => $this->getCanCreate(),
                 'multi' => $this->getIsMultiple(),
@@ -265,21 +272,35 @@ class TagField extends MultiSelectField
 
         $dataClass = $source->dataClass();
 
-        $values = $this->Value();
+        $values = $this->getValueArray();
 
         // If we have no values and we only want selected options we can bail here
         if (empty($values) && $onlySelected) {
             return ArrayList::create();
         }
 
+        $titleField = $this->getTitleField();
+
         // Convert an array of values into a datalist of options
         if (!$values instanceof SS_List) {
             if (is_array($values) && !empty($values)) {
+                // if values is an array of Ids then we should look up via
+                // ID.
+                if (array_filter($values, 'is_int')) {
+                    $queryField = 'ID';
+                } else {
+                    $queryField = $titleField;
+                }
+
                 if (is_a($source, DataList::class)) {
-                    $values = $source->filter($this->getTitleField(), $values);
+                    $values = $source->filterAny([
+                        $queryField => $values
+                    ]);
                 } else {
                     $values = DataList::create($dataClass)
-                        ->filter($this->getTitleField(), $values);
+                        ->filterAny([
+                            $queryField => $values
+                        ]);
                 }
             } else {
                 $values = ArrayList::create();
@@ -287,13 +308,13 @@ class TagField extends MultiSelectField
         }
 
         // Prep a function to parse a dataobject into an option
-        $addOption = function (DataObject $item) use ($options, $values) {
-            $titleField = $this->getTitleField();
+        $addOption = function (DataObject $item) use ($options, $values, $titleField) {
             $option = $item->$titleField;
+
             $options->push(ArrayData::create([
                 'Title' => $option,
                 'Value' => $option,
-                'Selected' => (bool) $values->find('ID', $item->ID)
+                'Selected' => (bool) $values->find($titleField, $option)
             ]));
         };
 
@@ -304,36 +325,10 @@ class TagField extends MultiSelectField
         }
 
         $source->each($addOption);
+
         return $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setValue($value, $source = null)
-    {
-        if ($source instanceof DataObject) {
-            $name = $this->getName();
-
-            if ($source->hasMethod($name)) {
-                $value = $source->$name()->column($this->getTitleField());
-            }
-        }
-
-        if (!is_array($value)) {
-            return parent::setValue($value);
-        }
-
-        // Safely map php / react-select values to flat list
-        $values = [];
-        foreach ($value as $item) {
-            if ($item) {
-                $values[] = isset($item['Value']) ? $item['Value'] : $item;
-            }
-        }
-
-        return parent::setValue($values);
-    }
 
     /**
      * Gets the source array if required
@@ -349,6 +344,7 @@ class TagField extends MultiSelectField
         }
         return $this->source;
     }
+
 
     /**
      * Intercept DataList source
@@ -368,21 +364,47 @@ class TagField extends MultiSelectField
         return $this;
     }
 
+
     /**
      * @param DataObject|DataObjectInterface $record DataObject to save data into
      * @throws Exception
      */
     public function getAttributes()
     {
+        $name = $this->getName();
+
+        if ($this->getIsMultiple() && strpos($name, '[') === false) {
+            $name .= '[]';
+        }
+
         return array_merge(
             parent::getAttributes(),
             [
-                'name' => $this->getName() . '[]',
+                'name' => $name,
                 'style' => 'width: 100%',
                 'data-schema' => json_encode($this->getSchemaData()),
             ]
         );
     }
+
+
+    protected function getListValues($values): array
+    {
+        if (empty($values)) {
+            return [];
+        }
+
+        if (is_array($values)) {
+            return $values;
+        }
+
+        if ($values instanceof SS_List) {
+            return $values->column($this->getTitleField());
+        }
+
+        return [trim((string) $values)];
+    }
+
 
     /**
      * {@inheritdoc}
@@ -390,8 +412,7 @@ class TagField extends MultiSelectField
     public function saveInto(DataObjectInterface $record)
     {
         $name = $this->getName();
-        $titleField = $this->getTitleField();
-        $values = $this->Value();
+        $values = $this->getValueArray();
 
         $ids = [];
 
@@ -399,49 +420,70 @@ class TagField extends MultiSelectField
             $values = [];
         }
 
-        if (empty($record) || empty($titleField)) {
+        if (empty($record)) {
             return;
         }
 
-        if (!$record->hasMethod($name)) {
-            throw new Exception(
-                sprintf("%s does not have a %s method", get_class($record), $name)
-            );
-        }
-
         /** @var Relation $relation */
-        $relation = $record->$name();
+        $relation = $record->hasMethod($name) ? $record->$name() : null;
 
         foreach ($values as $key => $value) {
-            // Get or create record
-            $record = $this->getOrCreateTag($value);
-            if ($record) {
-                $ids[] = $record->ID;
-                $values[$key] = $record->Title;
+            $tag = $this->getOrCreateTag($value);
+
+            if ($tag) {
+                $ids[] = $tag->ID;
+                $values[$key] = $tag->Title;
             }
         }
 
-        $relation->setByIDList(array_filter($ids ?? []));
+
+        if ($relation instanceof Relation) {
+            // Save ids into relation
+            $relation->setByIDList(array_filter($ids ?? []));
+        } elseif ($record->hasField($name)) {
+            if ($this->getIsMultiple()) {
+                if ($record->obj($name) instanceof DBMultiEnum) {
+                    // Save dataValue into field... a CSV for DBMultiEnum
+                    $record->$name = $this->csvEncode(array_filter(array_values($values)));
+                } else {
+                    // ... JSON-encoded string for other fields
+                    $record->$name = $this->stringEncode(array_filter(array_values($values)));
+                }
+            } else {
+                if (isset($tag) && $tag->ID) {
+                    $record->$name = $tag->ID;
+                } else {
+                    $record->$name = null;
+                }
+            }
+        }
     }
 
     /**
      * Get or create tag with the given value
      *
-     * @param  string $term
+     * @param string $value
+     *
      * @return DataObject|bool
      */
-    protected function getOrCreateTag($term)
+    protected function getOrCreateTag($value)
     {
+        if (is_array($value)) {
+            $value = $value['Value'] ?? '';
+        }
+
         // Check if existing record can be found
         $source = $this->getSourceList();
+        $titleField = $this->getTitleField();
+
         if (!$source) {
             return false;
         }
 
-        $titleField = $this->getTitleField();
         $record = $source
-            ->filter($titleField, $term)
+            ->filter($titleField, $value)
             ->first();
+
         if ($record) {
             return $record;
         }
@@ -450,16 +492,13 @@ class TagField extends MultiSelectField
         if ($this->getCanCreate()) {
             $dataClass = $source->dataClass();
             $record = Injector::inst()->create($dataClass);
-
-            if (is_array($term)) {
-                $term = $term['Value'];
-            }
-
-            $record->{$titleField} = $term;
+            $record->{$titleField} = $value;
             $record->write();
+
             if ($source instanceof SS_List) {
                 $source->add($record);
             }
+
             return $record;
         }
 
@@ -506,7 +545,8 @@ class TagField extends MultiSelectField
         // Map into a distinct list
         $items = [];
         $titleField = $this->getTitleField();
-        foreach ($query->map('ID', $titleField) as $id => $title) {
+
+        foreach ($query->map('ID', $titleField)->values() as $title) {
             $items[$title] = [
                 'Title' => $title,
                 'Value' => $title,
@@ -566,5 +606,15 @@ class TagField extends MultiSelectField
         $data['value'] = $options->count() ? $options->toNestedArray() : null;
 
         return $data;
+    }
+
+
+    public function getSchemaDataType(): string
+    {
+        if ($this->getIsMultiple()) {
+            return self::SCHEMA_DATA_TYPE_MULTISELECT;
+        }
+
+        return self::SCHEMA_DATA_TYPE_SINGLESELECT;
     }
 }

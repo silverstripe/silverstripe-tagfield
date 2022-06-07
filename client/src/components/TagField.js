@@ -56,7 +56,7 @@ class TagField extends Component {
     }
 
     this.setState({
-      value
+      value,
     });
   }
 
@@ -76,9 +76,7 @@ class TagField extends Component {
    *
    * @link https://github.com/JedWatson/react-select/issues/805
    */
-  handleOnBlur() {
-
-  }
+  handleOnBlur() {}
 
   /**
    * Initiate a request to fetch options, optionally using the given string as a filter.
@@ -94,20 +92,17 @@ class TagField extends Component {
     return fetch(url.format(fetchURL), { credentials: 'same-origin' })
       .then((response) => response.json())
       .then((json) => ({
-        options: json.items.map(item => ({
+        options: json.items.map((item) => ({
           [labelKey]: item.Title,
           [valueKey]: item.Value,
-        }))
+          Selected: item.Selected,
+        })),
       }));
   }
 
   render() {
-    const {
-      lazyLoad,
-      options,
-      creatable,
-      ...passThroughAttributes
-    } = this.props;
+    const { lazyLoad, options, creatable, ...passThroughAttributes } =
+      this.props;
 
     const optionAttributes = lazyLoad
       ? { loadOptions: this.getOptions }
@@ -126,6 +121,20 @@ class TagField extends Component {
     // "controlled"
     if (!this.isControlled()) {
       passThroughAttributes.value = this.state.value;
+    }
+
+    // if this is a single select then we just need the first value
+    if (!passThroughAttributes.multi && passThroughAttributes.value) {
+      if (Object.keys(passThroughAttributes.value).length > 0) {
+        const value =
+          passThroughAttributes.value[
+            Object.keys(passThroughAttributes.value)[0]
+          ];
+
+        if (typeof value === 'object') {
+          passThroughAttributes.value = value;
+        }
+      }
     }
 
     return (
