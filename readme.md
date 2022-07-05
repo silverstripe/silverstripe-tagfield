@@ -2,7 +2,7 @@
 
 Custom tag input field, for SilverStripe.
 
-[![Build Status](https://api.travis-ci.com/silverstripe/silverstripe-tagfield.svg?branch=2)](https://travis-ci.com/silverstripe/silverstripe-tagfield)
+[![CI](https://github.com/silverstripe/silverstripe-tagfield/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-tagfield/actions/workflows/ci.yml)
 [![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-tagfield.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-tagfield)
 [![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-tagfield/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-tagfield)
 [![Version](http://img.shields.io/packagist/v/silverstripe/tagfield.svg?style=flat)](https://packagist.org/packages/silverstripe/tagfield)
