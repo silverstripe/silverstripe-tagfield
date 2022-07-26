@@ -403,7 +403,7 @@ class TagField extends MultiSelectField
         }
 
         if ($values instanceof DataObject && $values->exists()) {
-            return [$values->{$this->getTitleField()}];
+            return [$values->{$this->getTitleField()} ?? $values->ID];
         }
 
         if (is_int($values)) {
