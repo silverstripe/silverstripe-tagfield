@@ -73,6 +73,45 @@ $field = TagField::create(
 **Note:** This assumes you have imported the namespaces class, e.g. use
 SilverStripe\TagField\TagField;
 
+
+#### Has-One Relations
+
+You can also use the TagField to select values for `has_one` relations.
+Let's assume, that a `BlogPost` *has one* `BlogCategory`.
+
+```php
+class BlogCategory extends DataObject
+{
+    private static $db = [
+        'Title' => 'Varchar(200)',
+    ];
+}
+```
+
+```php
+use SilverStripe\ORM\DataObject;
+
+class BlogPost extends DataObject
+{
+    private static $has_one = [
+        'BlogCategory' => BlogCategory::class
+    ];
+}
+```
+
+```php
+$field = TagField::create(
+    'BlogCategoryID',
+    $this->fieldLabel('BlogCategory'),
+    BlogCategory::get()
+)
+    ->setIsMultiple(false)
+    ->setCanCreate(true);
+```
+
+**Note:** We're using the `ID` suffix for the field-name (eg. `BlogCategoryID` instead of `BlogCategory`) and
+only allow one value by setting `->setIsMultiple(false)`
+
 ### String Tags
 
 ```php
