@@ -1,13 +1,9 @@
 # Tag Field
 
-Custom tag input field, for SilverStripe.
-
 [![CI](https://github.com/silverstripe/silverstripe-tagfield/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-tagfield/actions/workflows/ci.yml)
-[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-tagfield.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-tagfield)
-[![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-tagfield/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-tagfield)
-[![Version](http://img.shields.io/packagist/v/silverstripe/tagfield.svg?style=flat)](https://packagist.org/packages/silverstripe/tagfield)
-[![License](http://img.shields.io/packagist/l/silverstripe/tagfield.svg?style=flat)](license.md)
-[![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
+[![Silverstripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
+
+Custom tag input field, for SilverStripe.
 
 ## Overview
 
@@ -16,13 +12,13 @@ Custom tag input field, for SilverStripe.
 Allows storing tags as a relationship, or comma-delimited strings.
 Supports autocompletion with lazy-loading.
 
-Note: The field is optimised for usage in the SilverStripe CMS UI.
+Note: The field is optimised for usage in the Silverstripe CMS UI.
 The form field class itself can be used outside of the CMS,
 but you'll need to build your own frontend to interpret the raw field data (`data-schema` attribute).
 
 ## Requirements
 
-* SilverStripe 4.0
+* Silverstripe 4.0
 
 ## Installing
 
