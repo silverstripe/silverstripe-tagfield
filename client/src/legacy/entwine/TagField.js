@@ -31,4 +31,26 @@ window.jQuery.entwine('ss', ($) => {
       ReactDOM.unmountComponentAtNode(this[0]);
     }
   });
+
+  $('.cms-edit-form').entwine({
+    getChangeTrackerOptions() {
+      // Figure out if we're still returning the default value
+      const isDefault = (this.entwineData('ChangeTrackerOptions') === undefined);
+      // Get the current options
+      let opts = this._super();
+
+      if (isDefault) {
+        // If it is the default then...
+        // clone the object (so we don't modify the original),
+        opts = $.extend({}, opts);
+        // modify it,
+        opts.ignoreFieldSelector += ', .ss-tag-field .Select :input';
+        // then set the clone as the value on this element
+        // (so next call to this method gets this same clone)
+        this.setChangeTrackerOptions(opts);
+      }
+
+      return opts;
+    }
+  });
 });
