@@ -36,7 +36,7 @@ class StringTagField extends DropdownField
     /**
      * @var bool Triggers a write call within the saveInto function if enabled
      *
-     * @deprecated 3.0.0
+     * @deprecated 3.0.0 Will be removed without equivalent functionality to replace it
      */
     private static $immediate_write_enabled = true;
 
