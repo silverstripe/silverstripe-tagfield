@@ -6,6 +6,7 @@ use Iterator;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Dev\Deprecation;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\ArrayList;
@@ -281,7 +282,10 @@ class StringTagField extends DropdownField
 
         $record->$name = $this->dataValue();
 
-        if (self::config()->get('immediate_write_enabled')) {
+        $immediate_write_enabled = Deprecation::withNoReplacement(function () {
+            return self::config()->get('immediate_write_enabled');
+        });
+        if ($immediate_write_enabled) {
             $record->write();
         }
     }
