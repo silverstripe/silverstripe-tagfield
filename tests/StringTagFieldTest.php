@@ -8,6 +8,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\TagField\StringTagField;
 use SilverStripe\TagField\Tests\Stub\StringTagFieldTestBlogPost;
+use SilverStripe\Dev\Deprecation;
 
 class StringTagFieldTest extends SapphireTest
 {
@@ -63,10 +64,13 @@ class StringTagFieldTest extends SapphireTest
 
     public function testImmediateWriteEnabled()
     {
+        if (Deprecation::isEnabled()) {
+            $this->markTestSkipped('Test calls deprecated code');
+        }
         $record = $this->getNewStringTagFieldTestBlogPost('BlogPost1');
         $record->write();
 
-        StringTagField::config()->update('immediate_write_enabled', true);
+        StringTagField::config()->set('immediate_write_enabled', true);
 
         $field = new StringTagField('Tags');
         $field->setValue(['Tag1', 'Tag2']);
@@ -77,10 +81,13 @@ class StringTagFieldTest extends SapphireTest
 
     public function testImmediateWriteDisabled()
     {
+        if (Deprecation::isEnabled()) {
+            $this->markTestSkipped('Test calls deprecated code');
+        }
         $record = $this->getNewStringTagFieldTestBlogPost('BlogPost1');
         $record->write();
 
-        StringTagField::config()->update('immediate_write_enabled', false);
+        StringTagField::config()->set('immediate_write_enabled', false);
 
         $field = new StringTagField('Tags');
         $field->setValue(['Tag1', 'Tag2']);
