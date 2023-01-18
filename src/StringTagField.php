@@ -6,7 +6,6 @@ use Iterator;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Dev\Deprecation;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\ArrayList;
@@ -33,13 +32,6 @@ class StringTagField extends DropdownField
     private static $allowed_actions = [
         'suggest',
     ];
-
-    /**
-     * @var bool Triggers a write call within the saveInto function if enabled
-     *
-     * @deprecated 3.0.0 Will be removed without equivalent functionality to replace it
-     */
-    private static $immediate_write_enabled = true;
 
     /**
      * @var bool
@@ -281,13 +273,6 @@ class StringTagField extends DropdownField
         $name = $this->getName();
 
         $record->$name = $this->dataValue();
-
-        $immediate_write_enabled = Deprecation::withNoReplacement(function () {
-            return self::config()->get('immediate_write_enabled');
-        });
-        if ($immediate_write_enabled) {
-            $record->write();
-        }
     }
 
     /**
