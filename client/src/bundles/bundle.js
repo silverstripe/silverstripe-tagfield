@@ -1,2 +1,2 @@
-require('legacy/entwine/TagField');
-require('boot');
+import 'legacy/entwine/TagField';
+import 'boot';

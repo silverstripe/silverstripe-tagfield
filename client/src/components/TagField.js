@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
+import AsyncCreatableSelect from 'react-select/async-creatable';
+import CreatableSelect from 'react-select/creatable';
+import EmotionCssCacheProvider from 'containers/EmotionCssCacheProvider/EmotionCssCacheProvider';
+import i18n from 'i18n';
 import fetch from 'isomorphic-fetch';
 import fieldHolder from 'components/FieldHolder/FieldHolder';
 import url from 'url';
@@ -18,6 +23,7 @@ class TagField extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleOnBlur = this.handleOnBlur.bind(this);
+    this.isValidNewOption = this.isValidNewOption.bind(this);
     this.getOptions = this.getOptions.bind(this);
     this.fetchOptions = debounce(this.fetchOptions, 500);
   }
@@ -33,11 +39,11 @@ class TagField extends Component {
     const { lazyLoad, options } = this.props;
 
     if (!lazyLoad) {
-      return Promise.resolve({ options });
+      return Promise.resolve(options);
     }
 
     if (!input) {
-      return Promise.resolve({ options: [] });
+      return Promise.resolve([]);
     }
 
     return this.fetchOptions(input);
@@ -91,17 +97,62 @@ class TagField extends Component {
 
     return fetch(url.format(fetchURL), { credentials: 'same-origin' })
       .then((response) => response.json())
-      .then((json) => ({
-        options: json.items.map((item) => ({
+      .then((json) => json.items.map(
+        (item) => ({
           [labelKey]: item.Title,
           [valueKey]: item.Value,
           Selected: item.Selected,
-        })),
-      }));
+        })
+      ));
+  }
+
+  /**
+   * Check if a new option can be created based on a given input
+   * @param {string} inputValue
+   * @param {array|object} value
+   * @param {array} currentOptions
+   * @returns {boolean}
+   */
+  isValidNewOption(inputValue, value, currentOptions) {
+    const { valueKey } = this.props;
+
+    // Don't allow empty options
+    if (!inputValue) {
+      return false;
+    }
+
+    // Don't repeat the currently selected option
+    if (Array.isArray(value)) {
+      if (this.valueInOptions(inputValue, value, valueKey)) {
+        return false;
+      }
+    } else if (inputValue === value[valueKey]) {
+      return false;
+    }
+
+    // Don't repeat any existing option
+    return !this.valueInOptions(inputValue, currentOptions, valueKey);
+  }
+
+  /**
+   * Check if a value is in an array of options already
+   * @param {string} value
+   * @param {array} options
+   * @param {string} valueKey
+   * @returns {boolean}
+   */
+  valueInOptions(value, options, valueKey) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const item of options) {
+      if (value === item[valueKey]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   render() {
-    const { lazyLoad, options, creatable, ...passThroughAttributes } =
+    const { lazyLoad, options, creatable, multi, disabled, labelKey, valueKey, ...passThroughAttributes } =
       this.props;
 
     const optionAttributes = lazyLoad
@@ -110,11 +161,11 @@ class TagField extends Component {
 
     let SelectComponent = Select;
     if (lazyLoad && creatable) {
-      SelectComponent = Select.AsyncCreatable;
+      SelectComponent = AsyncCreatableSelect;
     } else if (lazyLoad) {
-      SelectComponent = Select.Async;
+      SelectComponent = AsyncSelect;
     } else if (creatable) {
-      SelectComponent = Select.Creatable;
+      SelectComponent = CreatableSelect;
     }
 
     // Update the value to passthrough with the kept state provided this component is not
@@ -124,7 +175,7 @@ class TagField extends Component {
     }
 
     // if this is a single select then we just need the first value
-    if (!passThroughAttributes.multi && passThroughAttributes.value) {
+    if (!multi && passThroughAttributes.value) {
       if (Object.keys(passThroughAttributes.value).length > 0) {
         const value =
           passThroughAttributes.value[
@@ -138,13 +189,22 @@ class TagField extends Component {
     }
 
     return (
-      <SelectComponent
-        {...passThroughAttributes}
-        onChange={this.handleChange}
-        onBlur={this.handleOnBlur}
-        inputProps={{ className: 'no-change-track' }}
-        {...optionAttributes}
-      />
+      <EmotionCssCacheProvider>
+        <SelectComponent
+          {...passThroughAttributes}
+          isMulti={multi}
+          isDisabled={disabled}
+          cacheOptions
+          onChange={this.handleChange}
+          {...optionAttributes}
+          getOptionLabel={(option) => option[labelKey]}
+          getOptionValue={(option) => option[valueKey]}
+          noOptionsMessage={({ inputValue }) => (inputValue ? i18n._t('TagField.NO_OPTIONS', 'No options') : i18n._t('TagField.TYPE_TO_SEARCH', 'Type to search'))}
+          isValidNewOption={this.isValidNewOption}
+          getNewOptionData={(inputValue, label) => ({ [labelKey]: label, [valueKey]: inputValue })}
+          classNamePrefix="ss-tag-field"
+        />
+      </EmotionCssCacheProvider>
     );
   }
 }

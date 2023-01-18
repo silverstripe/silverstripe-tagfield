@@ -5,9 +5,12 @@ jest.mock('isomorphic-fetch');
 
 import React from 'react';
 import Enzyme, { shallow } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-15.4';
+import Adapter from 'enzyme-adapter-react-16';
 import { Component as TagField } from '../TagField';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
+import AsyncCreatableSelect from 'react-select/async-creatable';
+import CreatableSelect from 'react-select/creatable';
 import fetch from 'isomorphic-fetch';
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -38,14 +41,14 @@ describe('TagField', () => {
       const wrapper = shallow(
         <TagField {...props} />
       );
-      expect(wrapper.find(Select.Creatable).length).toBe(1);
+      expect(wrapper.find(CreatableSelect).length).toBe(1);
     });
     it('Select.Async with lazyLoad option', () => {
       props.lazyLoad = true;
       const wrapper = shallow(
         <TagField {...props} />
       );
-      expect(wrapper.find(Select.Async).length).toBe(1);
+      expect(wrapper.find(AsyncSelect).length).toBe(1);
     });
     it('Select.AsyncCreatable with both creatable and lazyLoad options', () => {
       props.creatable = true;
@@ -53,7 +56,7 @@ describe('TagField', () => {
       const wrapper = shallow(
         <TagField {...props} />
       );
-      expect(wrapper.find(Select.AsyncCreatable).length).toBe(1);
+      expect(wrapper.find(AsyncCreatableSelect).length).toBe(1);
     });
   });
 
@@ -69,7 +72,7 @@ describe('TagField', () => {
       );
 
       fetch.mockImplementation(() => Promise.resolve({
-        json: () => ({}),
+        json: () => ({ items: [{ Title: 'item1', Value: 'item1' }] }),
       }));
     });
 
