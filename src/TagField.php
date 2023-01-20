@@ -63,7 +63,6 @@ class TagField extends MultiSelectField
      */
     protected $isMultiple = true;
 
-    /** @skipUpgrade */
     protected $schemaComponent = 'TagField';
 
     /**

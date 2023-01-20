@@ -1,4 +1,0 @@
-mappings:
-  StringTagField: SilverStripe\TagField\StringTagField
-  TagField: SilverStripe\TagField\TagField
-  TagField_Readonly: SilverStripe\TagField\TagField\Readonly

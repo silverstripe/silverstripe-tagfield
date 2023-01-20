@@ -66,7 +66,6 @@ class StringTagField extends DropdownField
      */
     protected $isMultiple = true;
 
-    /** @skipUpgrade */
     protected $schemaComponent = 'TagField';
 
     /**
