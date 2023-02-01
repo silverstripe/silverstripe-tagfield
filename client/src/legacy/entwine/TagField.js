@@ -1,10 +1,12 @@
 /* global window */
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { loadComponent } from 'lib/Injector';
 
 window.jQuery.entwine('ss', ($) => {
   $('.js-injector-boot .ss-tag-field.entwine').entwine({
+    ReactRoot: null,
+
     onmatch() {
       const cmsContent = this.closest('.cms-content').attr('id');
       const context = (cmsContent)
@@ -18,17 +20,25 @@ window.jQuery.entwine('ss', ($) => {
         }
       };
 
-      ReactDOM.render(
+      let root = this.getReactRoot();
+      if (!root) {
+        root = createRoot(this[0]);
+        this.setReactRoot(root);
+      }
+      root.render(
         <TagField
           noHolder
           {...dataSchema}
-        />,
-        this[0]
+        />
       );
     },
 
     onunmatch() {
-      ReactDOM.unmountComponentAtNode(this[0]);
+      const root = this.getReactRoot();
+      if (root) {
+        root.unmount();
+        this.setReactRoot(null);
+      }
     }
   });
 

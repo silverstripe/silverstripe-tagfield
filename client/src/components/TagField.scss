@@ -1,5 +1,110 @@
-@import "~react-select/scss/default";
-
-.ss-tag-field .Select--multi .Select-value {
+.ss-tag-field__multi-value {
   margin-top: 3px;
+}
+
+/* Styles below here are duplicates of the treedropdownfield styles in silverstripe/admin, but with the appropriate classnames for tagfield. */
+.ss-tag-field__control {
+  border-color: $gray-200;
+  box-shadow: none;
+}
+
+.ss-tag-field__control--is-focused {
+  border-color: $brand-primary;
+  box-shadow: none;
+}
+
+.ss-tag-field__option+.ss-tag-field__option {
+  border-top: 1px solid $border-color-light;
+}
+
+.ss-tag-field__option-button {
+  border: 1px solid $border-color-light;
+  border-radius: $border-radius;
+  background: $white;
+  // needed to override the width rule in .fill-width
+  width: auto !important; // sass-lint:disable-line no-important
+  max-width: 25%;
+  margin: -4px -5px -4px 5px;
+  padding: 4px 5px 4px 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: $gray-200;
+  }
+
+  .font-icon-right-open-big {
+    margin: 2px 0 0 -1px;
+    width: 24px;
+  }
+}
+
+.ss-tag-field__option-count-icon {
+  padding: 0 ($spacer / 2);
+  line-height: 0.8;
+}
+
+.ss-tag-field__option-context {
+  color: $gray-600;
+  font-size: $font-size-sm;
+}
+
+.ss-tag-field__option--is-focused {
+  background-color: $list-group-hover-bg;
+}
+
+.ss-tag-field__option--is-selected {
+  background: $link-color;
+  color: $white;
+
+  .ss-tag-field__option-button {
+    border-color: $brand-primary;
+    background: none;
+    color: $white;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+.ss-tag-field__option-title--highlighted {
+  font-weight: bold;
+}
+
+.ss-tag-field__indicator {
+  cursor: pointer;
+}
+
+.ss-tag-field__clear-indicator {
+  &:hover,
+  &:focus {
+    color: $brand-danger;
+  }
+}
+
+.ss-tag-field__dropdown-indicator {
+  &:hover,
+  &:focus {
+    color: $body-color-dark;
+  }
+}
+
+.ss-tag-field__multi-value {
+  color: $body-color;
+  background-color: $white;
+  border: 1px solid $input-focus-border-color;
+  border-radius: $border-radius;
+}
+
+.ss-tag-field__multi-value__remove {
+  font-size: $font-size-lg;
+  padding: 0 5px 2px;
+  border-left: 1px solid $input-focus-border-color;
+  border-radius: 0;
+
+  &:focus,
+  &:hover {
+    background-color: rgba(0, 113, 230, .08);
+    color: #0071e6;
+  }
 }

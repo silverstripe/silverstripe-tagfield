@@ -496,7 +496,7 @@ class TagField extends MultiSelectField
         }
 
         // Create new instance if not yet saved
-        if ($this->getCanCreate()) {
+        if ($this->getCanCreate() && $value) {
             $dataClass = $source->dataClass();
             $record = Injector::inst()->create($dataClass);
             $record->{$titleField} = $value;
