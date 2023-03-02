@@ -379,7 +379,7 @@ class StringTagField extends DropdownField
      */
     public function validate($validator)
     {
-        return true;
+        return $this->extendValidationResult(true, $validator);
     }
 
     /**
