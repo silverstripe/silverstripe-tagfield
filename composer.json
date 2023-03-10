@@ -20,8 +20,8 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
-        "silverstripe/framework": "4.13.x-dev",
-        "silverstripe/versioned": "1.13.x-dev"
+        "silverstripe/framework": "4.13.0-beta1",
+        "silverstripe/versioned": "1.13.0-beta1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
