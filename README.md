@@ -69,7 +69,6 @@ $field = TagField::create(
 **Note:** This assumes you have imported the namespaces class, e.g. use
 SilverStripe\TagField\TagField;
 
-
 #### Has-One Relations
 
 You can also use the TagField to select values for `has_one` relations.
