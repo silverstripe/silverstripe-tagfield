@@ -400,4 +400,11 @@ class StringTagField extends DropdownField
 
         return $this;
     }
+
+    public function performReadonlyTransformation()
+    {
+        $field = parent::performReadonlyTransformation();
+        $field->setValue(implode(', ', $this->Value()));
+        return $field;
+    }
 }
