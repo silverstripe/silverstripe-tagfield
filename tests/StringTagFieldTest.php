@@ -178,22 +178,26 @@ class StringTagFieldTest extends SapphireTest
         $this->assertNotEmpty($attributes['data-schema']);
     }
 
-    /**
-     * Ensure a source of tags matches the given string tag names
-     *
-     * @param array $expected
-     * @param DataList $actualSource
-     */
-    protected function compareTagLists(array $expected, DataList $actualSource)
+    public function testPerformReadonlyTransformation()
     {
-        $actual = array_keys($actualSource->map('ID', 'Title')->toArray());
-        sort($expected);
-        sort($actual);
+        $field = new StringTagField('Tags');
+        $field->setSource(['Test1', 'Test2', 'Test3']);
 
-        $this->assertEquals(
-            $expected,
-            $actual
-        );
+        // Ensure a single value can be rendered
+        $field->setValue(['Test2']);
+        $field_readonly = $field->performReadonlyTransformation();
+        $this->assertEquals('Test2', $field_readonly->Value());
+
+        // Ensure multiple valid values are rendered
+        $field->setValue(['Test1', 'Test2']);
+        $field_readonly = $field->performReadonlyTransformation();
+        $this->assertEquals('Test1, Test2', $field_readonly->Value());
+
+        // Ensure an value not in the source array is still rendered
+        // (because e.g. in history view it must have been a valid value when it was set)
+        $field->setValue(['Test', 'Test1']);
+        $field_readonly = $field->performReadonlyTransformation();
+        $this->assertEquals('Test, Test1', $field_readonly->Value());
     }
 
     /**
