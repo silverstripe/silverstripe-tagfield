@@ -45,7 +45,6 @@ class TagField extends Component {
     if (!input) {
       return Promise.resolve([]);
     }
-
     return this.fetchOptions(input);
   }
 
@@ -152,20 +151,32 @@ class TagField extends Component {
   }
 
   render() {
-    const { lazyLoad, options, creatable, multi, disabled, labelKey, valueKey, ...passThroughAttributes } =
-      this.props;
+    const {
+      lazyLoad,
+      options,
+      creatable,
+      multi,
+      disabled,
+      labelKey,
+      valueKey,
+      SelectComponent,
+      AsyncCreatableSelectComponent,
+      AsyncSelectComponent,
+      CreatableSelectComponent,
+      ...passThroughAttributes
+    } = this.props;
 
     const optionAttributes = lazyLoad
       ? { loadOptions: this.getOptions }
       : { options };
 
-    let SelectComponent = Select;
+    let DynamicSelect = SelectComponent;
     if (lazyLoad && creatable) {
-      SelectComponent = AsyncCreatableSelect;
+      DynamicSelect = AsyncCreatableSelectComponent;
     } else if (lazyLoad) {
-      SelectComponent = AsyncSelect;
+      DynamicSelect = AsyncSelectComponent;
     } else if (creatable) {
-      SelectComponent = CreatableSelect;
+      DynamicSelect = CreatableSelectComponent;
     }
 
     // Update the value to passthrough with the kept state provided this component is not
@@ -190,7 +201,7 @@ class TagField extends Component {
 
     return (
       <EmotionCssCacheProvider>
-        <SelectComponent
+        <DynamicSelect
           {...passThroughAttributes}
           isMulti={multi}
           isDisabled={disabled}
@@ -222,6 +233,10 @@ TagField.propTypes = {
   value: PropTypes.any,
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
+  SelectComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
+  AsyncCreatableSelectComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
+  AsyncSelectComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
+  CreatableSelectComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
 };
 
 TagField.defaultProps = {
@@ -231,6 +246,10 @@ TagField.defaultProps = {
   lazyLoad: false,
   creatable: false,
   multi: false,
+  SelectComponent: Select,
+  AsyncCreatableSelectComponent: AsyncCreatableSelect,
+  AsyncSelectComponent: AsyncSelect,
+  CreatableSelectComponent: CreatableSelect,
 };
 
 export { TagField as Component };
