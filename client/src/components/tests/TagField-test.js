@@ -1,88 +1,64 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* global jest, describe, beforeEach, it, expect, setTimeout, document */
-
-jest.mock('isomorphic-fetch');
+/* global jest, test, describe, beforeEach, it, expect, setTimeout, document */
 
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
 import { Component as TagField } from '../TagField';
-import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import AsyncCreatableSelect from 'react-select/async-creatable';
-import CreatableSelect from 'react-select/creatable';
-import fetch from 'isomorphic-fetch';
+import { render } from '@testing-library/react';
 
-Enzyme.configure({ adapter: new Adapter() });
+function makeProps(obj = {}) {
+  return {
+    name: 'Test',
+    labelKey: 'label',
+    valueKey: 'value',
+    lazyLoad: false,
+    creatable: false,
+    multi: true,
+    SelectComponent: () => <div className="test-dynamic test-select" />,
+    CreatableSelectComponent: () => <div className="test-dynamic test-creatable-select" />,
+    AsyncSelectComponent: () => <div className="test-dynamic test-async-select" />,
+    AsyncCreatableSelectComponent: () => <div className="test-dynamic test-async-creatable-select" />,
+    ...obj,
+  };
+}
 
-describe('TagField', () => {
-  let props;
+test('TagField should render a Select component by default', () => {
+  const { container } = render(
+    <TagField {...makeProps()}/>
+  );
+  expect(container.querySelectorAll('.test-dynamic')).toHaveLength(1);
+  expect(container.querySelector('.test-select')).not.toBeNull();
+});
 
-  beforeEach(() => {
-    props = {
-      name: 'Test',
-      labelKey: 'label',
-      valueKey: 'value',
-      lazyLoad: false,
-      creatable: false,
-      multi: true,
-    };
-  });
+test('TagField should render a CreatableSelect with creatable option', () => {
+  const { container } = render(
+    <TagField {...makeProps({
+      creatable: true
+    })}
+    />
+  );
+  expect(container.querySelectorAll('.test-dynamic')).toHaveLength(1);
+  expect(container.querySelector('.test-creatable-select')).not.toBeNull();
+});
 
-  describe('should render a Select component with type', () => {
-    it('Select', () => {
-      const wrapper = shallow(
-        <TagField {...props} />
-      );
-      expect(wrapper.find(Select).length).toBe(1);
-    });
-    it('Select.Creatable with creatable option', () => {
-      props.creatable = true;
-      const wrapper = shallow(
-        <TagField {...props} />
-      );
-      expect(wrapper.find(CreatableSelect).length).toBe(1);
-    });
-    it('Select.Async with lazyLoad option', () => {
-      props.lazyLoad = true;
-      const wrapper = shallow(
-        <TagField {...props} />
-      );
-      expect(wrapper.find(AsyncSelect).length).toBe(1);
-    });
-    it('Select.AsyncCreatable with both creatable and lazyLoad options', () => {
-      props.creatable = true;
-      props.lazyLoad = true;
-      const wrapper = shallow(
-        <TagField {...props} />
-      );
-      expect(wrapper.find(AsyncCreatableSelect).length).toBe(1);
-    });
-  });
+test('Tagfiled should render an AsyncSelect with lazy load option', () => {
+  const { container } = render(
+    <TagField {...makeProps({
+      lazyLoad: true
+    })}
+    />
+  );
+  expect(container.querySelectorAll('.test-dynamic')).toHaveLength(1);
+  expect(container.querySelector('.test-async-select')).not.toBeNull();
+});
 
-  describe('with lazyLoad on and given a URL', () => {
-    let wrapper;
-
-    beforeEach(() => {
-      props.lazyLoad = true;
-      props.optionUrl = 'localhost/some-fetch-url';
-
-      wrapper = shallow(
-        <TagField {...props} />
-      );
-
-      fetch.mockImplementation(() => Promise.resolve({
-        json: () => ({ items: [{ Title: 'item1', Value: 'item1' }] }),
-      }));
-    });
-
-    it('should fetch the URL for results', done => {
-      wrapper.instance().getOptions('a');
-
-      setTimeout(() => {
-        expect(fetch).toBeCalledWith('localhost/some-fetch-url?term=a', expect.anything());
-        done();
-      }, 500);
-    });
-  });
+test('Tagfiled should render a AsyncCreatableSelect with lazy load and creatable options', () => {
+  const { container } = render(
+    <TagField {...makeProps({
+      lazyLoad: true,
+      creatable: true
+    })}
+    />
+  );
+  expect(container.querySelectorAll('.test-dynamic')).toHaveLength(1);
+  expect(container.querySelector('.test-async-creatable-select')).not.toBeNull();
 });

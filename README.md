@@ -5,6 +5,12 @@
 
 Custom tag input field, for SilverStripe.
 
+## Installation
+
+```sh
+composer require silverstripe/tagfield
+```
+
 ## Overview
 
 ![Screenshot](docs/en/screenshot.png)
@@ -15,16 +21,6 @@ Supports autocompletion with lazy-loading.
 Note: The field is optimised for usage in the Silverstripe CMS UI.
 The form field class itself can be used outside of the CMS,
 but you'll need to build your own frontend to interpret the raw field data (`data-schema` attribute).
-
-## Requirements
-
-* Silverstripe 4.0
-
-## Installing
-
-```sh
-$ composer require silverstripe/tagfield
-```
 
 ## Using
 
