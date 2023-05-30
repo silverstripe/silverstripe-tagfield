@@ -1,14 +1,19 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { Component as TagField } from '../TagField';
+import TagField from 'components/TagField';
 
-storiesOf('TagField/TagField', module)
-  .addDecorator(storyFn => (
-    <div style={{ width: '250px' }} className="ss-tag-field">
-      {storyFn()}
-    </div>
-  ))
-  .add('Simple Example', () => (
+export default {
+    title: 'TagField/TagField',
+
+    decorators: [
+        (storyFn) => (
+            <div style={{ width: '250px' }} className="ss-tag-field">
+                {storyFn()}
+            </div>
+        ),
+    ],
+};
+
+export const SimpleExample = () => (
     <TagField
       name="test"
       options={[
@@ -19,8 +24,9 @@ storiesOf('TagField/TagField', module)
         { Title: 'Five', Value: 5 },
       ]}
     />
-  ))
-  .add('Multiple Selection', () => (
+);
+
+export const MultipleSelection = () => (
     <TagField
       name="test"
       multi
@@ -32,5 +38,4 @@ storiesOf('TagField/TagField', module)
         { Title: 'Five', Value: 5 },
       ]}
     />
-  ))
-;
+);
