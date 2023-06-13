@@ -1,41 +1,110 @@
 import React from 'react';
 import TagField from 'components/TagField';
+import { Title, Subtitle, Description, Primary, Controls, Stories } from '@storybook/blocks';
+
+const options = [
+  { Title: 'One', Value: 1 },
+  { Title: 'Two', Value: 2 },
+  { Title: 'Three', Value: 3 },
+  { Title: 'Four', Value: 4 },
+  { Title: 'Five', Value: 5 },
+];
 
 export default {
   title: 'TagField/TagField',
-
-  decorators: [
-    (storyFn) => (
-      <div style={{ width: '250px' }} className="ss-tag-field">
-        {storyFn()}
-      </div>
-    ),
-  ],
+  component: TagField,
+  decorators: [],
+  tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component: 'The Tag Field component.'
+      },
+      canvas: {
+        sourceState: 'shown',
+      },
+    }
+  },
+  argTypes: {
+    name: {
+      control: 'text',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: null },
+      },
+    },
+    options: {
+      description: 'List of tags options',
+      control: 'select',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    labelKey: {
+      control: 'text',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'Title' },
+      },
+    },
+    valueKey: {
+      control: 'text',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'Value' },
+      },
+    },
+    lazyLoad: {
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: false },
+      },
+    },
+    creatable: {
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: false },
+      },
+    },
+    multi: {
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: false },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: false },
+      },
+    },
+    optionUrl: {
+      control: 'text',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: null },
+      },
+    },
+  },
+  args: {
+    name: 'Test',
+    options
+  }
 };
 
-export const SimpleExample = () => (
+export const SimpleExample = (args) => (
   <TagField
-    name="test"
-    options={[
-      { Title: 'One', Value: 1 },
-      { Title: 'Two', Value: 2 },
-      { Title: 'Three', Value: 3 },
-      { Title: 'Four', Value: 4 },
-      { Title: 'Five', Value: 5 },
-    ]}
+    {...args}
   />
 );
 
-export const MultipleSelection = () => (
+export const MultipleSelection = (args) => (
   <TagField
-    name="test"
+    {...args}
     multi
-    options={[
-      { Title: 'One', Value: 1 },
-      { Title: 'Two', Value: 2 },
-      { Title: 'Three', Value: 3 },
-      { Title: 'Four', Value: 4 },
-      { Title: 'Five', Value: 5 },
-    ]}
   />
 );
