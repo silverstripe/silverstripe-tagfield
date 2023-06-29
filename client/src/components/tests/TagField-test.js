@@ -2,8 +2,8 @@
 /* global jest, test, describe, beforeEach, it, expect, setTimeout, document */
 
 import React from 'react';
-import { Component as TagField } from '../TagField';
 import { render } from '@testing-library/react';
+import { Component as TagField } from '../TagField';
 
 function makeProps(obj = {}) {
   return {

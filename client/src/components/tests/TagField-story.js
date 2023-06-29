@@ -1,6 +1,5 @@
 import React from 'react';
 import TagField from 'components/TagField';
-import { Title, Subtitle, Description, Primary, Controls, Stories } from '@storybook/blocks';
 
 const options = [
   { Title: 'One', Value: 1 },
