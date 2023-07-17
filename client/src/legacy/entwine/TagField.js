@@ -54,7 +54,7 @@ window.jQuery.entwine('ss', ($) => {
         // clone the object (so we don't modify the original),
         opts = $.extend({}, opts);
         // modify it,
-        opts.ignoreFieldSelector += ', .ss-tag-field .Select :input';
+        opts.ignoreFieldSelector += ', .ss-tag-field .no-change-track :input';
         // then set the clone as the value on this element
         // (so next call to this method gets this same clone)
         this.setChangeTrackerOptions(opts);
