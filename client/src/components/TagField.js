@@ -235,6 +235,7 @@ class TagField extends Component {
           isDisabled={disabled}
           cacheOptions
           onChange={this.handleChange}
+          onBlur={this.handleOnBlur}
           {...optionAttributes}
           getOptionLabel={(option) => option[labelKey]}
           getOptionValue={(option) => option[valueKey]}
