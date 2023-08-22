@@ -15,8 +15,16 @@ class TagField extends Component {
   constructor(props) {
     super(props);
 
+    this.selectComponentRef = React.createRef();
+
+    this.state = {
+      initalState: props.value ? props.value : [],
+      hasChanges: false,
+    };
+
     if (!this.isControlled()) {
       this.state = {
+        ...this.state,
         value: props.value,
       };
     }
@@ -26,6 +34,14 @@ class TagField extends Component {
     this.isValidNewOption = this.isValidNewOption.bind(this);
     this.getOptions = this.getOptions.bind(this);
     this.fetchOptions = debounce(this.fetchOptions, 500);
+  }
+
+  componentDidUpdate(previousProps, previousState) {
+    if (previousState.hasChanges !== this.state.hasChanges) {
+      const element = this.selectComponentRef.current.inputRef;
+      const event = new Event('change', { bubbles: true });
+      element.dispatchEvent(event);
+    }
   }
 
   /**
@@ -55,6 +71,16 @@ class TagField extends Component {
    * @param {string} value
    */
   handleChange(value) {
+    this.setState({
+      hasChanges: false
+    });
+
+    if (JSON.stringify(this.state.initalState) !== JSON.stringify(value)) {
+      this.setState({
+        hasChanges: true
+      });
+    }
+
     if (this.isControlled()) {
       this.props.onChange(value);
       return;
@@ -199,6 +225,8 @@ class TagField extends Component {
       }
     }
 
+    const changedClassName = this.state.hasChanges ? '' : 'no-change-track';
+
     return (
       <EmotionCssCacheProvider>
         <DynamicSelect
@@ -207,6 +235,7 @@ class TagField extends Component {
           isDisabled={disabled}
           cacheOptions
           onChange={this.handleChange}
+          onBlur={this.handleOnBlur}
           {...optionAttributes}
           getOptionLabel={(option) => option[labelKey]}
           getOptionValue={(option) => option[valueKey]}
@@ -214,6 +243,8 @@ class TagField extends Component {
           isValidNewOption={this.isValidNewOption}
           getNewOptionData={(inputValue, label) => ({ [labelKey]: label, [valueKey]: inputValue })}
           classNamePrefix="ss-tag-field"
+          className={changedClassName}
+          ref={this.selectComponentRef}
         />
       </EmotionCssCacheProvider>
     );
