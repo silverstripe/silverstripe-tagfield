@@ -10,8 +10,16 @@ class TagField extends Component {
   constructor(props) {
     super(props);
 
+    this.selectComponentRef = React.createRef();
+
+    this.state = {
+      initalState: props.value ? props.value : [],
+      hasChanges: false,
+    };
+
     if (!this.isControlled()) {
       this.state = {
+        ...this.state,
         value: props.value,
       };
     }
@@ -20,6 +28,14 @@ class TagField extends Component {
     this.handleOnBlur = this.handleOnBlur.bind(this);
     this.getOptions = this.getOptions.bind(this);
     this.fetchOptions = debounce(this.fetchOptions, 500);
+  }
+
+  componentDidUpdate(previousProps, previousState) {
+    if (previousState.hasChanges !== this.state.hasChanges) {
+      const element = this.selectComponentRef.current.select.wrapper;
+      const event = new Event('change', { bubbles: true });
+      element.dispatchEvent(event);
+    }
   }
 
   /**
@@ -50,6 +66,16 @@ class TagField extends Component {
    * @param {string} value
    */
   handleChange(value) {
+    this.setState({
+      hasChanges: false
+    });
+
+    if (JSON.stringify(this.state.initalState) !== JSON.stringify(value)) {
+      this.setState({
+        hasChanges: true
+      });
+    }
+    
     if (this.isControlled()) {
       this.props.onChange(value);
       return;
@@ -137,13 +163,16 @@ class TagField extends Component {
       }
     }
 
+    const changedClassName = this.state.hasChanges ? '' : 'no-change-track';
+
     return (
       <SelectComponent
         {...passThroughAttributes}
         onChange={this.handleChange}
         onBlur={this.handleOnBlur}
-        inputProps={{ className: 'no-change-track' }}
         {...optionAttributes}
+        className={changedClassName}
+        ref={this.selectComponentRef}
       />
     );
   }
