@@ -10,7 +10,11 @@ class TagField extends Component {
   constructor(props) {
     super(props);
 
-    this.selectComponentRef = React.createRef();
+    this.selectComponentRef = null;
+
+    this.setSelectComponentRef = ref => {
+      this.selectComponentRef = ref;
+    };
 
     this.state = {
       initalState: props.value ? props.value : [],
@@ -75,7 +79,7 @@ class TagField extends Component {
         hasChanges: true
       });
     }
-    
+
     if (this.isControlled()) {
       this.props.onChange(value);
       return;
@@ -172,7 +176,7 @@ class TagField extends Component {
         onBlur={this.handleOnBlur}
         {...optionAttributes}
         className={changedClassName}
-        ref={this.selectComponentRef}
+        ref={this.setSelectComponentRef}
       />
     );
   }
