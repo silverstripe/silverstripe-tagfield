@@ -36,7 +36,7 @@ class TagField extends Component {
 
   componentDidUpdate(previousProps, previousState) {
     if (previousState.hasChanges !== this.state.hasChanges) {
-      const element = this.selectComponentRef.current.select.wrapper;
+      const element = this.selectComponentRef.select.wrapper;
       const event = new Event('change', { bubbles: true });
       element.dispatchEvent(event);
     }
