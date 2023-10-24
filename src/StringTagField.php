@@ -366,7 +366,7 @@ class StringTagField extends DropdownField
                 ];
             }
         }
-        // @todo do we actually need lazy loading limits for StringTagField?
+
         return array_slice(array_values($items ?? []), 0, $this->getLazyLoadItemLimit());
     }
 
