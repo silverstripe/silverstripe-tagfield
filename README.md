@@ -121,7 +121,7 @@ $field = StringTagField::create(
     'Tags',
     'Tags',
     ['one', 'two'],
-    explode(',', $this->Tags)
+    explode(',', $this->Tags ?: '')
 );
 
 $field->setShouldLazyLoad(true); // tags should be lazy loaded
