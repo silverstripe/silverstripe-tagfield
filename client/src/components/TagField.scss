@@ -110,5 +110,7 @@
 }
 
 .ss-tag-field__menu {
+  // Prevents the dropdown from hiding behind TinyMCE
+  // see https://github.com/JedWatson/react-select/issues/5329
   z-index: 10;
 }
