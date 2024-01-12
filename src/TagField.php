@@ -257,7 +257,7 @@ class TagField extends MultiSelectField
     }
 
     /**
-     * @return ArrayList
+     * @return ArrayList<ArrayData>
      */
     protected function getOptions($onlySelected = false)
     {
@@ -582,7 +582,6 @@ class TagField extends MultiSelectField
      */
     public function performReadonlyTransformation()
     {
-        /** @var ReadonlyTagField $copy */
         $copy = $this->castedCopy(ReadonlyTagField::class);
         $copy->setSourceList($this->getSourceList());
         $copy->setTitleField($this->getTitleField());
