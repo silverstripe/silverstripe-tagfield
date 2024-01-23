@@ -219,7 +219,7 @@ class StringTagField extends DropdownField
     }
 
     /**
-     * @return ArrayList
+     * @return ArrayList<ArrayData>
      */
     protected function getOptions()
     {
@@ -356,7 +356,6 @@ class StringTagField extends DropdownField
     {
         $items = [];
         foreach ($this->getOptions() as $i => $tag) {
-            /** @var ArrayData $tag */
             $tagValue = $tag->Value;
             // Map into a distinct list (prevent duplicates)
             if (stripos($tagValue ?? '', $term ?? '') !== false && !array_key_exists($tagValue, $items ?? [])) {
