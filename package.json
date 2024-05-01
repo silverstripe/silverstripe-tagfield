@@ -22,10 +22,10 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lock": "npm-shrinkwrap --dev",
-    "lint": "eslint client/src && sass-lint client/src",
+    "lint": "eslint client/src && yarn lint-sass",
     "lint-js": "eslint client/src",
     "lint-js-fix": "eslint client/src --fix",
-    "lint-sass": "sass-lint client/src"
+    "lint-sass": "stylelint client/src"
   },
   "dependencies": {
     "classnames": "^2.3.2",
@@ -38,8 +38,8 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
-    "@silverstripe/eslint-config": "^1.1.0",
-    "@silverstripe/webpack-config": "^2.0.0",
+    "@silverstripe/eslint-config": "^1.2.1",
+    "@silverstripe/webpack-config": "^2.1.0",
     "@testing-library/react": "^14.0.0",
     "babel-jest": "^29.2.2",
     "copy-webpack-plugin": "^11.0.0",
