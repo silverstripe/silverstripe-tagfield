@@ -195,7 +195,7 @@ class TagField extends MultiSelectField
      * Set the model class name for tags
      *
      * @param DataList $sourceList
-     * @return self
+     * @return TagField
      */
     public function setSourceList($sourceList)
     {
@@ -210,7 +210,7 @@ class TagField extends MultiSelectField
     {
         $this->addExtraClass('entwine');
 
-        return $this->customise($properties)->renderWith(self::class);
+        return $this->customise($properties)->renderWith(TagField::class);
     }
 
     /**
@@ -618,9 +618,9 @@ class TagField extends MultiSelectField
     public function getSchemaDataType(): string
     {
         if ($this->getIsMultiple()) {
-            return self::SCHEMA_DATA_TYPE_MULTISELECT;
+            return TagField::SCHEMA_DATA_TYPE_MULTISELECT;
         }
 
-        return self::SCHEMA_DATA_TYPE_SINGLESELECT;
+        return TagField::SCHEMA_DATA_TYPE_SINGLESELECT;
     }
 }
