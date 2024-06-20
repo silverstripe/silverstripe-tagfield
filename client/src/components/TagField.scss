@@ -1,5 +1,22 @@
 .ss-tag-field__multi-value {
   margin-top: 3px;
+  color: $body-color;
+  background-color: $white;
+  border: 1px solid $input-focus-border-color;
+  border-radius: $border-radius;
+}
+
+.ss-tag-field__multi-value__remove {
+  font-size: $font-size-lg;
+  padding: 0 5px 2px;
+  border-left: 1px solid $input-focus-border-color;
+  border-radius: 0;
+
+  &:focus,
+  &:hover {
+    background-color: rgba(0, 113, 230, .08);
+    color: #0071e6;
+  }
 }
 
 /* Styles below here are duplicates of the treedropdownfield styles in silverstripe/admin, but with the appropriate classnames for tagfield. */
@@ -22,7 +39,7 @@
   border-radius: $border-radius;
   background: $white;
   // needed to override the width rule in .fill-width
-  width: auto !important; // sass-lint:disable-line no-important
+  width: auto !important;
   max-width: 25%;
   margin: -4px -5px -4px 5px;
   padding: 4px 5px 4px 4px;
@@ -86,26 +103,6 @@
   &:hover,
   &:focus {
     color: $body-color-dark;
-  }
-}
-
-.ss-tag-field__multi-value {
-  color: $body-color;
-  background-color: $white;
-  border: 1px solid $input-focus-border-color;
-  border-radius: $border-radius;
-}
-
-.ss-tag-field__multi-value__remove {
-  font-size: $font-size-lg;
-  padding: 0 5px 2px;
-  border-left: 1px solid $input-focus-border-color;
-  border-radius: 0;
-
-  &:focus,
-  &:hover {
-    background-color: rgba(0, 113, 230, .08);
-    color: #0071e6;
   }
 }
 
