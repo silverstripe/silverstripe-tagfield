@@ -6,4 +6,4 @@ To install this module, [download and install Composer](https://getcomposer.org/
 $ composer require silverstripe/tagfield
 ```
 
-Then run `/dev/build`, from either the command line or the browser. You'll then be able to use this field in your application.
+Then run `sake db:build --flush`, from the command line or visit `/dev/build?flush` in the browser. You'll then be able to use this field in your application.
