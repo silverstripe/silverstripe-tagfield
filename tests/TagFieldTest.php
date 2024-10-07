@@ -408,6 +408,22 @@ class TagFieldTest extends SapphireTest
         $field->setTitleField('Name');
         $readOnlyField = $field->performReadonlyTransformation();
         $this->assertEquals('Name', $readOnlyField->getTitleField());
+
+        // Also check Field options
+        $field = new TagField('Tags', '', TagFieldTestBlogTag::get());
+        $field->setTitleField('Title');
+        $field->setValue(['Tag1']);
+
+        // When not read only (and not lazy-loading) all source options are returned
+        $htmlText = $field->Field();
+        $this->assertStringContainsString('Tag1', $htmlText);
+        $this->assertStringContainsString('222', $htmlText);
+
+        // When read only mode, only selected options are returned
+        $readOnlyField = $field->performReadonlyTransformation();
+        $htmlText = $readOnlyField->Field();
+        $this->assertStringContainsString('Tag1', $htmlText);
+        $this->assertStringNotContainsString('222', $htmlText);
     }
 
     public function testItDisplaysWithSelectedValuesFromDataList()

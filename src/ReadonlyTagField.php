@@ -27,7 +27,8 @@ class ReadonlyTagField extends TagField
     {
         $options = array();
 
-        foreach ($this->getOptions()->filter('Selected', true) as $option) {
+        // only get the selected options
+        foreach ($this->getOptions(true) as $option) {
             $options[] = $option->Title;
         }
 
