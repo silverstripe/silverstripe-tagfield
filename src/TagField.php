@@ -11,7 +11,6 @@ use SilverStripe\Forms\MultiSelectField;
 use SilverStripe\Model\List\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\FieldType\DBMultiEnum;
 use SilverStripe\ORM\Relation;
 use SilverStripe\Model\List\SS_List;
@@ -369,11 +368,6 @@ class TagField extends MultiSelectField
         return $this;
     }
 
-
-    /**
-     * @param DataObject|DataObjectInterface $record DataObject to save data into
-     * @throws Exception
-     */
     public function getAttributes()
     {
         $name = $this->getName();
@@ -421,7 +415,7 @@ class TagField extends MultiSelectField
     /**
      * {@inheritdoc}
      */
-    public function saveInto(DataObjectInterface $record)
+    public function saveInto(DataObject $record)
     {
         $name = $this->getName();
         $values = $this->getValueArray();

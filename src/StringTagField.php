@@ -9,7 +9,6 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Model\List\ArrayList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\Model\List\SS_List;
 use SilverStripe\Model\ArrayData;
 use SilverStripe\View\Requirements;
@@ -258,7 +257,7 @@ class StringTagField extends DropdownField
         return parent::setValue(array_filter($value ?? []));
     }
 
-    public function saveInto(DataObjectInterface $record)
+    public function saveInto(DataObject $record)
     {
         parent::saveInto($record);
 
