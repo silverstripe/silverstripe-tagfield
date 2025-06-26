@@ -358,7 +358,7 @@ class TagFieldTest extends SapphireTest
         /**
          * @var TagFieldTestBlogPost $record
          */
-        $record = DataObject::get_by_id(TagFieldTestBlogPost::class, $record->ID);
+        $record = TagFieldTestBlogPost::get()->byID($record->ID);
 
         $this->compareExpectedAndActualTags(
             ['Tag1'],
