@@ -13,7 +13,7 @@ composer require silverstripe/tagfield
 
 ## Overview
 
-![Screenshot](docs/en/screenshot.png)
+![Screenshot](docs/en/_images/screenshot.png)
 
 Allows storing tags as a relationship, or comma-delimited strings.
 Supports autocompletion with lazy-loading.
@@ -127,7 +127,7 @@ $field = StringTagField::create(
 $field->setShouldLazyLoad(true); // tags should be lazy loaded
 ```
 
-You can find more in-depth documentation in [docs/en](docs/en/introduction.md).
+You can find more in-depth documentation in the [documentation](https://docs.silverstripe.org/en/optional_features/tagfield).
 
 ## Using TagField with silverstripe-taxonomy
 
