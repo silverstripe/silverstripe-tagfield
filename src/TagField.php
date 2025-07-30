@@ -319,7 +319,7 @@ class TagField extends MultiSelectField
             $options->push(ArrayData::create([
                 'Title' => $option,
                 'Value' => $option,
-                'Selected' => (bool) $values->find($titleField, $option)
+                'Selected' => $values->filter($titleField, $option)->exists()
             ]));
         };
 
