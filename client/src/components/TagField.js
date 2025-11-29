@@ -183,6 +183,7 @@ class TagField extends Component {
       creatable,
       multi,
       disabled,
+      clearable,
       labelKey,
       valueKey,
       SelectComponent,
@@ -233,6 +234,7 @@ class TagField extends Component {
           {...passThroughAttributes}
           isMulti={multi}
           isDisabled={disabled}
+          isClearable={clearable}
           cacheOptions
           onChange={this.handleChange}
           onBlur={this.handleOnBlur}
@@ -259,6 +261,7 @@ TagField.propTypes = {
   creatable: PropTypes.bool,
   multi: PropTypes.bool,
   disabled: PropTypes.bool,
+  clearable: PropTypes.bool,
   options: PropTypes.arrayOf(PropTypes.object),
   optionUrl: PropTypes.string,
   value: PropTypes.any,
@@ -277,6 +280,7 @@ TagField.defaultProps = {
   lazyLoad: false,
   creatable: false,
   multi: false,
+  clearable: true,
   SelectComponent: Select,
   AsyncCreatableSelectComponent: AsyncCreatableSelect,
   AsyncSelectComponent: AsyncSelect,
