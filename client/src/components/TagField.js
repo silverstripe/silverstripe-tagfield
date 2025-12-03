@@ -17,6 +17,7 @@ const TagField = ({
   creatable = false,
   multi = false,
   disabled = false,
+  clearable = true,
   labelKey = 'Title',
   valueKey = 'Value',
   SelectComponent = Select,
@@ -203,6 +204,7 @@ const TagField = ({
         {...passThroughAttributes}
         isMulti={multi}
         isDisabled={disabled}
+        isClearable={clearable}
         cacheOptions
         onChange={handleChange}
         onBlur={handleOnBlur}
@@ -228,6 +230,7 @@ TagField.propTypes = {
   creatable: PropTypes.bool,
   multi: PropTypes.bool,
   disabled: PropTypes.bool,
+  clearable: PropTypes.bool,
   options: PropTypes.arrayOf(PropTypes.object),
   optionUrl: PropTypes.string,
   value: PropTypes.any,

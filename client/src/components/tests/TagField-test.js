@@ -5,7 +5,7 @@ import React, { forwardRef, useImperativeHandle } from 'react';
 import { render } from '@testing-library/react';
 import { Component as TagField } from '../TagField';
 
-const MockSelect = forwardRef(({ className, onChange, onBlur, isMulti, isDisabled, value, options }, ref) => {
+const MockSelect = forwardRef(({ className, onChange, onBlur, isMulti, isDisabled, value, options, isClearable }, ref) => {
   useImperativeHandle(ref, () => ({
     inputRef: document.createElement('input'),
   }));
@@ -20,11 +20,12 @@ const MockSelect = forwardRef(({ className, onChange, onBlur, isMulti, isDisable
       data-has-on-blur={String(typeof onBlur === 'function')}
       data-has-value={String(hasValue)}
       data-has-options={String(!!options)}
+      data-is-clearable={String(isClearable)}
     />
   );
 });
 
-const MockCreatableSelect = forwardRef(({ className, onChange, isMulti, isDisabled, isValidNewOption, getNewOptionData }, ref) => {
+const MockCreatableSelect = forwardRef(({ className, onChange, isMulti, isDisabled, isValidNewOption, getNewOptionData, isClearable }, ref) => {
   useImperativeHandle(ref, () => ({
     inputRef: document.createElement('input'),
   }));
@@ -37,11 +38,12 @@ const MockCreatableSelect = forwardRef(({ className, onChange, isMulti, isDisabl
       data-has-on-change={String(typeof onChange === 'function')}
       data-has-is-valid-new-option={String(typeof isValidNewOption === 'function')}
       data-has-get-new-option-data={String(typeof getNewOptionData === 'function')}
+      data-is-clearable={String(isClearable)}
     />
   );
 });
 
-const MockAsyncSelect = forwardRef(({ className, isMulti, isDisabled, loadOptions }, ref) => {
+const MockAsyncSelect = forwardRef(({ className, isMulti, isDisabled, loadOptions, isClearable }, ref) => {
   useImperativeHandle(ref, () => ({
     inputRef: document.createElement('input'),
   }));
@@ -52,11 +54,12 @@ const MockAsyncSelect = forwardRef(({ className, isMulti, isDisabled, loadOption
       data-is-multi={String(isMulti)}
       data-is-disabled={String(isDisabled)}
       data-has-load-options={String(typeof loadOptions === 'function')}
+      data-is-clearable={String(isClearable)}
     />
   );
 });
 
-const MockAsyncCreatableSelect = forwardRef(({ className, isMulti, isDisabled, loadOptions, isValidNewOption }, ref) => {
+const MockAsyncCreatableSelect = forwardRef(({ className, isMulti, isDisabled, loadOptions, isValidNewOption, isClearable }, ref) => {
   useImperativeHandle(ref, () => ({
     inputRef: document.createElement('input'),
   }));
@@ -68,6 +71,7 @@ const MockAsyncCreatableSelect = forwardRef(({ className, isMulti, isDisabled, l
       data-is-disabled={String(isDisabled)}
       data-has-load-options={String(typeof loadOptions === 'function')}
       data-has-is-valid-new-option={String(typeof isValidNewOption === 'function')}
+      data-is-clearable={String(isClearable)}
     />
   );
 });
@@ -335,4 +339,117 @@ test('TagField should distinguish between controlled and uncontrolled modes', ()
     <TagField {...makeProps()} />
   );
   expect(uncontrolledContainer.querySelector('[data-testid="select-component"]')).not.toBeNull();
+});
+
+test('TagField passes isClearable=true when in multi mode with clearable=true', () => {
+  const { container } = render(
+    <TagField {...makeProps({
+      multi: true,
+      clearable: true,
+    })}
+    />
+  );
+  const selectElement = container.querySelector('.test-select');
+  expect(selectElement).not.toBeNull();
+  expect(selectElement.getAttribute('data-is-clearable')).toBe('true');
+});
+
+test('TagField passes isClearable=false when in multi mode with clearable=false', () => {
+  const { container } = render(
+    <TagField {...makeProps({
+      multi: true,
+      clearable: false,
+    })}
+    />
+  );
+  const selectElement = container.querySelector('.test-select');
+  expect(selectElement).not.toBeNull();
+  expect(selectElement.getAttribute('data-is-clearable')).toBe('false');
+});
+
+test('TagField passes isClearable=true when in non-multi mode with clearable=true', () => {
+  const { container } = render(
+    <TagField {...makeProps({
+      multi: false,
+      clearable: true,
+    })}
+    />
+  );
+  const selectElement = container.querySelector('.test-select');
+  expect(selectElement).not.toBeNull();
+  expect(selectElement.getAttribute('data-is-clearable')).toBe('true');
+});
+
+test('TagField passes isClearable=false when in non-multi mode with clearable=false', () => {
+  const { container } = render(
+    <TagField {...makeProps({
+      multi: false,
+      clearable: false,
+    })}
+    />
+  );
+  const selectElement = container.querySelector('.test-select');
+  expect(selectElement).not.toBeNull();
+  expect(selectElement.getAttribute('data-is-clearable')).toBe('false');
+});
+
+test('TagField in non-multi mode shows clear button when clearable=true', () => {
+  const onChange = jest.fn();
+  const testValue = { label: 'Test Option', value: 'test-value' };
+  const { container } = render(
+    <TagField {...makeProps({
+      multi: false,
+      clearable: true,
+      value: testValue,
+      onChange,
+    })}
+    />
+  );
+  const selectElement = container.querySelector('.test-select');
+  expect(selectElement).not.toBeNull();
+  expect(selectElement.getAttribute('data-is-clearable')).toBe('true');
+});
+
+test('TagField in multi mode shows clear button when clearable=true', () => {
+  const testValues = [
+    { label: 'Option 1', value: 'value-1' },
+    { label: 'Option 2', value: 'value-2' }
+  ];
+  const { container } = render(
+    <TagField {...makeProps({
+      multi: true,
+      clearable: true,
+      value: testValues,
+    })}
+    />
+  );
+  const selectElement = container.querySelector('.test-select');
+  expect(selectElement).not.toBeNull();
+  expect(selectElement.getAttribute('data-is-clearable')).toBe('true');
+});
+
+test('TagField with value and onChange behaves as controlled component', () => {
+  const onChange = jest.fn();
+  const testValue = { label: 'Test', value: 'test' };
+  const { rerender } = render(
+    <TagField {...makeProps({
+      multi: false,
+      clearable: true,
+      value: testValue,
+      onChange,
+    })}
+    />
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  const newValue = { label: 'New', value: 'new' };
+  rerender(
+    <TagField {...makeProps({
+      multi: false,
+      clearable: true,
+      value: newValue,
+      onChange,
+    })}
+    />
+  );
+  expect(onChange).not.toHaveBeenCalled();
 });
