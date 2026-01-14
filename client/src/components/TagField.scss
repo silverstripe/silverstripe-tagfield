@@ -26,8 +26,16 @@
 }
 
 .ss-tag-field__control--is-focused {
-  border-color: $brand-primary;
+  border-color: transparent;
   box-shadow: none;
+  outline-offset: var(--focus-outline-offset);
+  // We have to use !important here to override react-select styles, which also use !important
+  outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color) !important;
+
+  // this is required to override default react-select style
+  &:hover {
+    border-color: transparent;
+  }
 }
 
 .ss-tag-field__option+.ss-tag-field__option {
